@@ -1,4 +1,4 @@
-require('dotenv').config({path: __dirname + '/process.env'})
+require("dotenv").config({path: __dirname + "/process.env"})
 const database = require("./database");
 database.connect();
 const user = require("./Controllers/users");

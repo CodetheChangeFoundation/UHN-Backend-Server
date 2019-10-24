@@ -1,4 +1,4 @@
-require('dotenv').config({path: __dirname + '/process.env'})
+require("dotenv").config({path: __dirname + "/process.env"})
 database = require("../database");
 var db = database.getdb();
 let jwt = require("jsonwebtoken");
@@ -15,27 +15,27 @@ async function loginUser(req,res){
 
   try {
     console.log({username:data.username,password:data.password});
-    const result = await db.collection('details').findOne({username: data.username, password: data.password});
+    const result = await db.collection("details").findOne({username: data.username, password: data.password});
 
     if (result){
       let token = jwt.sign({username: data.username},
         process.env.SECRET,
         {
-          expiresIn: '24h'
+          expiresIn: "24h"
         }
       );
 
     res.status(200).json({
       success: true,
-      message: 'Authentication successful!',
+      message: "Authentication successful!",
       token: token,
       id: result._id
       })
-    console.log("Successful login.");
+    console.log("Successful login");
     }
 
   else{
-    res.status(404).send("Failed login");
+    res.status(401).send("Unauthorized");
     }
   }
   catch (err){
@@ -60,20 +60,20 @@ function signupUser(req,res){
       "phone":phone
       }
 
-    db.collection('details').insertOne(data,function(err, collection){
+    db.collection("details").insertOne(data,function(err, collection){
       if (err) throw err;
       console.log("Record inserted Successfully");
-      res.status(200).send("Successful signup");
+      res.status(200).json({"name": name, "username":username, "email":email, "phone":phone});
     });
 }
 
 async function userInfo(req,res){
-  const result = await db.collection('details').findOne({username: req.decoded.username});
+  const result = await db.collection("details").findOne({username: req.decoded.username});
   if(req.params.id==result._id){
       res.status(200).send(result);
   }
   else{
-    res.status(400).send("Access not allowed.");
+    res.status(404).send("User ID not found");
   }
 
 
