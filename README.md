@@ -3,13 +3,14 @@ University Health Network API Endpoint Backend Server
 
 ## Setup
 
-Run
-```(bash)
-$ npm install
-```
-Create a file named ".env" in project directory with SECRET and PORT
+1. Install Node.js through online browser
+2. Install MongoDB through online browser, specifically the MongoDB Community Server
 
-Run
-```(bash)
-$ node server.js
-```
+Starting the MongoDB Server
+1. Open command prompt from start on local PC (assuming windows setup)
+2. Type "cd ..." and replace "..." with the bin folder directory within where mongoDB is installed
+3. Run "mongo.exe"
+
+Starting the Express server
+1. Open command prompt from start on local PC (assuming windows setup)
+2. Type "cd ..." and replace "..." with the dire
