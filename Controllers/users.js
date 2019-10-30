@@ -3,6 +3,7 @@ database = require("../database");
 var db = database.getdb();
 let jwt = require("jsonwebtoken");
 let middleware = require("../middleware");
+var bcrypt = require('bcrypt');
 
 async function loginUser(req,res){
   var username = req.body.username;
@@ -15,9 +16,16 @@ async function loginUser(req,res){
 
   try {
     console.log({username:data.username,password:data.password});
-    const result = await db.collection("details").findOne({username: data.username, password: data.password});
+    var result = await db.collection("details").findOne({username: data.username});
+  }
+    catch (err){
+      console.log(err);
+      res.status(404).send("Failed retrieve");
+  };
 
-    if (result){
+  try{
+    const match = await bcrypt.compare(result.password,password);
+    if(match){
       let token = jwt.sign({username: data.username},
         process.env.SECRET,
         {
@@ -31,21 +39,21 @@ async function loginUser(req,res){
       token: token,
       id: result._id
       })
-    console.log("Successful login");
+      console.log("Successful login");
     }
 
-  else{
-    res.status(401).send("Unauthorized");
+    else{
+      res.status(401).send("Unauthorized");
     }
   }
-  catch (err){
-    console.log(err);
-    res.status(404).send("Failed retrieve");
-  };
+
+  catch{
+    console.log("Failed compare");
+  }
 }
 
 
-function signupUser(req,res){
+async function signupUser(req,res){
     var name = req.body.name;
     var username = req.body.username;
     var email =req.body.email;
