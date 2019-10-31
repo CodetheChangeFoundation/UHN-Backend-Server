@@ -1,18 +1,27 @@
-require("dotenv").config()
-
+require("dotenv").config();
+const database = require("./database");
+database.connect();
+const user = require("./Controllers/users");
 var express = require("express");
 var bodyParser = require("body-parser");
+let jwt = require("jsonwebtoken");
+let middleware = require("./middleware");
+const port = process.env.PORT || 3000;
 
-var app = express();
-var port = process.env.PORT;
-
+const app = express()
+app.use(express.static(__dirname + "/../public"));
 app.use(bodyParser.json());
-app.use(
-  bodyParser.urlencoded({
-    extended: true
-  })
-);
+app.use(express.static("public"));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
-app.get('/', (req, res) => res.send('Hello World!'))
+app.post("/signup", user.signupUser);
+app.post("/login", user.loginUser);
+app.get("/users/:id", middleware.checkToken, user.userInfo);
 
-app.listen(port, () => console.log(`UHN Backend Server listening on port ${port}!`))
+app.listen(port, function () {
+  console.log(`Server is running on port ${port}`);
+});
+
+export default app;
