@@ -1,92 +1,85 @@
-require("dotenv").config({path: __dirname + "/process.env"})
-database = require("../database");
+require("dotenv").config();
+var database = require("../database");
 var db = database.getdb();
 let jwt = require("jsonwebtoken");
-let middleware = require("../middleware");
-var bcrypt = require('bcrypt');
+var ObjectId = require('mongodb').ObjectId; 
 
-async function loginUser(req,res){
+async function loginUser(req, res) {
   var username = req.body.username;
   var password = req.body.password;
 
   var data = {
-      "username": username,
-      "password":password,
+    "username": username,
+    "password": password,
   }
 
   try {
-    console.log({username:data.username,password:data.password});
-    var result = await db.collection("details").findOne({username: data.username});
+    console.log({ username: data.username, password: data.password });
+    var result = await db.collection("users").findOne({ username: data.username });
   }
-    catch (err){
-      console.log(err);
-      res.status(404).send("Failed retrieve");
+  catch (err) {
+    console.log(err);
+    res.status(404).send("Failed retrieve");
   };
 
-  try{
-    const match = await bcrypt.compare(result.password,password);
-    if(match){
-      let token = jwt.sign({username: data.username},
+  try {
+    if (password === result.password) {
+      let token = jwt.sign({ username: data.username },
         process.env.SECRET,
         {
           expiresIn: "24h"
         }
       );
 
-    res.status(200).json({
-      success: true,
-      message: "Authentication successful!",
-      token: token,
-      id: result._id
+      res.status(200).json({
+        success: true,
+        message: "Authentication successful!",
+        token: token,
+        id: result._id
       })
       console.log("Successful login");
-    }
-
-    else{
+    } else {
       res.status(401).send("Unauthorized");
     }
-  }
-
-  catch{
+  } catch (err) {
     console.log("Failed compare");
   }
 }
 
 
-async function signupUser(req,res){
-    var name = req.body.name;
-    var username = req.body.username;
-    var email =req.body.email;
-    var pass = req.body.password;
-    var phone =req.body.phone;
+async function signupUser(req, res) {
+  var username = req.body.username;
+  var email = req.body.email;
+  var pass = req.body.password;
+  var phone = req.body.phone;
 
-    var data = {
-      "name": name,
-      "username":username,
-      "email":email,
-      "password":pass,
-      "phone":phone
-      }
+  var data = {
+    "username": username,
+    "email": email,
+    "password": pass,
+    "phone": phone
+  }
 
-    db.collection("details").insertOne(data,function(err, collection){
-      if (err) throw err;
-      console.log("Record inserted Successfully");
-      res.status(200).json({"name": name, "username":username, "email":email, "phone":phone});
-    });
+  db.collection("users").insertOne(data, function (err, collection) {
+    if (err) {
+      res.status(500).send("Internal Server Error");
+    };
+    console.log("Record inserted Successfully");
+    res.status(200).json({ "username": username, "email": email, "phone": phone });
+  });
 }
 
-async function userInfo(req,res){
-  const result = await db.collection("details").findOne({username: req.decoded.username});
-  if(req.params.id==result._id){
-      res.status(200).send(result);
+async function userInfo(req, res) {
+  const result = await db.collection("users").findOne({ _id: new ObjectId(req.params.id) });
+  
+  if (result) {
+    res.status(200).send(result);
   }
-  else{
+  else {
     res.status(404).send("User ID not found");
   }
-
-
 }
 
 module.exports = {
-  signupUser,loginUser,userInfo
+  signupUser, loginUser, userInfo
 }
