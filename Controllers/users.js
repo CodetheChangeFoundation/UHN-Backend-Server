@@ -2,6 +2,7 @@ require("dotenv").config();
 var database = require("../database");
 var db = database.getdb();
 let jwt = require("jsonwebtoken");
+var bcrypt = require("bcrypt");
 var ObjectId = require('mongodb').ObjectId; 
 
 async function loginUser(req, res) {
@@ -23,7 +24,7 @@ async function loginUser(req, res) {
   };
 
   try {
-    if (password === result.password) {
+    if (bcrypt.compareSync(data.password, result.password)) {
       let token = jwt.sign({ username: data.username },
         process.env.SECRET,
         {
@@ -43,6 +44,7 @@ async function loginUser(req, res) {
     }
   } catch (err) {
     console.log("Failed compare");
+    res.status(500).send("Internal Server Error");
   }
 }
 
@@ -56,7 +58,7 @@ async function signupUser(req, res) {
   var data = {
     "username": username,
     "email": email,
-    "password": pass,
+    "password": bcrypt.hashSync(pass, 10),
     "phone": phone
   }
 

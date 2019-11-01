@@ -1,6 +1,5 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
-import bcrypt from "bcrypt";
 import app from "../server";
 var database = require("../database");
 var db = database.getdb();
@@ -8,21 +7,13 @@ var db = database.getdb();
 chai.use(chaiHttp);
 chai.should();
 
-const SALT_ROUNDS = 10;
-
 describe("Sign up and Login", () => {
   const username = "TEST_USER_1";
   const email = "testuser@gmail.com";
   const phone = "7781231234";
   const plainTextPassword = "testuser1password";
-  var hashedPassword = "";
   var token = "";
   var userId = "";
-
-  before(() => {
-    hashedPassword = bcrypt.hashSync(plainTextPassword, bcrypt.genSaltSync(SALT_ROUNDS));
-    console.log("Processed before()");
-  })
 
   it("should sign up user", (done) => {
     chai.request(app)
@@ -30,7 +21,7 @@ describe("Sign up and Login", () => {
       .send({ 
         username: username, 
         email: email,
-        password: hashedPassword,
+        password: plainTextPassword,
         phone: phone,
       })
       .end((err, res) => {
@@ -43,13 +34,12 @@ describe("Sign up and Login", () => {
   it("should authenticate with correct credentials", (done) => {
     chai.request(app)
       .post("/login")
-      .send({ username: username, password: hashedPassword })
+      .send({ username: username, password: plainTextPassword })
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.a("object");
         userId = res.body.id;
         token = res.body.token;
-        console.log(token, userId);
         done();
       })
   })
@@ -61,7 +51,6 @@ describe("Sign up and Login", () => {
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.a("object");
-        console.log(res.body);
         done();
       })
   })

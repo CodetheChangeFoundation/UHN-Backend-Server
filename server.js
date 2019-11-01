@@ -4,7 +4,6 @@ database.connect();
 const user = require("./Controllers/users");
 var express = require("express");
 var bodyParser = require("body-parser");
-let jwt = require("jsonwebtoken");
 let middleware = require("./middleware");
 const port = process.env.PORT || 3000;
 
