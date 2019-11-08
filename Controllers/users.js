@@ -1,10 +1,13 @@
 require("dotenv").config({path: __dirname + "/.env"});
 var database = require("../database");
-var db = database.getdb();
+var mongoose = database.getmongoose();
+var Schema = mongoose.Schema;
 let jwt = require("jsonwebtoken");
 var bcrypt = require("bcrypt");
 var ObjectId = require("mongodb").ObjectId;
 var handle = require("./error_handling");
+
+const UserModel = mongoose.model("users", new Schema({username: String, password: String, email: String, phone: String}));
 
 async function loginUser(req, res) {
   var username = req.body.username;
@@ -17,7 +20,7 @@ async function loginUser(req, res) {
 
   try {
     console.log({ username: data.username, password: data.password });
-    var result = await db.collection("users").findOne({ username: data.username });
+    var result = await UserModel.findOne({username: username},"password").lean();
     console.log(result);
   }
   catch (err) {
@@ -62,24 +65,21 @@ async function signupUser(req, res) {
   var pass = req.body.password;
   var phone = req.body.phone;
 
-  var data = {
-    "username": username,
-    "email": email,
-    "password": bcrypt.hashSync(pass, 10),
-    "phone": phone
-  }
-
-  db.collection("users").insertOne(data, function (err, collection) {
-    if (err) {
-      handle.failedUserInsertionError(req,res);
-    };
+  try{
+    var insert = new UserModel({username: username, email: email, password: bcrypt.hashSync(pass, 10), phone: phone});
+    await insert.save();
     console.log("Record inserted Successfully");
     res.status(200).json({ "username": username, "email": email, "phone": phone });
-  });
-}
+  }
+  catch (err) {
+      handle.failedUserInsertionError(req,res);
+  };
+
+};
+
 
 async function userInfo(req, res) {
-  const result = await db.collection("users").findOne({ _id: new ObjectId(req.params.id) });
+  const result = await UserModel.findOne({_id: new ObjectId(req.params.id)}).lean();
 
   if (result) {
     var data = {
