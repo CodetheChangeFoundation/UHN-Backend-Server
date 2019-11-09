@@ -1,9 +1,10 @@
-require("dotenv").config();
+require("dotenv").config({ path: __dirname + "/.env" });
 var database = require("../database");
 var db = database.getdb();
 let jwt = require("jsonwebtoken");
 var bcrypt = require("bcrypt");
-var ObjectId = require('mongodb').ObjectId; 
+var ObjectId = require("mongodb").ObjectId;
+var handle = require("../Utils/error_handling");
 
 async function loginUser(req, res) {
   var username = req.body.username;
@@ -17,34 +18,40 @@ async function loginUser(req, res) {
   try {
     console.log({ username: data.username, password: data.password });
     var result = await db.collection("users").findOne({ username: data.username });
+    console.log(result);
   }
   catch (err) {
-    console.log(err);
-    res.status(404).send("Failed retrieve");
+    handle.notFound(res, "Cannot find requested username in database");
   };
 
-  try {
-    if (bcrypt.compareSync(data.password, result.password)) {
-      let token = jwt.sign({ username: data.username },
-        process.env.SECRET,
-        {
-          expiresIn: "24h"
-        }
-      );
+  if (result != null) {
+    try {
+      if (bcrypt.compareSync(data.password, result.password)) {
+        let token = jwt.sign({ username: data.username },
+          process.env.SECRET,
+          {
+            expiresIn: "24h"
+          }
+        );
 
-      res.status(200).json({
-        success: true,
-        message: "Authentication successful!",
-        token: token,
-        id: result._id
-      })
-      console.log("Successful login");
-    } else {
-      res.status(401).send("Unauthorized");
+        res.status(200).json({
+          success: true,
+          message: "Authentication successful!",
+          token: token,
+          id: result._id
+        })
+        console.log("Successful login");
+      }
+      else {
+        handle.unauthorized(res, "Password incorrect");
+      }
     }
-  } catch (err) {
-    console.log("Failed compare");
-    res.status(500).send("Internal Server Error");
+    catch (err) {
+      handle.internalServerError(res, "Bcrypt compareSync failed");
+    }
+  }
+  else {
+    handle.notFound(res, "Cannot find requested user ID in database");
   }
 }
 
@@ -64,7 +71,7 @@ async function signupUser(req, res) {
 
   db.collection("users").insertOne(data, function (err, collection) {
     if (err) {
-      res.status(500).send("Internal Server Error");
+      handle.internalServerError(res, "Insert user failed");
     };
     console.log("Record inserted Successfully");
     res.status(200).json({ "username": username, "email": email, "phone": phone });
@@ -73,12 +80,17 @@ async function signupUser(req, res) {
 
 async function userInfo(req, res) {
   const result = await db.collection("users").findOne({ _id: new ObjectId(req.params.id) });
-  
+
   if (result) {
-    res.status(200).send(result);
+    var data = {
+      "username": result.username,
+      "email": result.email,
+      "phone": result.phone
+    }
+    res.status(200).json(data);
   }
   else {
-    res.status(404).send("User ID not found");
+    handle.notFound(res, "Cannot find requested user ID in database");
   }
 }
 

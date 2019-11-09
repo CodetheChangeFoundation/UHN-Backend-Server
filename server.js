@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ path: __dirname + "./env" });
 const database = require("./database");
 database.connect();
 const user = require("./Controllers/users");
@@ -6,7 +6,6 @@ var express = require("express");
 var bodyParser = require("body-parser");
 let middleware = require("./middleware");
 const port = process.env.PORT || 3000;
-
 const app = express()
 app.use(express.static(__dirname + "/../public"));
 app.use(bodyParser.json());
