@@ -1,11 +1,11 @@
-require("dotenv").config({path: __dirname + "/.env"});
+require("dotenv").config({ path: __dirname + "/.env" });
 var database = require("../database");
 var mongoose = database.getmongoose();
 var Schema = mongoose.Schema;
 let jwt = require("jsonwebtoken");
 var bcrypt = require("bcrypt");
 var ObjectId = require("mongodb").ObjectId;
-var handle = require("./error_handling");
+var handle = require("../Utils/error_handling");
 
 const UserModel = mongoose.model("users", new Schema({username: String, password: String, email: String, phone: String}));
 
@@ -24,12 +24,12 @@ async function loginUser(req, res) {
     console.log(result);
   }
   catch (err) {
-    handle.retrievalError(req,res);
+    handle.notFound(res, "Cannot find requested username in database");
   };
 
-  if(result!=null){
+  if (result != null) {
     try {
-      if (bcrypt.compareSync(data.password,result.password)) {
+      if (bcrypt.compareSync(data.password, result.password)) {
         let token = jwt.sign({ username: data.username },
           process.env.SECRET,
           {
@@ -46,15 +46,15 @@ async function loginUser(req, res) {
         console.log("Successful login");
       }
       else {
-        handle.unauthorizedError(req,res);
+        handle.unauthorized(res, "Password incorrect");
       }
     }
     catch (err) {
-      handle.failedComparisonError(req,res);
+      handle.internalServerError(res, "Bcrypt compareSync failed");
     }
   }
-  else{
-    handle.userNotFound(req,res);
+  else {
+    handle.notFound(res, "Cannot find requested user ID in database");
   }
 }
 
@@ -90,7 +90,7 @@ async function userInfo(req, res) {
     res.status(200).json(data);
   }
   else {
-    handle.userNotFound(req,res);
+    handle.notFound(res, "Cannot find requested user ID in database");
   }
 }
 
