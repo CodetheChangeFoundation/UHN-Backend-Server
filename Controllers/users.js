@@ -7,7 +7,7 @@ var bcrypt = require("bcrypt");
 var ObjectId = require("mongodb").ObjectId;
 var handle = require("../Utils/error_handling");
 
-const UserModel = mongoose.model("users", new Schema({username: String, password: String, email: String, phone: String}));
+const UserModel = mongoose.model("users", new Schema({ username: String, password: String, email: String, phone: String }));
 
 async function loginUser(req, res) {
   var username = req.body.username;
@@ -20,7 +20,7 @@ async function loginUser(req, res) {
 
   try {
     console.log({ username: data.username, password: data.password });
-    var result = await UserModel.findOne({username: username},"password").lean();
+    var result = await UserModel.findOne({ username: username }, "password").lean();
     console.log(result);
   }
   catch (err) {
@@ -65,21 +65,21 @@ async function signupUser(req, res) {
   var pass = req.body.password;
   var phone = req.body.phone;
 
-  try{
-    var insert = new UserModel({username: username, email: email, password: bcrypt.hashSync(pass, 10), phone: phone});
+  try {
+    var insert = new UserModel({ username: username, email: email, password: bcrypt.hashSync(pass, 10), phone: phone });
     await insert.save();
     console.log("Record inserted Successfully");
     res.status(200).json({ "username": username, "email": email, "phone": phone });
   }
   catch (err) {
-      handle.failedUserInsertionError(req,res);
+    handle.internalServerError(res, "Insert user failed");
   };
 
 };
 
 
 async function userInfo(req, res) {
-  const result = await UserModel.findOne({_id: new ObjectId(req.params.id)}).lean();
+  const result = await UserModel.findOne({ _id: new ObjectId(req.params.id) }).lean();
 
   if (result) {
     var data = {
