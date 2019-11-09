@@ -1,7 +1,7 @@
 require("dotenv").config({ path: __dirname + "./env" });
 const database = require("./database");
 database.connect();
-const user = require("./Controllers/users");
+const user = require("./Controllers/user");
 var express = require("express");
 var bodyParser = require("body-parser");
 let middleware = require("./middleware");

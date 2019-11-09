@@ -1,13 +1,10 @@
 require("dotenv").config({ path: __dirname + "/.env" });
-var database = require("../database");
-var mongoose = database.getmongoose();
-var Schema = mongoose.Schema;
 let jwt = require("jsonwebtoken");
 var bcrypt = require("bcrypt");
 var ObjectId = require("mongodb").ObjectId;
 var handle = require("../Utils/error_handling");
 
-const UserModel = mongoose.model("users", new Schema({ username: String, password: String, email: String, phone: String }));
+var UserModel = require("../Models/user").model;
 
 async function loginUser(req, res) {
   var username = req.body.username;
@@ -66,15 +63,14 @@ async function signupUser(req, res) {
   var phone = req.body.phone;
 
   try {
-    var insert = new UserModel({ username: username, email: email, password: bcrypt.hashSync(pass, 10), phone: phone });
-    await insert.save();
+    var newUser = new UserModel({ username: username, email: email, password: bcrypt.hashSync(pass, 10), phone: phone });
+    await newUser.save();
     console.log("Record inserted Successfully");
     res.status(200).json({ "username": username, "email": email, "phone": phone });
   }
   catch (err) {
     handle.internalServerError(res, "Insert user failed");
   };
-
 };
 
 
