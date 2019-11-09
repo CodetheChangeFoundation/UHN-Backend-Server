@@ -1,4 +1,4 @@
-require("dotenv").config({path: __dirname + "/process.env"});
+require("dotenv").config({path: __dirname + "/.env"});
 let jwt = require("jsonwebtoken");
 
 let checkToken = (req, res, next) => {

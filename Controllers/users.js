@@ -4,7 +4,7 @@ var db = database.getdb();
 let jwt = require("jsonwebtoken");
 var bcrypt = require("bcrypt");
 var ObjectId = require("mongodb").ObjectId;
-var handle = require("./error_handling");
+var handle = require("../Utils/error_handling");
 
 async function loginUser(req, res) {
   var username = req.body.username;
@@ -21,10 +21,10 @@ async function loginUser(req, res) {
     console.log(result);
   }
   catch (err) {
-    handle.retrievalError(req,res);
+    handle.notFound(res, "Cannot find requested username in database");
   };
 
-  if(result!=null){
+  if(result != null){
     try {
       if (bcrypt.compareSync(data.password,result.password)) {
         let token = jwt.sign({ username: data.username },
@@ -43,15 +43,15 @@ async function loginUser(req, res) {
         console.log("Successful login");
       }
       else {
-        handle.unauthorizedError(req,res);
+        handle.unauthorized(res, "Password incorrect");
       }
     }
     catch (err) {
-      handle.failedComparisonError(req,res);
+      handle.internalServerError(res, "Bcrypt compareSync failed");
     }
   }
   else{
-    handle.userNotFound(req,res);
+    handle.notFound(res, "Cannot find requested user ID in database");
   }
 }
 
@@ -71,7 +71,7 @@ async function signupUser(req, res) {
 
   db.collection("users").insertOne(data, function (err, collection) {
     if (err) {
-      handle.failedUserInsertionError(req,res);
+      handle.internalServerError(res, "Insert user failed");
     };
     console.log("Record inserted Successfully");
     res.status(200).json({ "username": username, "email": email, "phone": phone });
@@ -90,7 +90,7 @@ async function userInfo(req, res) {
     res.status(200).json(data);
   }
   else {
-    handle.userNotFound(req,res);
+    handle.notFound(res, "Cannot find requested user ID in database");
   }
 }
 
