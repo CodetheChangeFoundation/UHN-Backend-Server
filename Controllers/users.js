@@ -1,4 +1,4 @@
-require("dotenv").config({path: __dirname + "/.env"});
+require("dotenv").config({ path: __dirname + "/.env" });
 var database = require("../database");
 var db = database.getdb();
 let jwt = require("jsonwebtoken");
@@ -24,9 +24,9 @@ async function loginUser(req, res) {
     handle.notFound(res, "Cannot find requested username in database");
   };
 
-  if(result != null){
+  if (result != null) {
     try {
-      if (bcrypt.compareSync(data.password,result.password)) {
+      if (bcrypt.compareSync(data.password, result.password)) {
         let token = jwt.sign({ username: data.username },
           process.env.SECRET,
           {
@@ -50,7 +50,7 @@ async function loginUser(req, res) {
       handle.internalServerError(res, "Bcrypt compareSync failed");
     }
   }
-  else{
+  else {
     handle.notFound(res, "Cannot find requested user ID in database");
   }
 }
