@@ -1,6 +1,5 @@
 var redis = require("../Services/redis");
 const onlineValue = "online";
-const offlineValue = "offline";
 
 async function setOnline(userid) {  
   try {
