@@ -5,6 +5,7 @@ var ObjectId = require("mongodb").ObjectId;
 var handle = require("../Utils/error_handling");
 
 var UserModel = require("../Models/user").model;
+var OnlineService = require("../Utils/online_status");
 
 async function loginUser(req, res) {
   var username = req.body.username;
@@ -33,6 +34,8 @@ async function loginUser(req, res) {
             expiresIn: "24h"
           }
         );
+        
+        OnlineService.setOnline(result._id.toString());
 
         res.status(200).json({
           success: true,
