@@ -6,10 +6,10 @@ const model = mongoose.model("users", new Schema({
   username: String,
   password: String,
   email: String,
-  phone: String
+  phone: String,
+  responders: [{_id:false, id: String}]
 }));
 
 module.exports = {
   model
 }
-

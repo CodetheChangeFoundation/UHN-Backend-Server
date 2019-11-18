@@ -1,4 +1,4 @@
-require("dotenv").config({ path: __dirname + "/.env" });
+require('dotenv').config({path: __dirname + '/../process.env'});
 let jwt = require("jsonwebtoken");
 var bcrypt = require("bcrypt");
 var ObjectId = require("mongodb").ObjectId;
@@ -34,7 +34,7 @@ async function loginUser(req, res) {
             expiresIn: "24h"
           }
         );
-        
+
         OnlineService.setOnline(result._id.toString());
 
         res.status(200).json({
@@ -50,6 +50,7 @@ async function loginUser(req, res) {
       }
     }
     catch (err) {
+      console.log(process.env.SECRET);
       handle.internalServerError(res, "Bcrypt compareSync failed");
     }
   }
@@ -93,6 +94,90 @@ async function userInfo(req, res) {
   }
 }
 
+
+
+async function getResponders(req,res){
+    const result = await UserModel.findOne({ _id: new ObjectId(req.params.id) }).lean();
+    if(result){
+      res.status(200).json({"responders": result.responders});
+    }
+    else {
+      handle.notFound(res, "Cannot find requested user ID in database");
+    }
+}
+
+
+async function addResponders(req,res){
+  var respondersToAdd = req.body.respondersToAdd;
+
+  if (respondersToAdd == null){
+    handle.badRequest(res, "No responders requested to be added");
+  }
+
+  else{
+    const user = await UserModel.findOne({ _id: new ObjectId(req.params.id)});
+
+    var validFlag = true;
+    if(user){
+
+      for (var i=0, len = respondersToAdd.length ; i<len; i++){     //validating responders to be added
+
+        try{
+          var foundUser = await UserModel.findOne({ _id: new ObjectId(respondersToAdd[i].id)}); //
+        }
+        catch{
+        validFlag = false; //not single String of 12 bytes or a string of 24 hex characters
+        break;
+        }
+
+        if (foundUser==null){
+          validFlag = false;//does not exist in database
+          break;
+        }
+      }
+
+       if(validFlag==true){
+         for (var i=0, len = respondersToAdd.length ; i<len; i++){
+           user.responders.push(respondersToAdd[i]);
+           user.save();
+         }
+         res.status(400).json(respondersToAdd);
+       }
+      else{
+         handle.badRequest(res, "One of responders to add is not valid"); //not single String of 12 bytes or a string of 24 hex characters or
+      }
+
+   }
+
+    else{
+      handle.notFound(res, "Cannot find requested user ID in database");
+     }
+   }
+}
+
+async function deleteResponder(req,res){
+    var user = await UserModel.findOne({ _id: new ObjectId(req.params.id)});
+    if(user){
+      var responders = user.get("responders");
+      let hasResponderID = responders.some(responder => responder["id"] === req.params.responderid);
+      if (hasResponderID){
+        user.responders.pull({id: req.params.responderid});
+        user.save();
+        res.status(200).send("Deletion successful");
+      }
+      else{
+        handle.badRequest(res,"Responder is not valid to delete for this user");
+      }
+
+    }
+    else{
+      handle.notFound(res, "Cannot find requested user ID in database");
+     }
+
+}
+
+
+
 module.exports = {
-  signupUser, loginUser, userInfo
+  signupUser, loginUser, userInfo, getResponders, addResponders, deleteResponder
 }
