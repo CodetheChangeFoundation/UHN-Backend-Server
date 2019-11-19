@@ -1,4 +1,3 @@
-require('dotenv').config({path: __dirname + '/../process.env'});
 let jwt = require("jsonwebtoken");
 var bcrypt = require("bcrypt");
 var ObjectId = require("mongodb").ObjectId;
