@@ -1,7 +1,7 @@
 var redis = require("../Services/redis");
 const onlineValue = "online";
 
-async function setOnline(userid) {  
+async function setOnline(userid) {
   try {
     const res = await redis.setAsync(userid, onlineValue);
   } catch(err) {

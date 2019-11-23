@@ -68,7 +68,9 @@ async function signupUser(req, res) {
   try {
     var newUser = new UserModel({ username: username, email: email, password: bcrypt.hashSync(pass, 10), phone: phone });
     await newUser.save();
+    OnlineService.setOffline(newUser._id.toString());
     console.log("Record inserted Successfully");
+
     res.status(200).json({ "username": username, "email": email, "phone": phone });
   }
   catch (err) {
@@ -80,12 +82,14 @@ async function signupUser(req, res) {
 async function userInfo(req, res) {
   const result = await UserModel.findOne({ _id: new ObjectId(req.params.id) }).lean();
 
+  var onlineStatus = await OnlineService.checkOnlineStatus(req.params.id);
+
   if (result) {
     var data = {
       "username": result.username,
       "email": result.email,
       "phone": result.phone,
-      "online": result.online
+      "online": onlineStatus
     }
     res.status(200).json(data);
   }
@@ -178,41 +182,79 @@ async function deleteResponder(req,res){
 
 
 async function searchUsers(req,res){
-  if (req.query.online=="true"){
-    try{
-      var result = await UserModel.find({online: true},"username _id").lean();
-      res.status(200).send(result);
-    }
-    catch{
-      handle.internalServerError(res, "Failed to query user database");
-    }
-  }
-  else if (req.query.online=="false"){
-    try{
-      var result = await UserModel.find({online: false},"username _id").lean();
-      res.status(200).send(result);
-    }
-    catch{
-      handle.internalServerError(res, "Failed to query user database");
-    }
-  }
+  // if (req.query.online=="true"){
+  //   try{
+  //     var result = await UserModel.find({ $where: function(){
+  //       return (OnlineService.checkOnlineStatus(this._id))
+  //     }}, "username _id").lean();
+  //     res.status(200).send(result);
+  //   }
+  //   catch{
+  //     handle.internalServerError(res, "Failed to query user database");
+  //   }
+  // }
+  // else if (req.query.online=="false"){
+  //   try{
+  //     var result = await UserModel.find( {$where: function(){
+  //       return (OnlineService.checkOnlineStatus(this._id))
+  //     }}, "username _id").lean();
+  //     res.status(200).send(result);
+  //   }
+  //   catch{
+  //     handle.internalServerError(res, "Failed to query user database");
+  //   }
+  // }
 
-  else{
     try{
       var result = await UserModel.find(null,"username _id").lean();
-      res.status(200).send(result);
     }
     catch{
       handle.internalServerError(res, "Failed to query user database");
     }
-  }
 
+    if (req.query.online=="true"){
+      for (var i=0, len=result.length;i<len;i++){
+          let id = result[i]._id.toString();
+          console.log(id);
+          try{
+            var status = await OnlineService.checkOnlineStatus(id);
+          }
+          catch{
+              handle.internalServerError(res, "Failed to query online status database");
+          }
+        if (status==false){
+          delete result[i];
+        }
+      }
+      res.status(200).send(result);
+    }
+
+    else if (req.query.online=="false"){
+      for (var i=0, len=result.length;i<len;i++){
+          let id = result[i]._id.toString();
+          console.log(id);
+          try{
+            var status = await OnlineService.checkOnlineStatus(id);
+          }
+          catch{
+              handle.internalServerError(res, "Failed to query online status database");
+          }
+        if (status==true){
+          delete result[i];
+        }
+      }
+      res.status(200).send(result);
+    }
+
+    else{
+      res.status(200).send(result);
+    }
 }
 
 async function toggleStatus(req,res){
   if (req.body.request == "online"){
     try{
-      const result = await UserModel.findOneAndUpdate({ _id: new ObjectId(req.params.id)},{online: true});
+      OnlineService.setOnline(req.params.id);
       res.status(200).send("User now online");
     }
     catch{
@@ -220,8 +262,9 @@ async function toggleStatus(req,res){
     }
   }
   else if (req.body.request == "offline"){
+
     try{
-      const result = await UserModel.findOneAndUpdate({ _id: new ObjectId(req.params.id)},{online: false});
+      OnlineService.setOffline(req.params.id);
       res.status(200).send("User now offline");
     }
     catch{
