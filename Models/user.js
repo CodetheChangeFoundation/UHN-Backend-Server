@@ -7,6 +7,7 @@ const model = mongoose.model("users", new Schema({
   password: String,
   email: String,
   phone: String,
+  online: Boolean,
   responders: [{_id:false, id: String}]
 }));
 

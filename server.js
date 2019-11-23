@@ -19,7 +19,9 @@ app.post("/login", user.loginUser);
 
 app.post("/users/:id/responders",middleware.checkToken,user.addResponders);
 
-//app.get("/users/search", user.searchUsers);
+app.post("/users/:id/status",middleware.checkToken,user.toggleStatus);
+
+app.get("/users/search", user.searchUsers);
 
 app.get("/users/:id", middleware.checkToken, user.userInfo);
 app.get("/users/:id/responders",middleware.checkToken,user.getResponders);
