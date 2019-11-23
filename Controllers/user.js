@@ -182,29 +182,6 @@ async function deleteResponder(req,res){
 
 
 async function searchUsers(req,res){
-  // if (req.query.online=="true"){
-  //   try{
-  //     var result = await UserModel.find({ $where: function(){
-  //       return (OnlineService.checkOnlineStatus(this._id))
-  //     }}, "username _id").lean();
-  //     res.status(200).send(result);
-  //   }
-  //   catch{
-  //     handle.internalServerError(res, "Failed to query user database");
-  //   }
-  // }
-  // else if (req.query.online=="false"){
-  //   try{
-  //     var result = await UserModel.find( {$where: function(){
-  //       return (OnlineService.checkOnlineStatus(this._id))
-  //     }}, "username _id").lean();
-  //     res.status(200).send(result);
-  //   }
-  //   catch{
-  //     handle.internalServerError(res, "Failed to query user database");
-  //   }
-  // }
-
     try{
       var result = await UserModel.find(null,"username _id").lean();
     }
@@ -215,7 +192,6 @@ async function searchUsers(req,res){
     if (req.query.online=="true"){
       for (var i=0, len=result.length;i<len;i++){
           let id = result[i]._id.toString();
-          console.log(id);
           try{
             var status = await OnlineService.checkOnlineStatus(id);
           }
@@ -232,7 +208,6 @@ async function searchUsers(req,res){
     else if (req.query.online=="false"){
       for (var i=0, len=result.length;i<len;i++){
           let id = result[i]._id.toString();
-          console.log(id);
           try{
             var status = await OnlineService.checkOnlineStatus(id);
           }
@@ -249,6 +224,7 @@ async function searchUsers(req,res){
     else{
       res.status(200).send(result);
     }
+
 }
 
 async function toggleStatus(req,res){
