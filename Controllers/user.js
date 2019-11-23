@@ -84,7 +84,8 @@ async function userInfo(req, res) {
     var data = {
       "username": result.username,
       "email": result.email,
-      "phone": result.phone
+      "phone": result.phone,
+      "online": result.online
     }
     res.status(200).json(data);
   }
@@ -176,7 +177,62 @@ async function deleteResponder(req,res){
 }
 
 
+async function searchUsers(req,res){
+  if (req.query.online=="true"){
+    try{
+      var result = await UserModel.find({online: true},"username _id").lean();
+      res.status(200).send(result);
+    }
+    catch{
+      handle.internalServerError(res, "Failed to query user database");
+    }
+  }
+  else if (req.query.online=="false"){
+    try{
+      var result = await UserModel.find({online: false},"username _id").lean();
+      res.status(200).send(result);
+    }
+    catch{
+      handle.internalServerError(res, "Failed to query user database");
+    }
+  }
+
+  else{
+    try{
+      var result = await UserModel.find(null,"username _id").lean();
+      res.status(200).send(result);
+    }
+    catch{
+      handle.internalServerError(res, "Failed to query user database");
+    }
+  }
+
+}
+
+async function toggleStatus(req,res){
+  if (req.body.request == "online"){
+    try{
+      const result = await UserModel.findOneAndUpdate({ _id: new ObjectId(req.params.id)},{online: true});
+      res.status(200).send("User now online");
+    }
+    catch{
+      handle.internalServerError(res, "Failed to find user in database");
+    }
+  }
+  else if (req.body.request == "offline"){
+    try{
+      const result = await UserModel.findOneAndUpdate({ _id: new ObjectId(req.params.id)},{online: false});
+      res.status(200).send("User now offline");
+    }
+    catch{
+      handle.internalServerError(res, "Failed to find user in database");
+    }
+  }
+  else{
+    handle.badRequest(res,"Invalid status toggle request");
+  }
+}
 
 module.exports = {
-  signupUser, loginUser, userInfo, getResponders, addResponders, deleteResponder
+  signupUser, loginUser, userInfo, getResponders, addResponders, deleteResponder, searchUsers, toggleStatus
 }
