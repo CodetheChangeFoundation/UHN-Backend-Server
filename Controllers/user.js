@@ -12,7 +12,7 @@ async function loginUser(req, res) {
 
   var data = {
     "username": username,
-    "password": password,
+    "password": password
   }
 
   try {
@@ -101,13 +101,13 @@ async function userInfo(req, res) {
 
 
 async function getResponders(req,res){
-    const result = await UserModel.findOne({ _id: new ObjectId(req.params.id) }).lean();
-    if(result){
-      res.status(200).json({"responders": result.responders});
-    }
-    else {
-      handle.notFound(res, "Cannot find requested user ID in database");
-    }
+  const result = await UserModel.findOne({ _id: new ObjectId(req.params.id) }).lean();
+  if (result) {
+    res.status(200).json({"responders": result.responders});
+  }
+  else {
+    handle.notFound(res, "Cannot find requested user ID in database");
+  }
 }
 
 
@@ -117,11 +117,11 @@ async function addResponders(req,res){
   if (respondersToAdd == null){
     handle.badRequest(res, "No responders requested to be added");
   }
-
   else{
     const user = await UserModel.findOne({ _id: new ObjectId(req.params.id)});
 
     var validFlag = true;
+
     if(user){
 
       for (var i=0, len = respondersToAdd.length ; i<len; i++){     //validating responders to be added
@@ -140,23 +140,22 @@ async function addResponders(req,res){
         }
       }
 
-       if(validFlag==true){
-         for (var i=0, len = respondersToAdd.length ; i<len; i++){
+       if (validFlag == true) {
+         for (var i = 0, len = respondersToAdd.length ; i<len; i++){
            user.responders.push(respondersToAdd[i]);
            user.save();
          }
          res.status(400).json(respondersToAdd);
        }
-      else{
+      else {
          handle.badRequest(res, "One of responders to add is not valid"); //not single String of 12 bytes or a string of 24 hex characters or
       }
-
-   }
+    }
 
     else{
       handle.notFound(res, "Cannot find requested user ID in database");
-     }
-   }
+    }
+  }
 }
 
 async function deleteResponder(req,res){
@@ -181,71 +180,44 @@ async function deleteResponder(req,res){
 }
 
 
-async function searchUsers(req,res){
-    try{
+async function searchUsers(req,res) {
+    try {
       var result = await UserModel.find(null,"username _id").lean();
     }
-    catch{
+    catch {
       handle.internalServerError(res, "Failed to query user database");
     }
 
-    if (req.query.online=="true"){
-      for (var i=0, len=result.length;i<len;i++){
-          let id = result[i]._id.toString();
-          try{
-            var status = await OnlineService.checkOnlineStatus(id);
-          }
-          catch{
-              handle.internalServerError(res, "Failed to query online status database");
-          }
-        if (status==false){
-          delete result[i];
-        }
+    if (req.query.online == "true" || req.query.online == "false" ) {
+      let promiseArr = [];
+      for (let user of result) {
+        promiseArr.push(OnlineService.checkOnlineStatus(user._id.toString()))
       }
-      res.status(200).send(result);
-    }
-
-    else if (req.query.online=="false"){
-      for (var i=0, len=result.length;i<len;i++){
-          let id = result[i]._id.toString();
-          try{
-            var status = await OnlineService.checkOnlineStatus(id);
-          }
-          catch{
-              handle.internalServerError(res, "Failed to query online status database");
-          }
-        if (status==true){
-          delete result[i];
+      var userStatus = await Promise.all(promiseArr);
+      var onlineUsers = result.filter((user, index) => {
+        if (req.query.online == "true"){
+          return userStatus[index];
         }
-      }
+        else if (req.query.online == "false"){
+          return !userStatus[index];
+        }
+      });
+
+      res.status(200).send(onlineUsers);
+    }
+    else {
       res.status(200).send(result);
     }
-
-    else{
-      res.status(200).send(result);
-    }
-
 }
 
 async function toggleStatus(req,res){
   if (req.body.request == "online"){
-    try{
       OnlineService.setOnline(req.params.id);
       res.status(200).send("User now online");
-    }
-    catch{
-      handle.internalServerError(res, "Failed to find user in database");
-    }
   }
   else if (req.body.request == "offline"){
-
-    try{
-      OnlineService.setOffline(req.params.id);
-      res.status(200).send("User now offline");
-    }
-    catch{
-      handle.internalServerError(res, "Failed to find user in database");
-    }
+    OnlineService.setOffline(req.params.id);
+    res.status(200).send("User now offline");
   }
   else{
     handle.badRequest(res,"Invalid status toggle request");
