@@ -10,13 +10,13 @@ async function loginUser(req, res) {
   var username = req.body.username;
   var password = req.body.password;
 
-  if (username==="" && password===""){
+  if ((username===""||username===null) && (password===""||password===null)){
     handle.badRequest("Username and Password cannot be an empty field");
   }
-  else if (username===""){
+  else if (username===""||username===null){
     handle.badRequest("Username cannot be an empty field");
   }
-  else if (password===""){
+  else if (password===""||password===null){
     handle.badRequest("Password Cannot be an empty field")
   }
   else{
@@ -67,6 +67,7 @@ async function loginUser(req, res) {
     else {
       handle.notFound(res, "Cannot find requested user ID in database");
     }
+
   }
 }
 
@@ -77,13 +78,13 @@ async function signupUser(req, res) {
   var pass = req.body.password;
   var phone = req.body.phone;
 
-  if (username==="" && pass===""){
+  if ((username===""||username===null) && (pass===""||pass===null)){
     handle.badRequest("Username and Password cannot be an empty field");
   }
-  else if (username===""){
+  else if (username===""||username===null){
     handle.badRequest("Username cannot be an empty field");
   }
-  else if (pass===""){
+  else if (pass==="""||pass===null){
     handle.badRequest("Password Cannot be an empty field")
   }
   else{
