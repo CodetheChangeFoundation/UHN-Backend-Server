@@ -10,51 +10,63 @@ async function loginUser(req, res) {
   var username = req.body.username;
   var password = req.body.password;
 
-  var data = {
-    "username": username,
-    "password": password
+  if (username==="" && password===""){
+    handle.badRequest("Username and Password cannot be an empty field");
   }
-
-  try {
-    console.log({ username: data.username, password: data.password });
-    var result = await UserModel.findOne({ username: username }, "password").lean();
-    console.log(result);
+  else if (username===""){
+    handle.badRequest("Username cannot be an empty field");
   }
-  catch (err) {
-    handle.notFound(res, "Cannot find requested username in database");
-  };
+  else if (password===""){
+    handle.badRequest("Password Cannot be an empty field")
+  }
+  else{
 
-  if (result != null) {
+    var data = {
+      "username": username,
+      "password": password
+    }
+
     try {
-      if (bcrypt.compareSync(data.password, result.password)) {
-        let token = jwt.sign({ username: data.username },
-          process.env.SECRET,
-          {
-            expiresIn: "24h"
-          }
-        );
-
-        OnlineService.setOnline(result._id.toString());
-
-        res.status(200).json({
-          success: true,
-          message: "Authentication successful!",
-          token: token,
-          id: result._id
-        })
-        console.log("Successful login");
-      }
-      else {
-        handle.unauthorized(res, "Password incorrect");
-      }
+      console.log({ username: data.username, password: data.password });
+      var result = await UserModel.findOne({ username: username }, "password").lean();
+      console.log(result);
     }
     catch (err) {
-      console.log(process.env.SECRET);
-      handle.internalServerError(res, "Bcrypt compareSync failed");
+      handle.notFound(res, "Cannot find requested username in database");
+    };
+
+    if (result != null) {
+      try {
+        if (bcrypt.compareSync(data.password, result.password)) {
+          let token = jwt.sign({ username: data.username },
+            process.env.SECRET,
+            {
+              expiresIn: "24h"
+            }
+          );
+
+          OnlineService.setOnline(result._id.toString());
+
+          res.status(200).json({
+            success: true,
+            message: "Authentication successful!",
+            token: token,
+            id: result._id
+          })
+          console.log("Successful login");
+        }
+        else {
+          handle.unauthorized(res, "Password incorrect");
+        }
+      }
+      catch (err) {
+        console.log(process.env.SECRET);
+        handle.internalServerError(res, "Bcrypt compareSync failed");
+      }
     }
-  }
-  else {
-    handle.notFound(res, "Cannot find requested user ID in database");
+    else {
+      handle.notFound(res, "Cannot find requested user ID in database");
+    }
   }
 }
 
@@ -65,17 +77,28 @@ async function signupUser(req, res) {
   var pass = req.body.password;
   var phone = req.body.phone;
 
-  try {
-    var newUser = new UserModel({ username: username, email: email, password: bcrypt.hashSync(pass, 10), phone: phone });
-    await newUser.save();
-    OnlineService.setOffline(newUser._id.toString());
-    console.log("Record inserted Successfully");
-
-    res.status(200).json({ "username": username, "email": email, "phone": phone });
+  if (username==="" && pass===""){
+    handle.badRequest("Username and Password cannot be an empty field");
   }
-  catch (err) {
-    handle.internalServerError(res, "Insert user failed");
-  };
+  else if (username===""){
+    handle.badRequest("Username cannot be an empty field");
+  }
+  else if (pass===""){
+    handle.badRequest("Password Cannot be an empty field")
+  }
+  else{
+    try {
+      var newUser = new UserModel({ username: username, email: email, password: bcrypt.hashSync(pass, 10), phone: phone });
+      await newUser.save();
+      OnlineService.setOffline(newUser._id.toString());
+      console.log("Record inserted Successfully");
+
+      res.status(200).json({ "username": username, "email": email, "phone": phone });
+    }
+    catch (err) {
+      handle.internalServerError(res, "Insert user failed");
+    };
+  }
 };
 
 
