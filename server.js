@@ -19,12 +19,15 @@ app.post("/login", user.loginUser);
 
 app.post("/users/:id/responders", middleware.checkToken, user.addResponders);
 
+app.post("/users/:id/location", middleware.checkToken,user.addLocation);
+
 app.post("/users/:id/status", middleware.checkToken, user.toggleStatus);
 
 app.get("/users/search", middleware.checkToken, user.searchUsers);
 
 app.get("/users/:id", middleware.checkToken, user.userInfo);
 app.get("/users/:id/responders", middleware.checkToken, user.getResponders);
+
 
 app.delete("/users/:id/responders/:responderid", middleware.checkToken, user.deleteResponder);
 

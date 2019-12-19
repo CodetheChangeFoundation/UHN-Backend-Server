@@ -27,7 +27,7 @@ async function loginUser(req, res) {
   if (result != null) {
     try {
       if (bcrypt.compareSync(data.password, result.password)) {
-        let token = jwt.sign({ username: data.username },
+        let token = jwt.sign({ _id: result._id },
           process.env.SECRET,
           {
             expiresIn: "24h"
@@ -224,6 +224,19 @@ async function toggleStatus(req,res){
   }
 }
 
+async function addLocation(req,res){
+  var lon = req.body.lat;
+  var lat = req.body.lat;
+  var query = {_id: req.params.id};
+  try{
+    UserModel.findOneAndUpdate(query,{location: {lat: lat, lon: lon}});
+  }
+  catch{
+    handle.internalServerError("Location could not be updated");
+  }
+  res.status(200).send("Location successfully updated");
+}
+
 module.exports = {
-  signupUser, loginUser, userInfo, getResponders, addResponders, deleteResponder, searchUsers, toggleStatus
+  signupUser, loginUser, userInfo, getResponders, addResponders, deleteResponder, searchUsers, toggleStatus, addLocation
 }
