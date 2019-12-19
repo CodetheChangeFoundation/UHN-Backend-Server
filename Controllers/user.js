@@ -225,11 +225,9 @@ async function toggleStatus(req,res){
 }
 
 async function addLocation(req,res){
-  var lon = req.body.lat;
-  var lat = req.body.lat;
-  var query = {_id: req.params.id};
+  var query = {_id: new ObjectId(req.params.id)};
   try{
-    UserModel.findOneAndUpdate(query,{location: {lat: lat, lon: lon}});
+    var result = await UserModel.findOneAndUpdate(query, {location: {lat: req.body.lat, lon: req.body.lon}}, {useFindAndModify: false});
   }
   catch{
     handle.internalServerError("Location could not be updated");
