@@ -11,12 +11,6 @@ function connect(){
   })
 }
 
-function getValidation(){
-  return {check: check,
-          validationResult: validationResult
-        };
-}
-
 function getdb(){
   return db;
 }
@@ -29,5 +23,4 @@ module.exports = {
   connect : connect,
   getdb : getdb,
   getmongoose: getmongoose,
-  getValidation: getValidation
 }

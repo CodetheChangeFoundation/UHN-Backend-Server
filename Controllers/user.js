@@ -2,17 +2,16 @@ let jwt = require("jsonwebtoken");
 var bcrypt = require("bcrypt");
 var ObjectId = require("mongodb").ObjectId;
 var handle = require("../Utils/error_handling");
-const database = require("../database");
-const { check, validationResult } = database.getValidation();
+const { customValidationResult } = require("../Utils/error_handling");
 
 var UserModel = require("../Models/user").model;
 var OnlineService = require("../Utils/online_status");
 
 async function loginUser(req, res) {
 
-  const errors = validationResult(req);
+  const errors = customValidationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(422).json({ errors: errors.array() });
+    return res.status(400).json({ errors: errors.array() });
   }
   else{
     var username = req.body.username;
@@ -69,9 +68,9 @@ async function loginUser(req, res) {
 
 
 async function signupUser(req, res) {
-  const errors = validationResult(req);
+  const errors = customValidationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(422).json({ errors: errors.array() });
+    return res.status(400).json({ errors: errors.array() });
   }
   else{
     var username = req.body.username;
