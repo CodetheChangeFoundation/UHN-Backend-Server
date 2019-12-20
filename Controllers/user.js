@@ -225,6 +225,18 @@ async function toggleStatus(req, res) {
   }
 }
 
+async function addLocation(req, res) {
+  var query = { _id: new ObjectId(req.params.id) };
+  try {
+    var result = await UserModel.findOneAndUpdate(query, {
+      location: { lat: req.body.lat, lon: req.body.lon }
+    });
+  } catch {
+    handle.internalServerError("Location could not be updated");
+  }
+  res.status(200).send("Location successfully updated");
+}
+
 module.exports = {
   signupUser,
   loginUser,
@@ -233,5 +245,6 @@ module.exports = {
   addResponders,
   deleteResponder,
   searchUsers,
-  toggleStatus
+  toggleStatus,
+  addLocation
 };

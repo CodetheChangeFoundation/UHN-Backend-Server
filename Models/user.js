@@ -7,6 +7,10 @@ const model = mongoose.model("users", new Schema({
   password: String,
   email: String,
   phone: String,
+  location:{
+    lat: Number,
+    lon: Number
+  },
   responders: [{_id:false, id: String}]
 }));
 

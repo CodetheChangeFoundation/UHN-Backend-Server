@@ -20,6 +20,8 @@ app.post("/login", validateLogin(), user.loginUser);
 
 app.post("/users/:id/responders", middleware.checkToken, user.addResponders);
 
+app.post("/users/:id/location", middleware.checkToken, user.addLocation);
+
 app.post("/users/:id/status", middleware.checkToken, user.toggleStatus);
 
 app.get("/users/search", middleware.checkToken, user.searchUsers);
