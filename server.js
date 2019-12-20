@@ -29,7 +29,6 @@ app.get("/users/search", middleware.checkToken, user.searchUsers);
 app.get("/users/:id", middleware.checkToken, user.userInfo);
 app.get("/users/:id/responders", middleware.checkToken, user.getResponders);
 
-
 app.delete("/users/:id/responders/:responderid", middleware.checkToken, user.deleteResponder);
 
 app.listen(port, function () {
