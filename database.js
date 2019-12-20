@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 var db = null;
+const { check, validationResult } = require("express-validator");
 
 function connect(){
   mongoose.connect("mongodb://localhost/uhn-database",{useNewUrlParser:true});
@@ -8,6 +9,12 @@ function connect(){
   db.once("open", function(callback){
       console.log("connected to database");
   })
+}
+
+function getValidation(){
+  return {check: check,
+          validationResult: validationResult
+        };
 }
 
 function getdb(){
@@ -21,5 +28,6 @@ function getmongoose(){
 module.exports = {
   connect : connect,
   getdb : getdb,
-  getmongoose: getmongoose
+  getmongoose: getmongoose,
+  getValidation: getValidation
 }

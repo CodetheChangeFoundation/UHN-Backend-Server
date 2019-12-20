@@ -1,6 +1,7 @@
 require("dotenv").config({path: __dirname + "/.env"});
 const database = require("./database");
 database.connect();
+const { check, validationResult } = database.getValidation();
 const user = require("./Controllers/user");
 var express = require("express");
 var bodyParser = require("body-parser");
@@ -14,8 +15,8 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-app.post("/signup", user.signupUser);
-app.post("/login", user.loginUser);
+app.post("/signup", [check("username").isLength({ min: 5}), check("email").isEmail(), check("password").isLength({ min: 5})], user.signupUser);
+app.post("/login", [check("username").isLength({ min: 5}),check("password").isLength({ min: 5})], user.loginUser);
 
 app.post("/users/:id/responders", middleware.checkToken, user.addResponders);
 
