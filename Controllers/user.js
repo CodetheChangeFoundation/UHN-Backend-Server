@@ -74,40 +74,36 @@ async function signupUser(req, res) {
     var pass = req.body.password;
     var phone = req.body.phone;
 
-    let query = {username: username};
+    var result = null;
 
-    let update = {
-      $setOnInsert: { //only updates upon insertion (document does not exist)
-        username: username,
-        email: email,
-        password: bcrypt.hashSync(pass, 10),
-        phone: phone
-      }
-    };
-
-    let options = { upsert: true }; // updates when document is not found
-
-    var insertSuccess = true;
 
     try{
-    UserModel.findOneAndUpdate(query,update,options);
+      let foundUser = UserModel.findOne({username: username}, "username _id").exec();
+      var result = await foundUser;
     }
-    catch(err) {
+    catch{
+      handle.internalServerError(res,"cannot query database");
+    }
+
+    if (result){
+      console.log(result);
       handle.badRequest(res, "username already exists");
-      insertSuccess = false;
+    }
+    else{
+      console.log(result);
+      res.status(200).json({ username: username, email: email, phone: phone });
     }
 
+    // try {
+    //   let _id = UserModel.findOne({ username: username }, "username", { lean: true });
+    //   console.log(_id);
+    //   OnlineService.setOffline(_id.toString());
+    //   console.log("Record inserted Successfully");
+    //   res.status(200).json({ username: username, email: email, phone: phone });
+    // } catch (err) {
+    //   handle.internalServerError(res, "Insert user failed");
+    // }
 
-    if (insertSuccess){
-      try {
-        OnlineService.setOffline(newUser._id.toString());
-        console.log("Record inserted Successfully");
-
-        res.status(200).json({ username: username, email: email, phone: phone });
-      } catch (err) {
-        handle.internalServerError(res, "Insert user failed");
-      }
-    }
   }
 }
 
