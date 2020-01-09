@@ -74,20 +74,39 @@ async function signupUser(req, res) {
     var pass = req.body.password;
     var phone = req.body.phone;
 
-    try {
-      var newUser = new UserModel({
+    let query = {username: username};
+
+    let update = {
+      $setOnInsert: { //only updates upon insertion (document does not exist)
         username: username,
         email: email,
         password: bcrypt.hashSync(pass, 10),
         phone: phone
-      });
-      await newUser.save();
-      OnlineService.setOffline(newUser._id.toString());
-      console.log("Record inserted Successfully");
+      }
+    };
 
-      res.status(200).json({ username: username, email: email, phone: phone });
-    } catch (err) {
-      handle.internalServerError(res, "Insert user failed");
+    let options = { upsert: true }; // updates when document is not found
+
+    var insertSuccess = true;
+
+    try{
+    UserModel.findOneAndUpdate(query,update,options)
+    }
+    catch(err) {
+      handle.badRequest(res, "username already exists");
+      insertSuccess = false;
+    }
+
+
+    if (insertSuccess){
+      try {
+        OnlineService.setOffline(newUser._id.toString());
+        console.log("Record inserted Successfully");
+
+        res.status(200).json({ username: username, email: email, phone: phone });
+      } catch (err) {
+        handle.internalServerError(res, "Insert user failed");
+      }
     }
   }
 }
