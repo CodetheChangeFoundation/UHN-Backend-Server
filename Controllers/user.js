@@ -90,7 +90,7 @@ async function signupUser(req, res) {
     var insertSuccess = true;
 
     try{
-    UserModel.findOneAndUpdate(query,update,options)
+    UserModel.findOneAndUpdate(query,update,options);
     }
     catch(err) {
       handle.badRequest(res, "username already exists");
