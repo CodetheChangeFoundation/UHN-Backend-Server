@@ -78,7 +78,7 @@ async function signupUser(req, res) {
 
 
     try{
-      let foundUser = UserModel.findOne({username: username}, "username _id").exec();
+      let foundUser = UserModel.findOne({username: username}).exec();
       var result = await foundUser;
     }
     catch{
@@ -86,24 +86,29 @@ async function signupUser(req, res) {
     }
 
     if (result){
-      console.log(result);
       handle.badRequest(res, "username already exists");
     }
     else{
-      console.log(result);
-      res.status(200).json({ username: username, email: email, phone: phone });
+      let newUser = new UserModel({
+        username: username,
+        email: email,
+        password: bcrypt.hashSync(pass, 10),
+        phone: phone
+      });
+      await newUser.save();
+
+      try{
+        let foundUser = UserModel.findOne({username: username}).exec();
+        var result = await foundUser;
+      }
+      catch{
+        handle.internalServerError(res,"cannot query database");
+      }
+
+      OnlineService.setOffline(result._id.toString());
+      if(result)
+        res.status(200).json({ username: username, email: email, phone: phone });
     }
-
-    // try {
-    //   let _id = UserModel.findOne({ username: username }, "username", { lean: true });
-    //   console.log(_id);
-    //   OnlineService.setOffline(_id.toString());
-    //   console.log("Record inserted Successfully");
-    //   res.status(200).json({ username: username, email: email, phone: phone });
-    // } catch (err) {
-    //   handle.internalServerError(res, "Insert user failed");
-    // }
-
   }
 }
 
