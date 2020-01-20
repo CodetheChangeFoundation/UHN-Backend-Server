@@ -85,7 +85,6 @@ async function signupUser(req, res) {
       handle.internalServerError(res, "cannot query database");
     }
 
-    console.log("ran")
     let newUser = new UserModel({
       username: username,
       email: email,
