@@ -74,21 +74,34 @@ async function signupUser(req, res) {
     var pass = req.body.password;
     var phone = req.body.phone;
 
-    try {
-      var newUser = new UserModel({
-        username: username,
-        email: email,
-        password: bcrypt.hashSync(pass, 10),
-        phone: phone
-      });
-      await newUser.save();
-      OnlineService.setOffline(newUser._id.toString());
-      console.log("Record inserted Successfully");
+    var result = null;
 
-      res.status(200).json({ username: username, email: email, phone: phone });
-    } catch (err) {
-      handle.internalServerError(res, "Insert user failed");
+    try {
+      let foundUser = await UserModel.findOne({ username: username }).exec();
+      if (foundUser) {
+        return handle.badRequest(res, "username already exists");
+      }
+    } catch {
+      handle.internalServerError(res, "cannot query database");
     }
+
+    let newUser = new UserModel({
+      username: username,
+      email: email,
+      password: bcrypt.hashSync(pass, 10),
+      phone: phone
+    });
+    await newUser.save();
+
+    try {
+      result = await UserModel.findOne({ username: username }).exec();
+    } catch {
+      handle.internalServerError(res, "new user not added to the database");
+    }
+
+    OnlineService.setOffline(result._id.toString());
+    if (result)
+      res.status(200).json({ username: username, email: email, phone: phone });
   }
 }
 
