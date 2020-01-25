@@ -9,7 +9,7 @@ const model = mongoose.model("users", new Schema({
   phone: String,
   location:{
     lat: Number,
-    lon: Number
+    lng: Number
   },
   responders: [{_id:false, id: String}]
 }));

@@ -242,7 +242,7 @@ async function addLocation(req, res) {
   var query = { _id: new ObjectId(req.params.id) };
   try {
     var result = await UserModel.findOneAndUpdate(query, {
-      location: { lat: req.body.lat, lon: req.body.lon }
+      location: { lat: req.body.lat, lng: req.body.lng }
     });
   } catch {
     handle.internalServerError("Location could not be updated");
