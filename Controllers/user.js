@@ -250,6 +250,21 @@ async function addLocation(req, res) {
   res.status(200).send("Location successfully updated");
 }
 
+async function getLocation(req, res) {
+  const result = await UserModel.findOne({
+    _id: new ObjectId(req.params.id)
+  }).lean();
+
+  if (result) {
+    const data = {
+      location: result.location,
+    };
+    res.status(200).json(data);
+  } else {
+    handle.notFound(res, "Cannot find requested user!");
+  }
+}
+
 module.exports = {
   signupUser,
   loginUser,
@@ -259,5 +274,6 @@ module.exports = {
   deleteResponder,
   searchUsers,
   toggleStatus,
-  addLocation
+  addLocation,
+  getLocation
 };
