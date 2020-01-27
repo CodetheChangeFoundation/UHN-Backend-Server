@@ -238,7 +238,7 @@ async function toggleStatus(req, res) {
   }
 }
 
-async function addLocation(req, res) {
+async function updateLocation(req, res) {
   var query = { _id: new ObjectId(req.params.id) };
   try {
     var result = await UserModel.findOneAndUpdate(query, {
@@ -274,6 +274,6 @@ module.exports = {
   deleteResponder,
   searchUsers,
   toggleStatus,
-  addLocation,
+  updateLocation,
   getLocation
 };
