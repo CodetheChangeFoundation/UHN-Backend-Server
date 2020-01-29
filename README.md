@@ -58,7 +58,8 @@ responders added in request of form:
 
 
 ## Toggling Online Status
-POST "/users/:id/status"
+POST "/users/:id/status":
+
 ```
 {
 "request": "online"
@@ -66,5 +67,15 @@ POST "/users/:id/status"
 or
 {
 "request" : offline
+}
+```
+
+## Getting Responders of a users
+GET "/users/:id/responders" :
+```
+{
+    "id": "xxxx,
+    "username": "xxx",
+    "onlineStatus": true/false
 }
 ```
