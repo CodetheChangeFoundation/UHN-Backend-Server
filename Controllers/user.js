@@ -125,7 +125,7 @@ async function getResponders(req, res) {
       let onlineStatus = await OnlineService.checkOnlineStatus(responders[i].id);
       returnInfo.push({id: responders[i].id, username: user.username, onlineStatus: onlineStatus});
     }
-    res.status(200).send(returnInfo);
+    res.status(200).json({Responders: returnInfo});
   } else {
     handle.notFound(res, "Cannot find requested user ID in database");
   }

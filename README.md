@@ -56,6 +56,19 @@ responders added in request of form:
 }
 ```
 
+HTTP Response:
+```
+{
+    "respondersAdded": [
+        {
+            "id": "xxxx",
+            "username": "xxx",
+            "onlineStatus": true/false
+        }
+    ]
+}
+```
+
 
 ## Toggling Online Status
 POST "/users/:id/status":
@@ -72,10 +85,16 @@ or
 
 ## Getting Responders of a user
 GET "/users/:id/responders" :
+
+HTTP Response:
 ```
 {
-    "id": "xxxx,
-    "username": "xxx",
-    "onlineStatus": true/false
+    "Responders": [
+        {
+            "id": "5e3110e483ea5e2e6c7a62c0",
+            "username": "userB",
+            "onlineStatus": false
+        }
+    ]
 }
 ```
