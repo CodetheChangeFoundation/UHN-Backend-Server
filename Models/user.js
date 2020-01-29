@@ -11,6 +11,7 @@ const model = mongoose.model("users", new Schema({
     lat: Number,
     lng: Number
   },
+  note: String,
   responders: [{_id:false, id: String}]
 }));
 
