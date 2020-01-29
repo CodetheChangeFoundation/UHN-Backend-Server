@@ -40,7 +40,31 @@ $ npm start
 ```
 
 ### Run tests
-Make sure you are in project directory and run 
+Make sure you are in project directory and run
 ```(bash)
 $ npm test
+```
+
+### Endpoint Documentation
+
+## Adding Responders to a user
+POST "/users/:id/responders" :
+```
+responders added in request of form:
+{
+"respondersToAdd": [{"id": "insertIDhere"},{"id": "insert2ndIDhere"}]
+}
+```
+
+
+## Toggling Online Status
+POST "/users/:id/status"
+```
+{
+"request": "online"
+}
+or
+{
+"request" : offline
+}
 ```
