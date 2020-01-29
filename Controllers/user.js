@@ -158,14 +158,15 @@ async function addResponders(req, res) {
           user.save();
         }
 
+        console.log(respondersToAdd);
         let returnInfo = []
         for(var i = 0, len = respondersToAdd.length; i < len; i++){
-          var user = await UserModel.findOne({ _id: new ObjectId(respondersToAdd[i].id)}).lean();
-          let onlineStatus = await OnlineService.checkOnlineStatus(responders[i].id);
-          returnInfo.push({id: respondersToAdd[i].id, username: user.username, onlineStatus: onlineStatus});
+          let responder = await UserModel.findOne({ _id: new ObjectId(respondersToAdd[i].id)}).lean();
+          let onlineStatus = await OnlineService.checkOnlineStatus(respondersToAdd[i].id);
+          returnInfo.push({id: respondersToAdd[i].id, username: responder.username, onlineStatus: onlineStatus});
 }
 
-        res.status(400).json(respondersToAdd);
+        res.status(400).json({respondersAdded: returnInfo});
       } else {
         handle.badRequest(res, "One of responders to add is not valid"); //not single String of 12 bytes or a string of 24 hex characters or
       }
