@@ -70,7 +70,7 @@ or
 }
 ```
 
-## Getting Responders of a users
+## Getting Responders of a user
 GET "/users/:id/responders" :
 ```
 {
