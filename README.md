@@ -39,6 +39,23 @@ Make sure you are in project directory and run, it will automatically detect any
 $ npm start
 ```
 
+### Starting PostgreSQL Metrics Database
+1. Download and install Postgres 12 (Older versions cannot use Postgres 12 databases). Remember superuser password.
+
+2. Start server with `pg_ctl -D "PathToPostgresInstall" start` (Default windows path: "C:/Program Files/PostgreSQL/12/data")
+Stop server with `pg_ctl -D "PathToPostgresInstall" stop`
+
+3. Once server has started, enter postgres CLI with superuser account 'postgres' `psql postgres postgres`
+
+4. Create database called "UHN-metrics" `CREATE DATABASE UHN-metrics;`
+
+5. Create user named metric with password pwctcuhn `CREATE ROLE metric WITH LOGIN PASSWORD 'pwctcuhn';`
+
+6. Logout from postgres server and enter following command in the root directory to initalize database `psql --username=metric UHN-metrics < data.sql`
+
+To fill database with example data, uncomment bottom statements in data.sql and run command from step 6.
+
+
 ### Run tests
 Make sure you are in project directory and run 
 ```(bash)
