@@ -47,7 +47,7 @@ $ npm test
 
 # Endpoint Documentation
 
-## Getting Responders of a user
+## Getting responders of a user
 GET "/users/:id/responders" :
 
 HTTP Response:
@@ -55,10 +55,37 @@ HTTP Response:
 {
     "Responders": [
         {
-            "id": "5e3110e483ea5e2e6c7a62c0",
-            "username": "userB",
-            "onlineStatus": false
+            "id": string,
+            "username": string,
+            "onlineStatus": boolean
         }
+    ]
+}
+```
+
+## Adding a responder to a user
+POST "/users/:id/responders" :
+
+Request Body:
+```
+{
+    "respondersToAdd": [
+        {"id": string},
+        ...
+    ]
+}
+```
+
+HTTP Response:
+```
+{
+    "respondersAdded": [
+        {
+            "id": string,
+            "username": string,
+            "onlineStatus": boolean
+        }
+        ...
     ]
 }
 ```
