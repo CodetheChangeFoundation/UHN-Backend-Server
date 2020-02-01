@@ -16,8 +16,10 @@
     "express": "^4.17.1",
     "express-validator": "^6.3.0",
     "jsonwebtoken": "^8.5.1",
+    "knex": "^0.20.8",
     "mongodb": "^3.3.3",
     "mongoose": "^5.7.6",
+    "pg": "^7.18.1",
     "redis": "^2.8.0"
   },
   "devDependencies": {
