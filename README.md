@@ -99,3 +99,21 @@ HTTP Response:
     "id": string
 }
 ```
+## Post request
+POST /users/:id/status"
+
+Post request in the form of the following:
+```
+{
+"request": "online"
+}
+or
+{
+"request" : offline
+}
+```
+
+HTTP Response:
+```
+User now online/offline
+```

@@ -150,6 +150,34 @@ async function getResponders(req, res) {
   }
 }
 
+async function getResponderCount(req,res){
+  const user = await UserModel.findOne({
+    _id: new ObjectId(req.params.id)
+  }).lean();
+
+  if (user) {
+    let responders = user.responders;
+    if (req.query.online=="false"||req.query.online==null){
+      res.status(200).json({count: responders.length});
+    }
+    else{
+      let count = 0;
+      for (let r of responders) {
+        var responder = await UserModel.findOne({
+          _id: new ObjectId(r.id)
+        }).lean();
+        let onlineStatus = await OnlineService.checkOnlineStatus(r.id);
+        if (onlineStatus==true)
+          count +=1;
+        }
+      res.status(200).json({online_count: count});
+    }
+  }
+  else {
+    handle.notFound(res, "Cannot find requested user ID in database");
+  }
+}
+
 async function addResponders(req, res) {
   var respondersToAdd = req.body.respondersToAdd;
 
@@ -163,7 +191,6 @@ async function addResponders(req, res) {
     if (user) {
       for (var i = 0, len = respondersToAdd.length; i < len; i++) {
         //validating responders to be added
-
         try {
           var foundUser = await UserModel.findOne({
             _id: new ObjectId(respondersToAdd[i].id)
@@ -282,6 +309,7 @@ async function addLocation(req, res) {
   res.status(200).send("Location successfully updated");
 }
 
+
 module.exports = {
   signupUser,
   loginUser,
@@ -291,5 +319,6 @@ module.exports = {
   deleteResponder,
   searchUsers,
   toggleStatus,
-  addLocation
+  addLocation,
+  getResponderCount
 };
