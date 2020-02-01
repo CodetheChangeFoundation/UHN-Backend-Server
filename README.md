@@ -89,3 +89,13 @@ HTTP Response:
     ]
 }
 ```
+
+## Deleting a responder from a user
+DELETE "/users/:id/responders/:responderid" :
+
+HTTP Response:
+```
+{
+    "id": string
+}
+```
