@@ -222,7 +222,7 @@ async function deleteResponder(req, res) {
     if (hasResponderID) {
       user.responders.pull({ id: req.params.responderid });
       user.save();
-      res.status(200).send("Deletion successful");
+      res.status(200).json({ success: true, deleted: req.params.responderid });
     } else {
       handle.badRequest(res, "Responder is not valid to delete for this user");
     }
