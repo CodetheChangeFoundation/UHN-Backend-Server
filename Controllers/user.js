@@ -113,23 +113,29 @@ async function userInfo(req, res) {
 }
 
 async function getResponders(req, res) {
-  const result = await UserModel.findOne({
+  const user = await UserModel.findOne({
     _id: new ObjectId(req.params.id)
   }).lean();
 
   var returnInfo = [];
-  if (result) {
-    let responders = result.responders;
-    for(var i = 0, len = responders.length; i < len; i++){
-      var user = await UserModel.findOne({ _id: new ObjectId(responders[i].id)}).lean();
-      let onlineStatus = await OnlineService.checkOnlineStatus(responders[i].id);
-      returnInfo.push({id: responders[i].id, username: user.username, onlineStatus: onlineStatus});
+  if (user) {
+    let responders = user.responders;
+    for (let r of responders) {
+      var responder = await UserModel.findOne({
+        _id: new ObjectId(r.id)
+      }).lean();
+      let onlineStatus = await OnlineService.checkOnlineStatus(r.id);
+      returnInfo.push({
+        id: r.id,
+        username: responder.username,
+        onlineStatus: onlineStatus
+      });
     }
-    res.status(200).json({Responders: returnInfo});
+    res.status(200).json({ responders: returnInfo });
   } else {
     handle.notFound(res, "Cannot find requested user ID in database");
   }
-};
+}
 
 async function addResponders(req, res) {
   var respondersToAdd = req.body.respondersToAdd;

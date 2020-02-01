@@ -45,43 +45,7 @@ Make sure you are in project directory and run
 $ npm test
 ```
 
-### Endpoint Documentation
-
-## Adding Responders to a user
-POST "/users/:id/responders" :
-```
-responders added in request of form:
-{
-"respondersToAdd": [{"id": "insertIDhere"},{"id": "insert2ndIDhere"}]
-}
-```
-
-HTTP Response:
-```
-{
-    "respondersAdded": [
-        {
-            "id": "xxxx",
-            "username": "xxx",
-            "onlineStatus": true/false
-        }
-    ]
-}
-```
-
-
-## Toggling Online Status
-POST "/users/:id/status":
-
-```
-{
-"request": "online"
-}
-or
-{
-"request" : offline
-}
-```
+# Endpoint Documentation
 
 ## Getting Responders of a user
 GET "/users/:id/responders" :
