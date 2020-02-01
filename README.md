@@ -99,8 +99,8 @@ HTTP Response:
     "id": string
 }
 ```
-## Post request
-POST /users/:id/status"
+## Toggling Statuses
+POST "/users/:id/status"
 
 Post request in the form of the following:
 ```
@@ -116,4 +116,19 @@ or
 HTTP Response:
 ```
 User now online/offline
+```
+
+##  Getting Responder Count
+GET "/user/:id/responders/count?online=true" (Gets only online responders)
+or "/user/:id/responders/count?online=false" (Gets all responders)
+or "/user/:id/responders/count?online" (Gets all responders)
+
+HTTP Response:
+```
+online_count: int
+```
+
+or
+```
+count: int
 ```
