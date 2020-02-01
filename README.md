@@ -40,7 +40,25 @@ $ npm start
 ```
 
 ### Run tests
-Make sure you are in project directory and run 
+Make sure you are in project directory and run
 ```(bash)
 $ npm test
+```
+
+# Endpoint Documentation
+
+## Getting Responders of a user
+GET "/users/:id/responders" :
+
+HTTP Response:
+```
+{
+    "Responders": [
+        {
+            "id": "5e3110e483ea5e2e6c7a62c0",
+            "username": "userB",
+            "onlineStatus": false
+        }
+    ]
+}
 ```
