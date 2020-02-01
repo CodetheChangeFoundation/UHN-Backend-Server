@@ -173,27 +173,36 @@ async function addResponders(req, res) {
           break;
         }
 
-        if (foundUser == null) {
+        if (
+          foundUser == null ||
+          user.responders.find(e => e.id === foundUser.id)
+        ) {
           validFlag = false; //does not exist in database
           break;
         }
       }
 
       if (validFlag == true) {
+        let returnInfo = [];
+
         for (var i = 0, len = respondersToAdd.length; i < len; i++) {
           user.responders.push(respondersToAdd[i]);
           user.save();
+
+          let responder = await UserModel.findOne({
+            _id: new ObjectId(respondersToAdd[i].id)
+          }).lean();
+          let onlineStatus = await OnlineService.checkOnlineStatus(
+            respondersToAdd[i].id
+          );
+          returnInfo.push({
+            id: respondersToAdd[i].id,
+            username: responder.username,
+            onlineStatus: onlineStatus
+          });
         }
 
-        console.log(respondersToAdd);
-        let returnInfo = []
-        for(var i = 0, len = respondersToAdd.length; i < len; i++){
-          let responder = await UserModel.findOne({ _id: new ObjectId(respondersToAdd[i].id)}).lean();
-          let onlineStatus = await OnlineService.checkOnlineStatus(respondersToAdd[i].id);
-          returnInfo.push({id: respondersToAdd[i].id, username: responder.username, onlineStatus: onlineStatus});
-}
-
-        res.status(400).json({respondersAdded: returnInfo});
+        res.status(200).json({ respondersAdded: returnInfo });
       } else {
         handle.badRequest(res, "One of responders to add is not valid"); //not single String of 12 bytes or a string of 24 hex characters or
       }
