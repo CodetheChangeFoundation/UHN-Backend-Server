@@ -150,6 +150,31 @@ async function getResponders(req, res) {
   }
 }
 
+async function getResponderCount(req, res) {
+  const user = await UserModel.findOne({
+    _id: new ObjectId(req.params.id)
+  }).lean();
+
+  if (user) {
+    let responders = user.responders;
+    if (req.query.online == "false" || Object.entries(req.query).length == 0) {
+      res.status(200).json({ count: responders.length });
+    } else {
+      let count = 0;
+      for (let r of responders) {
+        var responder = await UserModel.findOne({
+          _id: new ObjectId(r.id)
+        }).lean();
+        let onlineStatus = await OnlineService.checkOnlineStatus(r.id);
+        if (onlineStatus == true) count++;
+      }
+      res.status(200).json({ count: count });
+    }
+  } else {
+    handle.notFound(res, "Cannot find requested user ID in database");
+  }
+}
+
 async function addResponders(req, res) {
   var respondersToAdd = req.body.respondersToAdd;
 
@@ -163,7 +188,6 @@ async function addResponders(req, res) {
     if (user) {
       for (var i = 0, len = respondersToAdd.length; i < len; i++) {
         //validating responders to be added
-
         try {
           var foundUser = await UserModel.findOne({
             _id: new ObjectId(respondersToAdd[i].id)
@@ -273,10 +297,14 @@ async function toggleStatus(req, res) {
 async function updateLocation(req, res) {
   var query = { _id: new ObjectId(req.params.id) };
   try {
-    var result = await UserModel.findOneAndUpdate(query, {
-      location: { lat: req.body.lat, lng: req.body.lng },
-      note: req.body.note && req.body.note
-    }, { new: true }).lean();
+    var result = await UserModel.findOneAndUpdate(
+      query,
+      {
+        location: { lat: req.body.lat, lng: req.body.lng },
+        note: req.body.note && req.body.note
+      },
+      { new: true }
+    ).lean();
   } catch {
     handle.internalServerError("Location could not be updated");
   }
@@ -313,5 +341,6 @@ module.exports = {
   searchUsers,
   toggleStatus,
   updateLocation,
-  getLocation
+  getLocation,
+  getResponderCount
 };
