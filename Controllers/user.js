@@ -126,11 +126,25 @@ async function userInfo(req, res) {
 }
 
 async function getResponders(req, res) {
-  const result = await UserModel.findOne({
+  const user = await UserModel.findOne({
     _id: new ObjectId(req.params.id)
   }).lean();
-  if (result) {
-    res.status(200).json({ responders: result.responders });
+
+  var returnInfo = [];
+  if (user) {
+    let responders = user.responders;
+    for (let r of responders) {
+      var responder = await UserModel.findOne({
+        _id: new ObjectId(r.id)
+      }).lean();
+      let onlineStatus = await OnlineService.checkOnlineStatus(r.id);
+      returnInfo.push({
+        id: r.id,
+        username: responder.username,
+        onlineStatus: onlineStatus
+      });
+    }
+    res.status(200).json({ responders: returnInfo });
   } else {
     handle.notFound(res, "Cannot find requested user ID in database");
   }
@@ -159,18 +173,36 @@ async function addResponders(req, res) {
           break;
         }
 
-        if (foundUser == null) {
+        if (
+          foundUser == null ||
+          user.responders.find(e => e.id === foundUser.id)
+        ) {
           validFlag = false; //does not exist in database
           break;
         }
       }
 
       if (validFlag == true) {
+        let returnInfo = [];
+
         for (var i = 0, len = respondersToAdd.length; i < len; i++) {
           user.responders.push(respondersToAdd[i]);
           user.save();
+
+          let responder = await UserModel.findOne({
+            _id: new ObjectId(respondersToAdd[i].id)
+          }).lean();
+          let onlineStatus = await OnlineService.checkOnlineStatus(
+            respondersToAdd[i].id
+          );
+          returnInfo.push({
+            id: respondersToAdd[i].id,
+            username: responder.username,
+            onlineStatus: onlineStatus
+          });
         }
-        res.status(400).json(respondersToAdd);
+
+        res.status(200).json({ respondersAdded: returnInfo });
       } else {
         handle.badRequest(res, "One of responders to add is not valid"); //not single String of 12 bytes or a string of 24 hex characters or
       }
@@ -190,7 +222,7 @@ async function deleteResponder(req, res) {
     if (hasResponderID) {
       user.responders.pull({ id: req.params.responderid });
       user.save();
-      res.status(200).send("Deletion successful");
+      res.status(200).json({ id: req.params.responderid });
     } else {
       handle.badRequest(res, "Responder is not valid to delete for this user");
     }

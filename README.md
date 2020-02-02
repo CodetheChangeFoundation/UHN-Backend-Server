@@ -40,7 +40,62 @@ $ npm start
 ```
 
 ### Run tests
-Make sure you are in project directory and run 
+Make sure you are in project directory and run
 ```(bash)
 $ npm test
+```
+
+# Endpoint Documentation
+
+## Getting responders of a user
+GET "/users/:id/responders" :
+
+HTTP Response:
+```
+{
+    "Responders": [
+        {
+            "id": string,
+            "username": string,
+            "onlineStatus": boolean
+        }
+    ]
+}
+```
+
+## Adding a responder to a user
+POST "/users/:id/responders" :
+
+Request Body:
+```
+{
+    "respondersToAdd": [
+        {"id": string},
+        ...
+    ]
+}
+```
+
+HTTP Response:
+```
+{
+    "respondersAdded": [
+        {
+            "id": string,
+            "username": string,
+            "onlineStatus": boolean
+        }
+        ...
+    ]
+}
+```
+
+## Deleting a responder from a user
+DELETE "/users/:id/responders/:responderid" :
+
+HTTP Response:
+```
+{
+    "id": string
+}
 ```
