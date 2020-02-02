@@ -276,11 +276,15 @@ async function updateLocation(req, res) {
     var result = await UserModel.findOneAndUpdate(query, {
       location: { lat: req.body.lat, lng: req.body.lng },
       note: req.body.note && req.body.note
-    });
+    }, { new: true }).lean();
   } catch {
     handle.internalServerError("Location could not be updated");
   }
-  res.status(200).send("Location successfully updated");
+  res.status(200).json({
+    id: result._id,
+    location: result.location,
+    note: result.note
+  });
 }
 
 async function getLocation(req, res) {
