@@ -270,16 +270,37 @@ async function toggleStatus(req, res) {
   }
 }
 
-async function addLocation(req, res) {
+async function updateLocation(req, res) {
   var query = { _id: new ObjectId(req.params.id) };
   try {
     var result = await UserModel.findOneAndUpdate(query, {
-      location: { lat: req.body.lat, lon: req.body.lon }
-    });
+      location: { lat: req.body.lat, lng: req.body.lng },
+      note: req.body.note && req.body.note
+    }, { new: true }).lean();
   } catch {
     handle.internalServerError("Location could not be updated");
   }
-  res.status(200).send("Location successfully updated");
+  res.status(200).json({
+    id: result._id,
+    location: result.location,
+    note: result.note
+  });
+}
+
+async function getLocation(req, res) {
+  const result = await UserModel.findOne({
+    _id: new ObjectId(req.params.id)
+  }).lean();
+
+  if (result) {
+    const data = {
+      location: result.location,
+      note: result.note
+    };
+    res.status(200).json(data);
+  } else {
+    handle.notFound(res, "Cannot find requested user!");
+  }
 }
 
 module.exports = {
@@ -291,5 +312,6 @@ module.exports = {
   deleteResponder,
   searchUsers,
   toggleStatus,
-  addLocation
+  updateLocation,
+  getLocation
 };
