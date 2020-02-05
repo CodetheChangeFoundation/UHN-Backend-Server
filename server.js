@@ -3,7 +3,6 @@ const database = require("./database");
 database.connect();
 const { validateSignup, validateLogin } = require("./Utils/error_handling");
 const user = require("./Controllers/user");
-const metrics = require("./Controllers/metrics");
 var express = require("express");
 var bodyParser = require("body-parser");
 let middleware = require("./middleware");
