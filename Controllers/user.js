@@ -126,11 +126,50 @@ async function userInfo(req, res) {
 }
 
 async function getResponders(req, res) {
-  const result = await UserModel.findOne({
+  const user = await UserModel.findOne({
     _id: new ObjectId(req.params.id)
   }).lean();
-  if (result) {
-    res.status(200).json({ responders: result.responders });
+
+  var returnInfo = [];
+  if (user) {
+    let responders = user.responders;
+    for (let r of responders) {
+      var responder = await UserModel.findOne({
+        _id: new ObjectId(r.id)
+      }).lean();
+      let onlineStatus = await OnlineService.checkOnlineStatus(r.id);
+      returnInfo.push({
+        id: r.id,
+        username: responder.username,
+        onlineStatus: onlineStatus
+      });
+    }
+    res.status(200).json({ responders: returnInfo });
+  } else {
+    handle.notFound(res, "Cannot find requested user ID in database");
+  }
+}
+
+async function getResponderCount(req, res) {
+  const user = await UserModel.findOne({
+    _id: new ObjectId(req.params.id)
+  }).lean();
+
+  if (user) {
+    let responders = user.responders;
+    if (req.query.online == "false" || Object.entries(req.query).length == 0) {
+      res.status(200).json({ count: responders.length });
+    } else {
+      let count = 0;
+      for (let r of responders) {
+        var responder = await UserModel.findOne({
+          _id: new ObjectId(r.id)
+        }).lean();
+        let onlineStatus = await OnlineService.checkOnlineStatus(r.id);
+        if (onlineStatus == true) count++;
+      }
+      res.status(200).json({ count: count });
+    }
   } else {
     handle.notFound(res, "Cannot find requested user ID in database");
   }
@@ -149,7 +188,6 @@ async function addResponders(req, res) {
     if (user) {
       for (var i = 0, len = respondersToAdd.length; i < len; i++) {
         //validating responders to be added
-
         try {
           var foundUser = await UserModel.findOne({
             _id: new ObjectId(respondersToAdd[i].id)
@@ -159,18 +197,36 @@ async function addResponders(req, res) {
           break;
         }
 
-        if (foundUser == null) {
+        if (
+          foundUser == null ||
+          user.responders.find(e => e.id === foundUser.id)
+        ) {
           validFlag = false; //does not exist in database
           break;
         }
       }
 
       if (validFlag == true) {
+        let returnInfo = [];
+
         for (var i = 0, len = respondersToAdd.length; i < len; i++) {
           user.responders.push(respondersToAdd[i]);
           user.save();
+
+          let responder = await UserModel.findOne({
+            _id: new ObjectId(respondersToAdd[i].id)
+          }).lean();
+          let onlineStatus = await OnlineService.checkOnlineStatus(
+            respondersToAdd[i].id
+          );
+          returnInfo.push({
+            id: respondersToAdd[i].id,
+            username: responder.username,
+            onlineStatus: onlineStatus
+          });
         }
-        res.status(400).json(respondersToAdd);
+
+        res.status(200).json({ respondersAdded: returnInfo });
       } else {
         handle.badRequest(res, "One of responders to add is not valid"); //not single String of 12 bytes or a string of 24 hex characters or
       }
@@ -190,7 +246,7 @@ async function deleteResponder(req, res) {
     if (hasResponderID) {
       user.responders.pull({ id: req.params.responderid });
       user.save();
-      res.status(200).send("Deletion successful");
+      res.status(200).json({ id: req.params.responderid });
     } else {
       handle.badRequest(res, "Responder is not valid to delete for this user");
     }
@@ -241,17 +297,25 @@ async function toggleStatus(req, res) {
 async function updateLocation(req, res) {
   var query = { _id: new ObjectId(req.params.id) };
   try {
-    var result = await UserModel.findOneAndUpdate(query, {
-      location: {
-        coords: req.body.coords,
-        note: req.body.note && req.body.note
-      }
-    });
+    var result = await UserModel.findOneAndUpdate(
+      query,
+      {
+        location: {
+          coords: req.body.coords,
+          note: req.body.note && req.body.note
+        }
+      },
+      { new: true }
+    ).lean();
     res.status(200).send(result)
   } catch {
     handle.internalServerError("Location could not be updated");
   }
-  res.status(200).send("Location successfully updated");
+  res.status(200).json({
+    id: result._id,
+    location: result.location,
+    note: result.note
+  });
 }
 
 async function getLocation(req, res) {
@@ -279,5 +343,6 @@ module.exports = {
   searchUsers,
   toggleStatus,
   updateLocation,
-  getLocation
+  getLocation,
+  getResponderCount
 };
