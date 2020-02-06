@@ -4,10 +4,7 @@ var ObjectId = require("mongodb").ObjectId;
 var handle = require("../Utils/error_handling");
 const { customValidationResult } = require("../Utils/error_handling");
 
-let metricDB = require('knex')({
-  client: 'pg',
-  connection: process.env.DATABASE_URL
-});
+const UserMetrics = require("../Models/user");
 
 var UserModel = require("../Models/user").model;
 var OnlineService = require("../Utils/online_status");
@@ -58,11 +55,7 @@ async function loginUser(req, res) {
           console.log("Successful login");
 
           try {
-            await metricDB('users').where({
-              username: data.username
-            }).update({
-              lastlogin: metricDB.fn.now()
-            }).returning("*").then(res => console.log(res));
+            await UserMetrics.updateUserLoginTime(data.username);
           } catch (err) {
             handle.notFound(res, 'Cannot find user in metrics database');
           }
@@ -116,12 +109,7 @@ async function signupUser(req, res) {
     }
 
     try {
-      await metricDB('users').insert({
-        username: username,
-        lastlogin: metricDB.fn.now()
-      }).returning("*").then(res => {
-        console.log(res)
-      })
+      await UserMetrics.addNewUserToMetrics(username);
     } catch (err) {
       console.log(err)
       handle.internalServerError(res, "Cannot add new user to metrics database")
