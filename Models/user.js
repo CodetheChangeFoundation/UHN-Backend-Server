@@ -2,15 +2,15 @@ var database = require("../database");
 var mongoose = database.getmongoose();
 var Schema = mongoose.Schema;
 
-let metricDB = require('knex')({
-  client: 'pg',
+let metricDB = require("knex")({
+  client: "pg",
   connection: process.env.DATABASE_URL
 });
 
 async function updateUserLoginTime(username){
   let checkExists = null;
   try {
-    await metricDB('users').where({
+    await metricDB("users").where({
       username: username
     }).update({
       lastlogin: metricDB.fn.now()
@@ -33,11 +33,11 @@ async function updateUserLoginTime(username){
 
 async function addNewUserToMetrics(username) {
  try {
-   await metricDB('users').insert({
+   await metricDB("users").insert({
     username: username,
     lastlogin: metricDB.fn.now()
   }).returning("*").then(res => {
-    console.log(res)
+    console.log(res);
   })
  } catch (err) {
    throw err;
