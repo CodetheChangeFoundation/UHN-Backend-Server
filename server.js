@@ -33,6 +33,10 @@ app.get("/users/:id/responders", middleware.checkToken, user.getResponders);
 app.get("/users/:id/responders/count",middleware.checkToken,user.getResponderCount);
 app.delete("/users/:id/responders/:responderid", middleware.checkToken, user.deleteResponder);
 
+app.post("/metrics/alarm", alarm.alarmStart)
+app.put("/metrics/alarm", alarm.alarmStatusSet)
+app.put("/metrics/alarm/extend", alarm.extendAlarm)
+
 app.listen(port, function () {
   console.log(`Server is running on port ${port}`);
 });

@@ -24,6 +24,7 @@ async function createAlarmLog(username, timeStart, timeEnd) {
 }
 
 async function updateAlarmEndTime(logID, newTime) {
+  let result = null;
   try {
     await metricDB("alarmlog").where({
       id: logID
@@ -31,19 +32,30 @@ async function updateAlarmEndTime(logID, newTime) {
       alarmend: newTime
     }).returning("*").then(res => {
       console.log(res);
-    })
+      result = res;
+    });
+
+    return result;
+
   } catch (err) {
     throw err;
   }
 }
 
-async function updateAlarmSent(logID) {
+async function updateAlarmSent(logID, status) {
+  let result = null;
   try {
     await metricDB("alarmlog").where({
       id: logID
     }).update({
-      alarmsent: "TRUE"
+      alarmsent: status
+    }).returning("*").then(res => {
+      console.log(res);
+      result = res;
     })
+
+    return result;
+
   } catch (err) {
     throw err;
   }
