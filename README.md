@@ -52,10 +52,13 @@ $ npm start
 ```
 
 ### Starting PostgreSQL Metrics Database
-1. Download and install Postgres 12 (Older versions cannot use Postgres 12 databases). Remember superuser password.
+1. [Download](https://www.postgresql.org/download/) and install Postgres 12 (Older versions cannot use Postgres 12 databases). Remember superuser password.
 
-2. Start server with `pg_ctl -D "PathToPostgresInstall" start` (Default windows path: "C:/Program Files/PostgreSQL/12/data")
-Stop server with `pg_ctl -D "PathToPostgresInstall" stop`
+2. Start server with `pg_ctl -D "PathToPostgresInstall" start` 
+
+    (Default windows path: "C:/Program Files/PostgreSQL/12/data")
+
+    Stop server with `pg_ctl -D "PathToPostgresInstall" stop`
 
 3. Once server has started, enter postgres CLI with superuser account 'postgres' `psql postgres postgres`
 
