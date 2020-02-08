@@ -234,7 +234,7 @@ Request Body:
     "alarmInfo": [
         {
             "alarmID": integer,
-            "newEnd": string // get UTC string with: new Date().toUTCString()
+            "newTime": string // get UTC string with: new Date().toUTCString()
         }
         ...
     ]

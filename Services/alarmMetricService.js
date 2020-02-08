@@ -12,8 +12,8 @@ async function alarmStart(req, res) {
     let alarmID = null;
     await metricDB("alarmlog").insert({
       userid: metricDB("users").select("id").where({username: data.username}),
-      alarmstart: data.timeStart,
-      alarmend: data.timeEnd,
+      alarmstart: data.startTime,
+      alarmend: data.endTime,
       alarmsent: "FALSE"
     }).returning("*").then(res => {
       alarmID = res[0].id;
@@ -50,6 +50,7 @@ async function extendAlarm(req, res) {
       handle.notFound("Cannot find alarm log with given ID");
     }
   } catch (err) {
+    console.log(err);
     handle.internalServerError(res, "Cannot update alarm end time");
   }
 }
@@ -75,6 +76,7 @@ async function alarmStatusSet(req, res) {
       handle.notFound("Cannot find alarm log with given ID");
     }
   } catch (err) {
+    console.log(err)
     handle.internalServerError(res, "Cannot update alarm log sent state");
   }
 }
