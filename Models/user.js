@@ -1,4 +1,4 @@
-var database = require("../database");
+var database = require("../database/mongoose");
 var mongoose = database.getmongoose();
 var Schema = mongoose.Schema;
 
