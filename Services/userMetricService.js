@@ -15,15 +15,12 @@ async function updateUserLoginTime(username){
     }).returning("*").then(res => {
       checkExists = res;
       console.log(checkExists);
+
+      if (checkExists.length < 1) {
+        await addNewUserToMetrics(username);
+      }
     });
 
-    if (checkExists.length < 1) {
-      try {
-        await addNewUserToMetrics(username);
-      } catch (err) {
-        throw err;
-      }
-    }
   } catch (err) {
     throw err;
   }
