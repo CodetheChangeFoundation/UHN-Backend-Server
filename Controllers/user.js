@@ -4,7 +4,10 @@ var ObjectId = require("mongodb").ObjectId;
 var handle = require("../Utils/error_handling");
 const { customValidationResult } = require("../Utils/error_handling");
 
-const UserMetrics = require("../Models/user");
+let metricDB = require("knex")({
+  client: "pg",
+  connection: process.env.DATABASE_URL
+});
 
 var UserModel = require("../Models/user").model;
 var OnlineService = require("../Utils/online_status");
@@ -55,7 +58,7 @@ async function loginUser(req, res) {
           console.log("Successful login");
 
           try {
-            await UserMetrics.updateUserLoginTime(data.username);
+            await updateUserLoginTime(data.username);
           } catch (err) {
             handle.notFound(res, 'Cannot find user in metrics database');
           }
@@ -109,7 +112,7 @@ async function signupUser(req, res) {
     }
 
     try {
-      await UserMetrics.addNewUserToMetrics(username);
+      await addNewUserToMetrics(username);
     } catch (err) {
       console.log(err)
       handle.internalServerError(res, "Cannot add new user to metrics database")
@@ -346,6 +349,43 @@ async function getLocation(req, res) {
     handle.notFound(res, "Cannot find requested user!");
   }
 }
+
+async function updateUserLoginTime(username){
+  let checkExists = null;
+  try {
+    await metricDB("users").where({
+      username: username
+    }).update({
+      lastlogin: metricDB.fn.now()
+    }).returning("*").then(res => {
+      checkExists = res;
+      console.log(checkExists);
+    });
+
+    if (checkExists.length < 1) {
+      try {
+        await addNewUserToMetrics(username);
+      } catch (err) {
+        throw err;
+      }
+    }
+  } catch (err) {
+    throw err;
+  }
+}
+
+async function addNewUserToMetrics(username) {
+  try {
+    await metricDB("users").insert({
+     username: username,
+     lastlogin: metricDB.fn.now()
+   }).returning("*").then(res => {
+     console.log(res);
+   })
+  } catch (err) {
+    throw err;
+  }
+ }
 
 module.exports = {
   signupUser,
