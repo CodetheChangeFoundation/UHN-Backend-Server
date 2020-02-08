@@ -167,14 +167,9 @@ Request Body:
 
 ```
 {
-    "alarmInfo": [
-        {
-            "username": string,
-            "startTime": string, // get UTC string with: new Date().toUTCString()
-            "endTime": string // get UTC string with: new Date().toUTCString()
-        }
-        ...
-    ]
+    "username": string,
+    "startTime": string, // get UTC string with: new Date().toUTCString()
+    "endTime": string // get UTC string with: new Date().toUTCString()
 }
 ```
 
@@ -182,15 +177,10 @@ HTTP Response:
 
 ```
 {
-    "addedAlarm": [
-        {
-            "alarmID": integer // keep returned id for future log updates
-            "username": string,
-            "startTime": string,
-            "endTime": string 
-        }
-        ...
-    ]
+    "id": integer // keep returned id for future log updates
+    "username": string,
+    "startTime": string,
+    "endTime": string 
 }
 ```
 
@@ -201,28 +191,18 @@ PUT "/metrics/alarm/:id"
 Request Body:
 
 ```
-{
-    "alarmInfo": [ // requires one of sentStatus or newEndTime but also supports updating both at once
-        {
-            "sentStatus": boolean,
-            "newEndTime": string // get UTC string with: new Date().toUTCString()
-        }
-        ...
-    ]
+{// requires one of sentStatus or newEndTime but also supports updating both at once
+    "sentStatus": boolean,
+    "newEndTime": string // get UTC string with: new Date().toUTCString()
 }
 ```
 
 HTTP Response:
 
 ```
-{
-    "response": [ // returns alarmStatus if sentStatus was in body, same for alarmEnd and newEndTime
-        {
-            "id": integer,
-            "alarmStatus": boolean,
-            "alarmEnd": string 
-        }
-        ...
-    ]
+{// returns alarmStatus if sentStatus was in body, same for alarmEnd and newEndTime
+    "id": integer,
+    "alarmStatus": boolean,
+    "alarmEnd": string 
 }
 ```

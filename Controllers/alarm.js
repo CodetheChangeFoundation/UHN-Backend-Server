@@ -17,7 +17,7 @@ async function alarmStart(req, res) {
     let alarmID = await alarmService.createAlarmLog(userID, data.startTime, data.endTime);
     console.log(alarmID);
     res.status(200).json({
-      alarmID: alarmID,
+      id: alarmID,
       username: data.username,
       startTime: data.startTime,
       endTime: data.endTime
