@@ -170,8 +170,8 @@ Request Body:
     "alarmInfo": [
         {
             "username": string,
-            "startTime": string, // get UTC string from Date object with .toUTCString()
-            "endTime": string // get UTC string from Date object with .toUTCString()
+            "startTime": string, // get UTC string with: new Date().toUTCString()
+            "endTime": string // get UTC string with: new Date().toUTCString()
         }
         ...
     ]
@@ -234,7 +234,7 @@ Request Body:
     "alarmInfo": [
         {
             "alarmID": integer,
-            "newEnd": string // get UTC string from Date object with .toUTCString()
+            "newEnd": string // get UTC string with: new Date().toUTCString()
         }
         ...
     ]
