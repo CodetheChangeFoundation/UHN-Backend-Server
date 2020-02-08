@@ -158,3 +158,99 @@ HTTP Response:
     "count": int
 }
 ```
+
+## Adding Alarm Metric Log
+
+POST "/metrics/alarm"
+
+Request Body:
+
+```
+{
+    "alarmInfo": [
+        {
+            "username": string,
+            "startTime": string, // get UTC string from Date object with .toUTCString()
+            "endTime": string // get UTC string from Date object with .toUTCString()
+        }
+        ...
+    ]
+}
+```
+
+HTTP Response:
+
+```
+{
+    "addedAlarm": [
+        {
+            "alarmID": integer // keep returned id for future log updates
+        }
+        ...
+    ]
+}
+```
+
+## Update Alarm Log Sent Status
+
+PUT "/metrics/alarm"
+
+Request Body:
+
+```
+{
+    "alarmInfo": [
+        {
+            "alarmID": integer,
+            "sentStatus": boolean
+        }
+        ...
+    ]
+}
+```
+
+HTTP Response:
+
+```
+{
+    "response": [
+        {
+            "success": boolean,
+            "message": string
+        }
+        ...
+    ]
+}
+```
+
+## Update Alarm Log End Time
+
+PUT "/metrics/alarm/extend"
+
+Request Body:
+
+```
+{
+    "alarmInfo": [
+        {
+            "alarmID": integer,
+            "newEnd": string // get UTC string from Date object with .toUTCString()
+        }
+        ...
+    ]
+}
+```
+
+HTTP Response:
+
+```
+{
+    "response": [
+        {
+            "success": boolean,
+            "message": string
+        }
+        ...
+    ]
+}
+```
