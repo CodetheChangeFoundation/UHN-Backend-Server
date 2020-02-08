@@ -7,7 +7,6 @@ var Schema = mongoose.Schema;
 //   connection: process.env.DATABASE_URL
 // });
 
-const userMetricModel = metrics
 
 const model = mongoose.model("users", new Schema({
   username: String,
