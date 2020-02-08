@@ -1,4 +1,4 @@
-let model = require("../Models/alarm").alarmMetrics;
+let model = require("../Models/metrics/alarm").alarm;
 
 let metricDB = require("knex")({
   client: "pg",

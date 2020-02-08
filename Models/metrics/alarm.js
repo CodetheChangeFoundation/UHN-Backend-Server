@@ -1,4 +1,4 @@
-const alarmMetrics = {
+const alarm = {
   id: Number,
   userid: Number,
   alarmstart: Date,
@@ -7,5 +7,5 @@ const alarmMetrics = {
 } 
 
 module.exports = {
-  alarmMetrics
+  alarm
 }

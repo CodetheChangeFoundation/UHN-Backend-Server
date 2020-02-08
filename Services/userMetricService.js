@@ -1,4 +1,4 @@
-let model = require("../Models/user").userMetrics;
+let model = require("../Models/metrics/user").user;
 
 let metricDB = require("knex")({
   client: "pg",
