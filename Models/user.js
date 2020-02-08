@@ -2,11 +2,11 @@ var database = require("../database");
 var mongoose = database.getmongoose();
 var Schema = mongoose.Schema;
 
-// let metrics = require("knex")({
-//   client: "pg",
-//   connection: process.env.DATABASE_URL
-// });
-
+const userMetrics = {
+  id: Number,
+  username: String,
+  LastLogin: Date
+}
 
 const model = mongoose.model("users", new Schema({
   username: String,
@@ -23,4 +23,5 @@ const model = mongoose.model("users", new Schema({
 
 module.exports = {
   model,
+  userMetrics
 }

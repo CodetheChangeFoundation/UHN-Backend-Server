@@ -1,14 +1,25 @@
-const alarmModel = require("../Models/alarm");
+let model = require("../Models/alarm").alarmMetrics;
 const handle = require("../Utils/error_handling");
+
+let metricDB = require("knex")({
+  client: "pg",
+  connection: process.env.DATABASE_URL
+});
 
 async function alarmStart(req, res) {
   let data = req.body;
   try {
-    let alarmID = await alarmModel.createAlarmLog(data.username, data.startTime, data.endTime);
+    let alarmID = null;
+    await metricDB("alarmlog").insert({
+      userid: metricDB("users").select("id").where({username: data.username}),
+      alarmstart: data.timeStart,
+      alarmend: data.timeEnd,
+      alarmsent: "FALSE"
+    }).returning("*").then(res => {
+      alarmID = res[0].id;
+    });
     console.log(alarmID);
     res.status(200).json({
-      success: true,
-      message: "Successfully created alarm log for user",
       alarmID: alarmID
     });
   } catch (err) {
@@ -20,7 +31,15 @@ async function alarmStart(req, res) {
 async function extendAlarm(req, res) {
   let data = req.body;
   try {
-    let updated = await alarmModel.updateAlarmEndTime(data.alarmID, data.newEnd);
+    let updated = null;
+    await metricDB("alarmlog").where({
+      id: data.alarmID
+    }).update({
+      alarmend: data.newTime
+    }).returning("*").then(res => {
+      console.log(res);
+      updated = res;
+    });
 
     if (updated.length === 1) {
       res.status(200).json({
@@ -38,7 +57,15 @@ async function extendAlarm(req, res) {
 async function alarmStatusSet(req, res) {
   let data = req.body;
   try {
-    let updated = await alarmModel.updateAlarmSent(data.alarmID, data.sentStatus);
+    let updated = null;
+    await metricDB("alarmlog").where({
+      id: data.alarmID
+    }).update({
+      alarmsent: data.sentStatus
+    }).returning("*").then(res => {
+      console.log(res);
+      updated = res;
+    })
     if (updated.length === 1) {
       res.status(200).json({
         success: true,
@@ -54,6 +81,6 @@ async function alarmStatusSet(req, res) {
 
 module.exports = {
   alarmStart,
-  extendAlarm,
-  alarmStatusSet
+  alarmStatusSet,
+  extendAlarm
 }
