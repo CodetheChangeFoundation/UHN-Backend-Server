@@ -243,19 +243,40 @@ async function deleteResponders(req, res) {
   var user = await UserModel.findOne({ _id: new ObjectId(req.params.id) });
   let respondersToDelete = req.body.respondersToDelete;
 
+  let returnInfo = [];
+
   if (user) {
     var responders = user.get("responders");
+    let respondersToDeleteAreValid = true;
 
-    let respondersToDeleteAreValid;
     for (i in respondersToDelete){
-        respondersToDeleteAreValid = responders.some(responder => responders.includes(i));
+        respondersToDeleteAreValid = responders.some(
+          responder => responder["id"] === i.id
+        );
+        if (!respondersToDelete)
+          break;
     }
 
+    if (respondersToDeleteAreValid) {
+      for (i in respondersToDelete){
+        user.responders.pull({ id: i.id});
+        user.save();
 
-    if (hasResponderID) {
-      user.responders.pull({ id: req.params.responderid });
-      user.save();
+        let responder = await UserModel.findOne({
+          _id: new ObjectId(i.id)
+        }).lean();
+        let onlineStatus = await OnlineService.checkOnlineStatus(
+          i.id
+        );
+
+        returnInfo.push({
+          id: i.id,
+          username: i.username,
+          onlineStatus: onlineStatus
+        });
+      }
       res.status(200).json({ id: req.params.responderid });
+
     } else {
       handle.badRequest(res, "Responder is not valid to delete for this user");
     }
