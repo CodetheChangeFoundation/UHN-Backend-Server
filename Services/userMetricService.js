@@ -42,7 +42,24 @@ async function addNewUserToMetrics(username) {
   }
 }
 
+async function getUserID(username) {
+  let foundID = null;
+  try {
+    await metricDB("users").where({
+      username: username
+    }).returning("*").then(res => {
+      console.log(res);
+      foundID = res;
+    })
+  } catch (err) {
+    throw err;
+  }
+
+  return foundID;
+}
+
 module.exports = {
   updateUserLoginTime,
-  addNewUserToMetrics
+  addNewUserToMetrics,
+  getUserID
 }

@@ -1,10 +1,20 @@
 let alarmService = require("../Services/alarmMetricService");
+let findUserID = require("../Services/userMetricService").getUserID;
 const handle = require("../Utils/error_handling");
 
 async function alarmStart(req, res) {
   let data = req.body;
+
+  let userID = null;
   try {
-    let alarmID = await alarmService.createAlarmLog(data.username, data.startTime, data.endTime);
+    userID = await findUserID(data.username);
+    if (userID.length === 1) {
+      userID = userID[0].id;
+    } else {
+      handle.notFound(res, "Cannot find userID for username")
+    }
+
+    let alarmID = await alarmService.createAlarmLog(userID, data.startTime, data.endTime);
     console.log(alarmID);
     res.status(200).json({
       success: true,

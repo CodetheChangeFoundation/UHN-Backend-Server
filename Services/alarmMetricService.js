@@ -5,11 +5,12 @@ let metricDB = require("knex")({
   connection: process.env.DATABASE_URL
 });
 
-async function createAlarmLog(username, timeStart, timeEnd) {
+async function createAlarmLog(userID, timeStart, timeEnd) {
   let alarmLogID = null;
+
   try {
     await metricDB("alarmlog").insert({
-      userid: metricDB("users").select("id").where({username: username}),
+      userid: parseInt(userID),
       alarmstart: timeStart,
       alarmend: timeEnd,
       alarmsent: "FALSE"
