@@ -241,11 +241,17 @@ async function addResponders(req, res) {
 
 async function deleteResponders(req, res) {
   var user = await UserModel.findOne({ _id: new ObjectId(req.params.id) });
+  let respondersToDelete = req.body.respondersToDelete;
+
   if (user) {
     var responders = user.get("responders");
-    let hasResponderID = responders.some(
-      responder => responder["id"] === req.params.responderid
-    );
+
+    let respondersToDeleteAreValid;
+    for (i in respondersToDelete){
+        respondersToDeleteAreValid = responders.some(responder => responders.includes(i));
+    }
+
+
     if (hasResponderID) {
       user.responders.pull({ id: req.params.responderid });
       user.save();
