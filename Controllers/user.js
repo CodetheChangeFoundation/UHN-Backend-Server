@@ -239,7 +239,7 @@ async function addResponders(req, res) {
   }
 }
 
-async function deleteResponder(req, res) {
+async function deleteResponders(req, res) {
   var user = await UserModel.findOne({ _id: new ObjectId(req.params.id) });
   if (user) {
     var responders = user.get("responders");
