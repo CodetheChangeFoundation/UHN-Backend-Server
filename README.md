@@ -138,3 +138,32 @@ HTTP Response:
     "count": int
 }
 ```
+
+## Adding Help Request
+
+POST "/help_request"
+
+Request Body:
+
+```
+{
+    "user_id": string
+}
+```
+
+HTTP Response:
+
+```
+{
+    "id": string,
+    "user_id": string,
+    "responder_id": string || null (initialized, only filled when a responder accepts this request),
+    "status": enum["open", "sent_to_responder", "taken", "arrived", "resolved"] (initialized to "open"),
+    "responders: [
+        { id: string }
+        ...
+    ],
+    "created_at": date,
+    "updated_at": date
+}
+```

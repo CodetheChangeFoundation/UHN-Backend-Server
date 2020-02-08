@@ -1,4 +1,4 @@
-var redis = require("../Services/redis");
+var redis = require("./redis");
 const onlineValue = "online";
 
 async function setOnline(userid) {
