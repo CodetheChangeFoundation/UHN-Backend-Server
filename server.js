@@ -3,7 +3,7 @@ const database = require("./database");
 database.connect();
 const { validateSignup, validateLogin } = require("./Utils/error_handling");
 const user = require("./Controllers/user");
-const alarmService = require("./Services/alarmMetricService");
+const alarmMetrics = require("./Controllers/alarm");
 var express = require("express");
 var bodyParser = require("body-parser");
 let middleware = require("./middleware");
@@ -33,9 +33,8 @@ app.get("/users/:id/responders", middleware.checkToken, user.getResponders);
 app.get("/users/:id/responders/count",middleware.checkToken,user.getResponderCount);
 app.delete("/users/:id/responders/:responderid", middleware.checkToken, user.deleteResponder);
 
-app.post("/metrics/alarm", alarmService.alarmStart)
-app.put("/metrics/alarm", alarmService.alarmStatusSet)
-app.put("/metrics/alarm/extend", alarmService.extendAlarm)
+app.post("/metrics/alarm", alarmMetrics.alarmStart)
+app.put("/metrics/alarm/:id", alarmMetrics.alarmUpdate)
 
 app.listen(port, function () {
   console.log(`Server is running on port ${port}`);

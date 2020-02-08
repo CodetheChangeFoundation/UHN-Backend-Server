@@ -1,88 +1,70 @@
 let model = require("../Models/alarm").alarmMetrics;
-const handle = require("../Utils/error_handling");
 
 let metricDB = require("knex")({
   client: "pg",
   connection: process.env.DATABASE_URL
 });
 
-async function alarmStart(req, res) {
-  let data = req.body;
+async function createAlarmLog(username, timeStart, timeEnd) {
+  let alarmLogID = null;
   try {
-    let alarmID = null;
     await metricDB("alarmlog").insert({
-      userid: metricDB("users").select("id").where({username: data.username}),
-      alarmstart: data.startTime,
-      alarmend: data.endTime,
+      userid: metricDB("users").select("id").where({username: username}),
+      alarmstart: timeStart,
+      alarmend: timeEnd,
       alarmsent: "FALSE"
     }).returning("*").then(res => {
-      alarmID = res[0].id;
+      console.log(res);
+      alarmLogID = res[0].id;
     });
-    console.log(alarmID);
-    res.status(200).json({
-      alarmID: alarmID
-    });
+
+    return alarmLogID;
+
   } catch (err) {
-    console.log(err)
-    handle.internalServerError(res, "Cannot create metrics alarm log for user");
+    throw err;
   }
 }
 
-async function extendAlarm(req, res) {
-  let data = req.body;
+async function updateAlarmEndTime(logID, newTime) {
+  let result = null;
   try {
-    let updated = null;
     await metricDB("alarmlog").where({
-      id: data.alarmID
+      id: logID
     }).update({
-      alarmend: data.newTime
-    }).returning("*").then(res => {
+      alarmend: newTime
+    }).returning("alarmend").then(res => {
       console.log(res);
-      updated = res;
+      result = res;
     });
 
-    if (updated.length === 1) {
-      res.status(200).json({
-        success: true,
-        message: "Successfully updated alarm log time"
-      })
-    } else {
-      handle.notFound("Cannot find alarm log with given ID");
-    }
+    return result;
+
   } catch (err) {
-    console.log(err);
-    handle.internalServerError(res, "Cannot update alarm end time");
+    throw err;
   }
 }
 
-async function alarmStatusSet(req, res) {
-  let data = req.body;
+async function updateAlarmSent(logID, status) {
+  let result = null;
   try {
-    let updated = null;
     await metricDB("alarmlog").where({
-      id: data.alarmID
+      id: logID
     }).update({
-      alarmsent: data.sentStatus
-    }).returning("*").then(res => {
+      alarmsent: status
+    }).returning("alarmsent").then(res => {
       console.log(res);
-      updated = res;
+      result = res;
     })
-    if (updated.length === 1) {
-      res.status(200).json({
-        success: true,
-        message: "Successfully updated alarm sent status"
-      })
-    } else {
-      handle.notFound("Cannot find alarm log with given ID");
-    }
+
+    return result;
+
   } catch (err) {
-    console.log(err)
-    handle.internalServerError(res, "Cannot update alarm log sent state");
+    throw err;
   }
 }
 
 module.exports = {
-  alarmStart,
-  alarmStatusSet,
-  extendAlarm
+  createAlarmLog,
+  updateAlarmEndTime,
+  updateAlarmSent
 }

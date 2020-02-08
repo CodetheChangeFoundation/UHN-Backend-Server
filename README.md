@@ -191,18 +191,18 @@ HTTP Response:
 }
 ```
 
-## Update Alarm Log Sent Status
+## Update Alarm Log Properties
 
-PUT "/metrics/alarm"
+PUT "/metrics/alarm/:id"
 
 Request Body:
 
 ```
 {
-    "alarmInfo": [
+    "alarmInfo": [ // requires one of sentStatus or newEndTime but also supports updating both at once
         {
-            "alarmID": integer,
-            "sentStatus": boolean
+            "sentStatus": boolean,
+            "newEndTime": string // get UTC string with: new Date().toUTCString()
         }
         ...
     ]
@@ -213,42 +213,10 @@ HTTP Response:
 
 ```
 {
-    "response": [
+    "response": [ // returns alarmStatus if sentStatus was in body, same for alarmEnd and newEndTime
         {
-            "success": boolean,
-            "message": string
-        }
-        ...
-    ]
-}
-```
-
-## Update Alarm Log End Time
-
-PUT "/metrics/alarm/extend"
-
-Request Body:
-
-```
-{
-    "alarmInfo": [
-        {
-            "alarmID": integer,
-            "newTime": string // get UTC string with: new Date().toUTCString()
-        }
-        ...
-    ]
-}
-```
-
-HTTP Response:
-
-```
-{
-    "response": [
-        {
-            "success": boolean,
-            "message": string
+            "alarmStatus": boolean,
+            "alarmEnd": string 
         }
         ...
     ]
