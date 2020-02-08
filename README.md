@@ -185,6 +185,9 @@ HTTP Response:
     "addedAlarm": [
         {
             "alarmID": integer // keep returned id for future log updates
+            "username": string,
+            "startTime": string,
+            "endTime": string 
         }
         ...
     ]
@@ -215,6 +218,7 @@ HTTP Response:
 {
     "response": [ // returns alarmStatus if sentStatus was in body, same for alarmEnd and newEndTime
         {
+            "id": integer,
             "alarmStatus": boolean,
             "alarmEnd": string 
         }

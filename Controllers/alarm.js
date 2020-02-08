@@ -17,9 +17,10 @@ async function alarmStart(req, res) {
     let alarmID = await alarmService.createAlarmLog(userID, data.startTime, data.endTime);
     console.log(alarmID);
     res.status(200).json({
-      success: true,
-      message: "Successfully created alarm log for user",
-      alarmID: alarmID
+      alarmID: alarmID,
+      username: data.username,
+      startTime: data.startTime,
+      endTime: data.endTime
     });
   } catch (err) {
     console.log(err)
@@ -31,7 +32,9 @@ async function alarmUpdate(req, res) {
   let data = req.body;
   let id = req.params.id;
   
-  let result = {};
+  let result = {
+    id: id
+  };
   let updatedField = null;
 
   if (data.sentStatus) {
@@ -61,40 +64,6 @@ async function alarmUpdate(req, res) {
   }
 
   res.status(200).json(result);
-}
-
-async function extendAlarm(alarmID, newTime) {
-  try {
-    let updated = await alarmService.updateAlarmEndTime(alarmID, newTime);
-
-    if (updated.length === 1) {
-      res.status(200).json({
-        success: true,
-        message: "Successfully updated alarm log time"
-      })
-    } else {
-      handle.notFound("Cannot find alarm log with given ID");
-    }
-  } catch (err) {
-    handle.internalServerError(res, "Cannot update alarm end time");
-  }
-}
-
-async function alarmStatusSet(req, res) {
-  let data = req.body;
-  try {
-    let updated = await alarmService.updateAlarmSent(data.alarmID, data.sentStatus);
-    if (updated.length === 1) {
-      res.status(200).json({
-        success: true,
-        message: "Successfully updated alarm sent status"
-      })
-    } else {
-      handle.notFound("Cannot find alarm log with given ID");
-    }
-  } catch (err) {
-    handle.internalServerError(res, "Cannot update alarm log sent state");
-  }
 }
 
 module.exports = {
