@@ -329,8 +329,6 @@ async function addPushToken(req, res) {
     handle.internalServerError(res, "Cannot update user's push token");
   }
 
-  console.log("req body: ", req.body.push_token);
-
   res.status(200).json({
     id: result._id,
     push_token: result.push_token

@@ -167,3 +167,23 @@ HTTP Response:
     "updated_at": date
 }
 ```
+## Adding Help Request
+
+POST "/user/{id}/notifications"
+
+Request Body:
+
+```
+{
+    "push_token": string
+}
+```
+
+HTTP Response:
+
+```
+{
+    "id": string,
+    "push_token": string
+}
+```
