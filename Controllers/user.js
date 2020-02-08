@@ -35,7 +35,7 @@ async function loginUser(req, res) {
       try {
         if (bcrypt.compareSync(data.password, result.password)) {
           let token = jwt.sign(
-            { username: data.username },
+            { id: result._id },
             process.env.SECRET,
             {
               expiresIn: "24h"
@@ -307,7 +307,6 @@ async function updateLocation(req, res) {
       },
       { new: true }
     ).lean();
-    res.status(200).send(result)
   } catch {
     handle.internalServerError("Location could not be updated");
   }
