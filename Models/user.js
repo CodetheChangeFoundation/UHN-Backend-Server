@@ -14,10 +14,12 @@ const model = mongoose.model("users", new Schema({
   email: String,
   phone: String,
   location:{
-    lat: Number,
-    lng: Number
+    coords: {
+      lat: Number,
+      lng: Number
+    },
+    note: String,
   },
-  note: String,
   responders: [{_id:false, id: String}]
 }));
 

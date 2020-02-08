@@ -37,7 +37,7 @@ async function loginUser(req, res) {
       try {
         if (bcrypt.compareSync(data.password, result.password)) {
           let token = jwt.sign(
-            { username: data.username },
+            { id: result._id },
             process.env.SECRET,
             {
               expiresIn: "24h"
@@ -316,8 +316,10 @@ async function updateLocation(req, res) {
     var result = await UserModel.findOneAndUpdate(
       query,
       {
-        location: { lat: req.body.lat, lng: req.body.lng },
-        note: req.body.note && req.body.note
+        location: {
+          coords: req.body.coords,
+          note: req.body.note && req.body.note
+        }
       },
       { new: true }
     ).lean();
@@ -338,8 +340,7 @@ async function getLocation(req, res) {
 
   if (result) {
     const data = {
-      location: result.location,
-      note: result.note
+      location: result.location
     };
     res.status(200).json(data);
   } else {
