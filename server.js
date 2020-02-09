@@ -37,7 +37,7 @@ app.get("/users/:id/responders/count",middleware.checkToken,user.getResponderCou
 app.delete("/users/:id/responders/:responderid", middleware.checkToken, user.deleteResponder);
 
 // Help requests
-app.post("/help_requests", middleware.checkToken, help_request.addHelpRequest);
+app.post("/help-requests", middleware.checkToken, help_request.addHelpRequest);
 
 // FOR TESTING ONLY
 app.get("/test-notif", notification.testSendNotification);
