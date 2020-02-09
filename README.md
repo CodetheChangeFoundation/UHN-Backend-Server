@@ -167,7 +167,7 @@ HTTP Response:
     "updated_at": date
 }
 ```
-## Adding Help Request
+## Adding Push Token
 
 POST "/user/{id}/notifications"
 
