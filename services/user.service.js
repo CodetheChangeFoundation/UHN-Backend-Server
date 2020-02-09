@@ -1,22 +1,22 @@
 var ObjectId = require("mongodb").ObjectId;
 var UserModel = require("../models/user").model;
 
-const findUserById = async (user_id, withPassword = false) => {
+const findUserById = async (userId, withPassword = false) => {
   let user = null;
 
   if (!withPassword) {
     user = await UserModel.findOne({
-      _id: new ObjectId(user_id)
+      _id: new ObjectId(userId)
     })
       .select("-password");
   } else {
     user = await UserModel.findOne({
-      _id: new ObjectId(user_id)
+      _id: new ObjectId(userId)
     });
   }
 
   if (!user) {
-    throw new Error(`User with id ${user_id} not found.`);
+    throw new Error(`User with id ${userId} not found.`);
   } else {
     return user;
   }

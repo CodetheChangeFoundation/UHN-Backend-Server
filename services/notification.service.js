@@ -6,7 +6,7 @@ var expo = expo_server.getExpoInstance();
 
 // TODO: Need to handle receipts of notifications, to handle errors
 const sendBatchNotifications = async (user, help_request) => {
-  let push_tokens = [];
+  let pushTokens = [];
   let notifications = [];
   let responders = user.responders;
 
@@ -15,13 +15,13 @@ const sendBatchNotifications = async (user, help_request) => {
 
     try {
       responder = await UserService.findUserById(r.id);
-      push_tokens.push(responder.push_token);
+      pushTokens.push(responder.pushToken);
     } catch (err) {
       console.error(err.message + "\nSkipping to the next one.");
     }
   }
 
-  for (let pt of push_tokens) {
+  for (let pt of pushTokens) {
     if (!Expo.isExpoPushToken(pt)) {
       console.error(`Push token ${pt} is not a valid Expo push token`);
       continue;

@@ -147,7 +147,7 @@ Request Body:
 
 ```
 {
-    "user_id": string
+    "userId": string
 }
 ```
 
@@ -156,15 +156,15 @@ HTTP Response:
 ```
 {
     "id": string,
-    "user_id": string,
-    "responder_id": string || null (initialized, only filled when a responder accepts this request),
+    "userId": string,
+    "responderId": string || null (initialized, only filled when a responder accepts this request),
     "status": enum["open", "sent_to_responder", "taken", "arrived", "resolved"] (initialized to "open"),
     "responders: [
         { id: string }
         ...
     ],
-    "created_at": date,
-    "updated_at": date
+    "createdAt": date,
+    "updatedAt": date
 }
 ```
 ## Adding Push Token
@@ -175,7 +175,7 @@ Request Body:
 
 ```
 {
-    "push_token": string
+    "pushToken": string
 }
 ```
 
@@ -184,6 +184,6 @@ HTTP Response:
 ```
 {
     "id": string,
-    "push_token": string
+    "pushToken": string
 }
 ```

@@ -320,7 +320,7 @@ async function addPushToken(req, res) {
         _id: new ObjectId(req.params.id)
       },
       {
-        push_token: req.body.push_token
+        pushToken: req.body.pushToken
       },
       { new: true }
     ).lean();
@@ -330,7 +330,7 @@ async function addPushToken(req, res) {
 
   res.status(200).json({
     id: result._id,
-    push_token: result.push_token
+    pushToken: result.pushToken
   });
 }
 
