@@ -41,7 +41,7 @@ const findUserByUsername = async (username, withPassword = false) => {
   }
 };
 
-const cleanUser = user => {
+const cleanUserAttributes = user => {
   if (user.password) {
     delete user.password;
   }
@@ -55,5 +55,5 @@ const cleanUser = user => {
 module.exports = {
   findUserById,
   findUserByUsername,
-  cleanUser
+  cleanUserAttributes
 };

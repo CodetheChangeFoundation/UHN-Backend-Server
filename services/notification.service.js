@@ -5,16 +5,10 @@ import { Expo } from "expo-server-sdk"
 var expo = expo_server.getExpoInstance();
 
 // TODO: Need to handle receipts of notifications, to handle errors
-const sendBatchNotifications = async (responders, help_request) => {
+const sendBatchNotifications = async (user, help_request) => {
   let push_tokens = [];
   let notifications = [];
-  let user = null;
-
-  try {
-    user = await UserService.findUserById(help_request.user_id);
-  } catch(err) {
-    console.error(err.message);
-  }
+  let responders = user.responders;
 
   for (let r of responders) {
     let responder = null;
@@ -38,7 +32,8 @@ const sendBatchNotifications = async (responders, help_request) => {
       sound: "default",
       // TODO: Missing location details
       body: `${user.get("username")} is unresponsive. Please help!`,
-      data: { user: UserService.cleanUser(user.toJSON()) }
+      // TODO: Pending to change to actual data passed by notification
+      data: { user: UserService.cleanUserAttributes(user.toJSON()) }
     };
 
     notifications.push(notification);

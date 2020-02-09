@@ -30,7 +30,7 @@ const addHelpRequest = async (req, res) => {
     handle.internalServerError(res, "Cannot create help request.");
   }
 
-  await NotificationService.sendBatchNotifications(responders, help_request);
+  await NotificationService.sendBatchNotifications(user, help_request);
 
   res.status(200).json({
     id: help_request._id.toString(),

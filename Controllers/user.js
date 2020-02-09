@@ -26,7 +26,7 @@ async function loginUser(req, res) {
 
     try {
       if (bcrypt.compareSync(password, result.password)) {
-        let token = jwt.sign({ username: username }, process.env.SECRET, {
+        let token = jwt.sign({ id: result._id }, process.env.SECRET, {
           expiresIn: "24h"
         });
 
@@ -82,7 +82,7 @@ async function signupUser(req, res) {
 
     OnlineService.setOffline(newUser._id.toString());
 
-    let result = UserService.cleanUser(newUser.toJSON());
+    let result = UserService.cleanUserAttributes(newUser.toJSON());
 
     res.status(200).json(result);
   }
@@ -288,7 +288,6 @@ async function updateLocation(req, res) {
       },
       { new: true }
     ).lean();
-    res.status(200).send(result)
   } catch {
     handle.internalServerError("Location could not be updated");
   }
