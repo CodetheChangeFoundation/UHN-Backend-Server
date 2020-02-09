@@ -141,7 +141,7 @@ HTTP Response:
 
 ## Adding Help Request
 
-POST "/help_request"
+POST "/help-request"
 
 Request Body:
 
