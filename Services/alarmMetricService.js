@@ -1,4 +1,4 @@
-let model = require("../Models/metrics/alarm").alarm;
+import AlarmMetricModel from "../Models/metrics/alarm";
 
 let metricDB = require("knex")({
   client: "pg",
@@ -8,12 +8,14 @@ let metricDB = require("knex")({
 async function createAlarmLog(userID, timeStart, timeEnd) {
   let alarmLogID = null;
 
+  let alarm = new AlarmMetricModel(null, parseInt(userID), timeStart, timeEnd, false);
+
   try {
     await metricDB("alarmlog").insert({
-      userid: parseInt(userID),
-      alarmstart: timeStart,
-      alarmend: timeEnd,
-      alarmsent: "FALSE"
+      userid: alarm.userid,
+      alarmstart: alarm.timeStart,
+      alarmend: alarm.timeEnd,
+      alarmsent: alarm.wasSent
     }).returning("*").then(res => {
       console.log(res);
       alarmLogID = res[0].id;
@@ -28,11 +30,13 @@ async function createAlarmLog(userID, timeStart, timeEnd) {
 
 async function updateAlarmEndTime(logID, newTime) {
   let result = null;
+
+  let alarm = new AlarmMetricModel(logID, null, null, newTime, null);
   try {
     await metricDB("alarmlog").where({
-      id: logID
+      id: alarm.id
     }).update({
-      alarmend: newTime
+      alarmend: alarm.timeEnd
     }).returning("alarmend").then(res => {
       console.log(res);
       result = res;
@@ -47,11 +51,13 @@ async function updateAlarmEndTime(logID, newTime) {
 
 async function updateAlarmSent(logID, status) {
   let result = null;
+
+  let alarm = new AlarmMetricModel(logID, null, null, null, status);
   try {
     await metricDB("alarmlog").where({
-      id: logID
+      id: alarm.id
     }).update({
-      alarmsent: status
+      alarmsent: alarm.wasSent
     }).returning("alarmsent").then(res => {
       console.log(res);
       result = res;

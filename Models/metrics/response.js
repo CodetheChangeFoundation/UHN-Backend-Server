@@ -1,11 +1,9 @@
-const response = {
-    id: Number,
-    responderid: Number,
-    alarmid: Number,
-    alertresponse: Boolean,
-    responsetime: String
-}
-
-module.exports = {
-    response
+export default class ResponseMetricModel {
+  constructor(id, responderID, alarmID, alertResponse, responseTime) {
+    this.id = id;
+    this.responderID = responderID;
+    this.alarmID = alarmID;
+    this.alertResponse = alertResponse;
+    this.responseTime = responseTime;
+  }
 }

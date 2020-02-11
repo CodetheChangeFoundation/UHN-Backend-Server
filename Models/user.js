@@ -18,6 +18,5 @@ const model = mongoose.model("users", new Schema({
 }));
 
 module.exports = {
-  model,
-  userMetrics
+  model
 }

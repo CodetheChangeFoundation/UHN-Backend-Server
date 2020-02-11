@@ -1,11 +1,9 @@
-const alarm = {
-  id: Number,
-  userid: Number,
-  alarmstart: Date,
-  alarmend: Date,
-  alarmsent: Boolean
-} 
-
-module.exports = {
-  alarm
+export default class timeMetricModel {
+  constructor(id, userID, timeStart, timeEnd, wasSent) {
+    this.id = id;
+    this.userid = userID;
+    this.timeStart = timeStart;
+    this.timeEnd = timeEnd;
+    this.wasSent = wasSent;
+  }
 }

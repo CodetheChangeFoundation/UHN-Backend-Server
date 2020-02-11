@@ -1,4 +1,4 @@
-let model = require("../Models/metrics/user").user;
+import UserMetricModel from "../Models/metrics/user";
 
 let metricDB = require("knex")({
   client: "pg",
@@ -7,17 +7,19 @@ let metricDB = require("knex")({
 
 async function updateUserLoginTime(username){
   let checkExists = null;
+
+  let user = new UserMetricModel(null, username, metricDB.fn.now());
   try {
     await metricDB("users").where({
-      username: username
+      username: user.name
     }).update({
-      lastlogin: metricDB.fn.now()
+      lastlogin: user.lastLogin
     }).returning("*").then(res => {
       checkExists = res;
       console.log(checkExists);
 
       if (checkExists.length < 1) {
-        await addNewUserToMetrics(username);
+        addNewUserToMetrics(username);
       }
     });
 
@@ -27,10 +29,11 @@ async function updateUserLoginTime(username){
 }
 
 async function addNewUserToMetrics(username) {
+  let user = new UserMetricModel(null, username, metricDB.fn.now());
   try {
     await metricDB("users").insert({
-     username: username,
-     lastlogin: metricDB.fn.now()
+     username: user.name,
+     lastlogin: user.lastLogin
    }).returning("*").then(res => {
      console.log(res);
    })
@@ -41,9 +44,11 @@ async function addNewUserToMetrics(username) {
 
 async function getUserID(username) {
   let foundID = null;
+  
+  let user = new UserMetricModel(null, username, null);
   try {
     await metricDB("users").where({
-      username: username
+      username: user.name
     }).returning("*").then(res => {
       console.log(res);
       foundID = res;
