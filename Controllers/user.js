@@ -246,13 +246,11 @@ async function deleteResponders(req, res) {
 
   if (user) {
     var responders = user.get("responders");
-    console.log(responders)
     let respondersToDeleteAreValid = true;
     for (let i of respondersToDelete){
         respondersToDeleteAreValid = responders.some(
           responder => responder["id"] === i.id
         );
-        console.log(respondersToDeleteAreValid)
         if (!respondersToDeleteAreValid)
           break;
     }
