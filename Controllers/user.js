@@ -241,44 +241,39 @@ async function addResponders(req, res) {
 
 async function deleteResponders(req, res) {
   var user = await UserModel.findOne({ _id: new ObjectId(req.params.id) });
-  let respondersToDelete = req.body.respondersToDelete;
-
+  var respondersToDelete = req.body.respondersToDelete;
   let returnInfo = [];
 
   if (user) {
     var responders = user.get("responders");
+    console.log(responders)
     let respondersToDeleteAreValid = true;
-
-    for (i in respondersToDelete){
+    for (let i of respondersToDelete){
         respondersToDeleteAreValid = responders.some(
           responder => responder["id"] === i.id
         );
-        if (!respondersToDelete)
+        console.log(respondersToDeleteAreValid)
+        if (!respondersToDeleteAreValid)
           break;
     }
 
     if (respondersToDeleteAreValid) {
-      for (i in respondersToDelete){
+      for (let i of respondersToDelete){
         user.responders.pull({ id: i.id});
         user.save();
-
         let responder = await UserModel.findOne({
           _id: new ObjectId(i.id)
         }).lean();
-        let onlineStatus = await OnlineService.checkOnlineStatus(
-          i.id
-        );
 
         returnInfo.push({
           id: i.id,
-          username: i.username,
-          onlineStatus: onlineStatus
+          username: responder.username
         });
       }
-      res.status(200).json({ id: req.params.responderid });
+      res.status(200).json({ respondersDeleted: returnInfo });
 
     } else {
-      handle.badRequest(res, "Responder is not valid to delete for this user");
+      handle.badRequest(res, "At least one of the responders is not valid to delete for this user");
     }
   } else {
     handle.notFound(res, "Cannot find requested user ID in database");
@@ -343,7 +338,7 @@ module.exports = {
   userInfo,
   getResponders,
   addResponders,
-  deleteResponder,
+  deleteResponders,
   searchUsers,
   toggleStatus,
   addLocation,

@@ -90,15 +90,34 @@ HTTP Response:
 }
 ```
 
-## Deleting a responder from a user
-DELETE "/users/:id/responders/:responderid" :
+## Deleting a responders from a user
+DELETE "/users/:id/responders/"
+
+Request Body:
+```
+{
+    "respondersToDelete": [
+        {"id": string},
+        ...
+    ]
+}
+```
+
 
 HTTP Response:
 ```
 {
-    "id": string
+    "respondersDeleted": [
+        {
+            "id": string,
+            "username": string
+        }
+        ...
+    ]
 }
 ```
+
+
 ## Toggling Statuses
 POST "/users/:id/status"
 
