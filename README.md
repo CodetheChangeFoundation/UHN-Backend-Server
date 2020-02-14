@@ -91,7 +91,7 @@ HTTP Response:
 ```
 
 ## Deleting a responders from a user
-DELETE "/users/:id/responders/"
+DELETE "/users/:id/responders"
 
 Request Body:
 ```

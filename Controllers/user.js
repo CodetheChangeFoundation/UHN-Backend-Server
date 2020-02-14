@@ -258,16 +258,16 @@ async function deleteResponders(req, res) {
     if (respondersToDeleteAreValid) {
       for (let i of respondersToDelete){
         user.responders.pull({ id: i.id});
-        user.save();
         let responder = await UserModel.findOne({
           _id: new ObjectId(i.id)
         }).lean();
-
+        
         returnInfo.push({
           id: i.id,
           username: responder.username
         });
       }
+      user.save();
       res.status(200).json({ respondersDeleted: returnInfo });
 
     } else {
