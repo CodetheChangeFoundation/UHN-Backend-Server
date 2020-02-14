@@ -215,42 +215,45 @@ async function addResponders(req, res) {
 }
 
 async function deleteResponders(req, res) {
-  var user = await UserModel.findOne({ _id: new ObjectId(req.params.id) });
+  var user = null;
+
+  try {
+    user = await UserService.findUserById(req.params.id);
+  } catch (err) {
+    handle.notFound(res, err.message);
+  }
+
   var respondersToDelete = req.body.respondersToDelete;
   let returnInfo = [];
 
-  if (user) {
-    var responders = user.get("responders");
-    let respondersToDeleteAreValid = true;
-    for (let i of respondersToDelete){
-        respondersToDeleteAreValid = responders.some(
-          responder => responder["id"] === i.id
-        );
-        if (!respondersToDeleteAreValid)
-          break;
-    }
+  var responders = user.get("responders");
+  let respondersToDeleteAreValid = true;
+  for (let i of respondersToDelete) {
+    respondersToDeleteAreValid = responders.some(
+      responder => responder["id"] === i.id
+    );
+    if (!respondersToDeleteAreValid)
+      break;
+  }
 
-    if (respondersToDeleteAreValid) {
-      for (let i of respondersToDelete){
-        user.responders.pull({ id: i.id});
-        let responder = await UserModel.findOne({
-          _id: new ObjectId(i.id)
-        }).lean();
-        
-        returnInfo.push({
-          id: i.id,
-          username: responder.username
-        });
-      }
-      user.save();
-      res.status(200).json({ respondersDeleted: returnInfo });
+  if (respondersToDeleteAreValid) {
+    for (let i of respondersToDelete) {
+      user.responders.pull({ id: i.id });
+      let responder = await UserModel.findOne({
+        _id: new ObjectId(i.id)
+      }).lean();
 
-    } else {
-      handle.badRequest(res, "At least one of the responders is not valid to delete for this user");
+      returnInfo.push({
+        id: i.id,
+        username: responder.username
+      });
     }
+    user.save();
+    res.status(200).json({ respondersDeleted: returnInfo });
+
   } else {
-    handle.notFound(res, "Cannot find requested user ID in database");
-  }  
+    handle.badRequest(res, "At least one of the responders is not valid to delete for this user");
+  }
 }
 
 async function searchUsers(req, res) {
