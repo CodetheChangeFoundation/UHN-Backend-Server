@@ -22,7 +22,7 @@ app.post("/login", validateLogin(), user.loginUser);
 
 app.post("/users/:id/responders", middleware.checkToken, user.addResponders);
 
-app.post("/users/:id/notificationToken", user.addPushToken);
+app.post("/users/:id/notification-token", user.addPushToken);
 
 app.put("/users/:id/location", middleware.checkToken, user.updateLocation);
 app.get("/users/:id/location", middleware.checkToken, user.getLocation);
