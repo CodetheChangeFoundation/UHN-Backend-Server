@@ -8,8 +8,11 @@ const model = mongoose.model("users", new Schema({
   email: String,
   phone: String,
   location:{
-    lat: Number,
-    lon: Number
+    coords: {
+      lat: Number,
+      lng: Number
+    },
+    note: String,
   },
   responders: [{_id:false, id: String}]
 }));

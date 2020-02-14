@@ -35,7 +35,7 @@ async function loginUser(req, res) {
       try {
         if (bcrypt.compareSync(data.password, result.password)) {
           let token = jwt.sign(
-            { username: data.username },
+            { id: result._id },
             process.env.SECRET,
             {
               expiresIn: "24h"
@@ -150,30 +150,27 @@ async function getResponders(req, res) {
   }
 }
 
-async function getResponderCount(req,res){
+async function getResponderCount(req, res) {
   const user = await UserModel.findOne({
     _id: new ObjectId(req.params.id)
   }).lean();
 
   if (user) {
     let responders = user.responders;
-    if (req.query.online=="false"||req.query.online==null){
-      res.status(200).json({count: responders.length});
-    }
-    else{
+    if (req.query.online == "false" || Object.entries(req.query).length == 0) {
+      res.status(200).json({ count: responders.length });
+    } else {
       let count = 0;
       for (let r of responders) {
         var responder = await UserModel.findOne({
           _id: new ObjectId(r.id)
         }).lean();
         let onlineStatus = await OnlineService.checkOnlineStatus(r.id);
-        if (onlineStatus==true)
-          count +=1;
-        }
-      res.status(200).json({online_count: count});
+        if (onlineStatus == true) count++;
+      }
+      res.status(200).json({ count: count });
     }
-  }
-  else {
+  } else {
     handle.notFound(res, "Cannot find requested user ID in database");
   }
 }
@@ -317,18 +314,43 @@ async function toggleStatus(req, res) {
   }
 }
 
-async function addLocation(req, res) {
+async function updateLocation(req, res) {
   var query = { _id: new ObjectId(req.params.id) };
   try {
-    var result = await UserModel.findOneAndUpdate(query, {
-      location: { lat: req.body.lat, lon: req.body.lon }
-    });
+    var result = await UserModel.findOneAndUpdate(
+      query,
+      {
+        location: {
+          coords: req.body.coords,
+          note: req.body.note && req.body.note
+        }
+      },
+      { new: true }
+    ).lean();
   } catch {
     handle.internalServerError("Location could not be updated");
   }
-  res.status(200).send("Location successfully updated");
+  res.status(200).json({
+    id: result._id,
+    location: result.location,
+    note: result.note
+  });
 }
 
+async function getLocation(req, res) {
+  const result = await UserModel.findOne({
+    _id: new ObjectId(req.params.id)
+  }).lean();
+
+  if (result) {
+    const data = {
+      location: result.location
+    };
+    res.status(200).json(data);
+  } else {
+    handle.notFound(res, "Cannot find requested user!");
+  }
+}
 
 module.exports = {
   signupUser,
@@ -339,6 +361,7 @@ module.exports = {
   deleteResponders,
   searchUsers,
   toggleStatus,
-  addLocation,
+  updateLocation,
+  getLocation,
   getResponderCount
 };
