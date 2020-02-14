@@ -214,25 +214,43 @@ async function addResponders(req, res) {
   }
 }
 
-async function deleteResponder(req, res) {
-  var user = null;
+async function deleteResponders(req, res) {
+  var user = await UserModel.findOne({ _id: new ObjectId(req.params.id) });
+  var respondersToDelete = req.body.respondersToDelete;
+  let returnInfo = [];
 
-  try {
-    user = await UserService.findUserById(req.params.id);
-  } catch (err) {
-    handle.notFound(res, err.message);
-  }
+  if (user) {
+    var responders = user.get("responders");
+    let respondersToDeleteAreValid = true;
+    for (let i of respondersToDelete){
+        respondersToDeleteAreValid = responders.some(
+          responder => responder["id"] === i.id
+        );
+        if (!respondersToDeleteAreValid)
+          break;
+    }
 
-  var responders = user.get("responders");
-  let hasResponderID = responders.some(
-    responder => responder["id"] === req.params.responderid
-  );
-  if (hasResponderID) {
-    user.responders.pull({ id: req.params.responderid });
-    user.save();
-  }
+    if (respondersToDeleteAreValid) {
+      for (let i of respondersToDelete){
+        user.responders.pull({ id: i.id});
+        let responder = await UserModel.findOne({
+          _id: new ObjectId(i.id)
+        }).lean();
+        
+        returnInfo.push({
+          id: i.id,
+          username: responder.username
+        });
+      }
+      user.save();
+      res.status(200).json({ respondersDeleted: returnInfo });
 
-  res.status(200).json({ id: req.params.responderid });
+    } else {
+      handle.badRequest(res, "At least one of the responders is not valid to delete for this user");
+    }
+  } else {
+    handle.notFound(res, "Cannot find requested user ID in database");
+  }  
 }
 
 async function searchUsers(req, res) {
@@ -339,7 +357,7 @@ module.exports = {
   userInfo,
   getResponders,
   addResponders,
-  deleteResponder,
+  deleteResponders,
   searchUsers,
   toggleStatus,
   updateLocation,
