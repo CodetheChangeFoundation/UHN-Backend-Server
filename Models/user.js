@@ -7,14 +7,14 @@ const model = mongoose.model("users", new Schema({
   password: String,
   email: String,
   phone: String,
-  location:{
+  location: {
     coords: {
       lat: Number,
       lng: Number
     },
     note: String,
   },
-  responders: [{_id:false, id: String}],
+  responders: [{ _id: false, id: String }],
   pushToken: String
 }, { versionKey: false }));
 
