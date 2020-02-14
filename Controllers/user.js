@@ -30,7 +30,6 @@ async function loginUser(req, res) {
           expiresIn: "24h"
         });
 
-        console.log("token: ", token);
 
         OnlineService.setOnline(result._id.toString());
 
