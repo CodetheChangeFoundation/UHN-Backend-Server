@@ -109,15 +109,31 @@ HTTP Response:
 }
 ```
 
-## Deleting a responder from a user
+## Deleting a responders from a user
+DELETE "/users/:id/responders"
 
-DELETE "/users/:id/responders/:responderid" :
+Request Body:
+```
+{
+    "respondersToDelete": [
+        {"id": string},
+        ...
+    ]
+}
+```
+
 
 HTTP Response:
 
 ```
 {
-    "id": string
+    "respondersDeleted": [
+        {
+            "id": string,
+            "username": string
+        }
+        ...
+    ]
 }
 ```
 
