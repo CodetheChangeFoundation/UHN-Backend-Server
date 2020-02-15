@@ -1,11 +1,12 @@
 let jwt = require("jsonwebtoken");
 var bcrypt = require("bcrypt");
 var ObjectId = require("mongodb").ObjectId;
-var handle = require("../Utils/error_handling");
-const { customValidationResult } = require("../Utils/error_handling");
+var handle = require("../utils/error_handling");
+const { customValidationResult } = require("../utils/error_handling");
 
-var UserModel = require("../Models/user").model;
-var OnlineService = require("../Utils/online_status");
+var UserModel = require("../models/user").model;
+var OnlineService = require("../services/online.service");
+var UserService = require("../services/user.service");
 
 async function loginUser(req, res) {
   const errors = customValidationResult(req);
@@ -15,47 +16,34 @@ async function loginUser(req, res) {
     var username = req.body.username;
     var password = req.body.password;
 
-    var data = {
-      username: username,
-      password: password
-    };
+    var result = null;
 
     try {
-      console.log({ username: data.username, password: data.password });
-      var result = await UserModel.findOne(
-        { username: username },
-        "password"
-      ).lean();
-      console.log(result);
+      result = await UserService.findUserByUsername(username, password);
     } catch (err) {
-      handle.notFound(res, "Cannot find requested username in database");
+      handle.notFound(res, err.message);
     }
 
-    if (result != null) {
-      try {
-        if (bcrypt.compareSync(data.password, result.password)) {
-          let token = jwt.sign({ id: result._id }, process.env.SECRET, {
-            expiresIn: "24h"
-          });
+    try {
+      if (bcrypt.compareSync(password, result.password)) {
+        let token = jwt.sign({ id: result._id }, process.env.SECRET, {
+          expiresIn: "24h"
+        });
 
-          OnlineService.setOnline(result._id.toString());
 
-          res.status(200).json({
-            success: true,
-            message: "Authentication successful!",
-            token: token,
-            id: result._id
-          });
-          console.log("Successful login");
-        } else {
-          handle.unauthorized(res, "Password incorrect");
-        }
-      } catch (err) {
-        console.log(process.env.SECRET);
-        handle.internalServerError(res, "Bcrypt compareSync failed");
+        OnlineService.setOnline(result._id.toString());
+
+        res.status(200).json({
+          success: true,
+          message: "Authentication successful!",
+          token: token,
+          id: result._id
+        });
+      } else {
+        handle.unauthorized(res, "Username or password incorrect");
       }
-    } else {
-      handle.notFound(res, "Cannot find requested user ID in database");
+    } catch (err) {
+      handle.internalServerError(res, "Bcrypt compareSync failed");
     }
   }
 }
@@ -69,9 +57,6 @@ async function signupUser(req, res) {
     var email = req.body.email;
     var pass = req.body.password;
     var phone = req.body.phone;
-
-    var result = null;
-
     try {
       let foundUser = await UserModel.findOne({ username: username }).exec();
       if (foundUser) {
@@ -87,38 +72,35 @@ async function signupUser(req, res) {
       password: bcrypt.hashSync(pass, 10),
       phone: phone
     });
-    await newUser.save();
 
     try {
-      result = await UserModel.findOne({ username: username }).exec();
-    } catch {
-      handle.internalServerError(res, "new user not added to the database");
+      await newUser.save();
+    } catch (err) {
+      return handle.internalServerError(res, "Cannot create user.");
     }
 
-    OnlineService.setOffline(result._id.toString());
-    if (result)
-      res.status(200).json({ username: username, email: email, phone: phone });
+    OnlineService.setOffline(newUser._id.toString());
+
+    let result = UserService.cleanUserAttributes(newUser.toJSON());
+
+    res.status(200).json(result);
   }
 }
 
 async function userInfo(req, res) {
-  const result = await UserModel.findOne({
-    _id: new ObjectId(req.params.id)
-  }).lean();
+  var user = null;
 
-  var onlineStatus = await OnlineService.checkOnlineStatus(req.params.id);
-
-  if (result) {
-    var data = {
-      username: result.username,
-      email: result.email,
-      phone: result.phone,
-      online: onlineStatus
-    };
-    res.status(200).json(data);
-  } else {
-    handle.notFound(res, "Cannot find requested user ID in database");
+  try {
+    user = await UserService.findUserById(req.params.id);
+  } catch (err) {
+    handle.notFound(res, err.message);
   }
+
+  var onlineStatus = await OnlineService.checkOnlineStatus(user._id);
+
+  let result = UserService.cleanUser(user);
+  result.onlineStatus = onlineStatus;
+  res.status(200).json(result);
 }
 
 async function getResponders(req, res) {
@@ -175,7 +157,7 @@ async function addResponders(req, res) {
   var respondersToAdd = req.body.respondersToAdd;
 
   if (respondersToAdd == null) {
-    handle.badRequest(res, "No responders requested to be added");
+    handle.badRequest(res, "The attribute 'respondersToAdd' is required.");
   } else {
     const user = await UserModel.findOne({ _id: new ObjectId(req.params.id) });
 
@@ -187,7 +169,7 @@ async function addResponders(req, res) {
         try {
           var foundUser = await UserModel.findOne({
             _id: new ObjectId(respondersToAdd[i].id)
-          }); //
+          });
         } catch {
           validFlag = false; //not single String of 12 bytes or a string of 24 hex characters
           break;
@@ -234,43 +216,44 @@ async function addResponders(req, res) {
 }
 
 async function deleteResponders(req, res) {
-  var user = await UserModel.findOne({ _id: new ObjectId(req.params.id) });
+  var user = null;
+
+  try {
+    user = await UserService.findUserById(req.params.id);
+  } catch (err) {
+    handle.notFound(res, err.message);
+  }
+
   var respondersToDelete = req.body.respondersToDelete;
   let returnInfo = [];
 
-  if (user) {
-    var responders = user.get("responders");
-    let respondersToDeleteAreValid = true;
+  var responders = user.get("responders");
+  let respondersToDeleteAreValid = true;
+  for (let i of respondersToDelete) {
+    respondersToDeleteAreValid = responders.some(
+      responder => responder["id"] === i.id
+    );
+    if (!respondersToDeleteAreValid)
+      break;
+  }
+
+  if (respondersToDeleteAreValid) {
     for (let i of respondersToDelete) {
-      respondersToDeleteAreValid = responders.some(
-        responder => responder["id"] === i.id
-      );
-      if (!respondersToDeleteAreValid) break;
+      user.responders.pull({ id: i.id });
+      let responder = await UserModel.findOne({
+        _id: new ObjectId(i.id)
+      }).lean();
+
+      returnInfo.push({
+        id: i.id,
+        username: responder.username
+      });
     }
+    user.save();
+    res.status(200).json({ respondersDeleted: returnInfo });
 
-    if (respondersToDeleteAreValid) {
-      for (let i of respondersToDelete) {
-        user.responders.pull({ id: i.id });
-        let responder = await UserModel.findOne({
-          _id: new ObjectId(i.id)
-        }).lean();
-
-        returnInfo.push({
-          id: i.id,
-          username: responder.username
-        });
-      }
-
-      user.save();
-      res.status(200).json({ respondersDeleted: returnInfo });
-    } else {
-      handle.badRequest(
-        res,
-        "At least one of the responders is not valid to delete for this user"
-      );
-    }
   } else {
-    handle.notFound(res, "Cannot find requested user ID in database");
+    handle.badRequest(res, "At least one of the responders is not valid to delete for this user");
   }
 }
 
@@ -351,6 +334,27 @@ async function getLocation(req, res) {
   }
 }
 
+async function addPushToken(req, res) {
+  try {
+    var result = await UserModel.findOneAndUpdate(
+      {
+        _id: new ObjectId(req.params.id)
+      },
+      {
+        pushToken: req.body.pushToken
+      },
+      { new: true }
+    ).lean();
+  } catch (err) {
+    handle.internalServerError(res, "Cannot update user's push token");
+  }
+
+  res.status(200).json({
+    id: result._id,
+    pushToken: result.pushToken
+  });
+}
+
 module.exports = {
   signupUser,
   loginUser,
@@ -362,5 +366,6 @@ module.exports = {
   toggleStatus,
   updateLocation,
   getLocation,
-  getResponderCount
+  getResponderCount,
+  addPushToken
 };

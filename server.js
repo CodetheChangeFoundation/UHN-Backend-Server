@@ -1,8 +1,10 @@
 require("dotenv").config({path: __dirname + "/.env"});
-const database = require("./database");
-database.connect();
-const { validateSignup, validateLogin } = require("./Utils/error_handling");
-const user = require("./Controllers/user");
+const InitializationService = require("./services/initialization.service");
+InitializationService.initialize();
+const { validateSignup, validateLogin } = require("./utils/error_handling");
+const user = require("./controllers/user");
+const notification = require("./controllers/notification");
+const help_request = require("./controllers/help_request")
 var express = require("express");
 var bodyParser = require("body-parser");
 let middleware = require("./middleware");
@@ -20,6 +22,8 @@ app.post("/login", validateLogin(), user.loginUser);
 
 app.post("/users/:id/responders", middleware.checkToken, user.addResponders);
 
+app.post("/users/:id/notification-token", user.addPushToken);
+
 app.put("/users/:id/location", middleware.checkToken, user.updateLocation);
 app.get("/users/:id/location", middleware.checkToken, user.getLocation);
 
@@ -31,6 +35,12 @@ app.get("/users/:id", middleware.checkToken, user.userInfo);
 app.get("/users/:id/responders", middleware.checkToken, user.getResponders);
 app.get("/users/:id/responders/count",middleware.checkToken,user.getResponderCount);
 app.delete("/users/:id/responders", middleware.checkToken, user.deleteResponders);
+
+// Help requests
+app.post("/help-requests", middleware.checkToken, help_request.addHelpRequest);
+
+// FOR TESTING ONLY
+app.get("/test-notif", notification.testSendNotification);
 
 app.listen(port, function () {
   console.log(`Server is running on port ${port}`);
