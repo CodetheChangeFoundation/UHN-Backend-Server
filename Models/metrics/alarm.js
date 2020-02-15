@@ -1,4 +1,4 @@
-export default class timeMetricModel {
+export default class AlarmMetricModel {
   constructor(id, userID, timeStart, timeEnd, wasSent) {
     this.id = id;
     this.userid = userID;
