@@ -1,6 +1,6 @@
-let alarmService = require("../Services/alarmMetricService");
-let findUserID = require("../Services/userMetricService").getUserID;
-const handle = require("../Utils/error_handling");
+let alarmService = require("../../Services/metrics/alarmMetricService");
+let findUserID = require("../../Services/metrics/userMetricService").getUserID;
+const handle = require("../../Utils/error_handling");
 
 async function alarmStart(req, res) {
   let data = req.body;

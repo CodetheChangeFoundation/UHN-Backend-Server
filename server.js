@@ -3,7 +3,7 @@ const InitializationService = require("./services/initialization.service");
 InitializationService.initialize();
 const { validateSignup, validateLogin } = require("./utils/error_handling");
 const user = require("./controllers/user");
-const alarmMetrics = require("./controllers/alarm");
+const alarmMetrics = require("./controllers/metrics/alarm");
 const notification = require("./controllers/notification");
 const help_request = require("./controllers/help_request")
 var express = require("express");

@@ -4,7 +4,7 @@ var ObjectId = require("mongodb").ObjectId;
 var handle = require("../utils/error_handling");
 const { customValidationResult } = require("../utils/error_handling");
 
-let metricService = require("../Services/userMetricService");
+let metricService = require("../Services/metrics/userMetricService");
 
 var UserModel = require("../models/user").model;
 var OnlineService = require("../services/online.service");
