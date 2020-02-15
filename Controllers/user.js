@@ -189,11 +189,10 @@ async function addResponders(req, res) {
 
         for (var i = 0, len = respondersToAdd.length; i < len; i++) {
           user.responders.push(respondersToAdd[i]);
-          await user.save();
-
           let responder = await UserModel.findOne({
             _id: new ObjectId(respondersToAdd[i].id)
           }).lean();
+
           let onlineStatus = await OnlineService.checkOnlineStatus(
             respondersToAdd[i].id
           );
@@ -203,6 +202,8 @@ async function addResponders(req, res) {
             onlineStatus: onlineStatus
           });
         }
+
+        user.save();
 
         res.status(200).json({ respondersAdded: returnInfo });
       } else {
