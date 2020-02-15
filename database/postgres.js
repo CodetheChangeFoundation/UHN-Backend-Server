@@ -2,7 +2,6 @@ var knex = require('knex')
 let metricDB;
 
 async function connect() {
-  console.log("started pg connection")
   metricDB = knex({
     client: 'pg',
     connection: process.env.DATABASE_URL
