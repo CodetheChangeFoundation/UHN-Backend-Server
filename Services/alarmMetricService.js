@@ -1,9 +1,7 @@
 import AlarmMetricModel from "../Models/metrics/alarm";
+import metrics from "../database/postgres";
 
-let metricDB = require("knex")({
-  client: "pg",
-  connection: process.env.DATABASE_URL
-});
+let metricDB = metrics.getMetrics();
 
 async function createAlarmLog(userID, timeStart, timeEnd) {
   let alarmLogID = null;

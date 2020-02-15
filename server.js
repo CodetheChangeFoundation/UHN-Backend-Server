@@ -1,6 +1,10 @@
 require("dotenv").config({path: __dirname + "/.env"});
-const database = require("./database");
+const database = require("./database/mongoose");
 database.connect();
+
+const metrics = require("./database/postgres");
+metrics.connect();
+
 const { validateSignup, validateLogin } = require("./Utils/error_handling");
 const user = require("./Controllers/user");
 const alarmMetrics = require("./Controllers/alarm");

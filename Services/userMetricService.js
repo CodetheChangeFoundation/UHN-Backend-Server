@@ -1,9 +1,7 @@
 import UserMetricModel from "../Models/metrics/user";
+import metrics from "../database/postgres";
 
-let metricDB = require("knex")({
-  client: "pg",
-  connection: process.env.DATABASE_URL
-});
+let metricDB = metrics.getMetrics();
 
 async function updateUserLoginTime(username){
   let checkExists = null;
