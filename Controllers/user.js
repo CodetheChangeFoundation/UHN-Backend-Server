@@ -34,13 +34,9 @@ async function loginUser(req, res) {
     if (result != null) {
       try {
         if (bcrypt.compareSync(data.password, result.password)) {
-          let token = jwt.sign(
-            { id: result._id },
-            process.env.SECRET,
-            {
-              expiresIn: "24h"
-            }
-          );
+          let token = jwt.sign({ id: result._id }, process.env.SECRET, {
+            expiresIn: "24h"
+          });
 
           OnlineService.setOnline(result._id.toString());
 
@@ -211,11 +207,10 @@ async function addResponders(req, res) {
 
         for (var i = 0, len = respondersToAdd.length; i < len; i++) {
           user.responders.push(respondersToAdd[i]);
-          user.save();
-
           let responder = await UserModel.findOne({
             _id: new ObjectId(respondersToAdd[i].id)
           }).lean();
+
           let onlineStatus = await OnlineService.checkOnlineStatus(
             respondersToAdd[i].id
           );
@@ -225,6 +220,8 @@ async function addResponders(req, res) {
             onlineStatus: onlineStatus
           });
         }
+
+        user.save();
 
         res.status(200).json({ respondersAdded: returnInfo });
       } else {
@@ -244,31 +241,33 @@ async function deleteResponders(req, res) {
   if (user) {
     var responders = user.get("responders");
     let respondersToDeleteAreValid = true;
-    for (let i of respondersToDelete){
-        respondersToDeleteAreValid = responders.some(
-          responder => responder["id"] === i.id
-        );
-        if (!respondersToDeleteAreValid)
-          break;
+    for (let i of respondersToDelete) {
+      respondersToDeleteAreValid = responders.some(
+        responder => responder["id"] === i.id
+      );
+      if (!respondersToDeleteAreValid) break;
     }
 
     if (respondersToDeleteAreValid) {
-      for (let i of respondersToDelete){
-        user.responders.pull({ id: i.id});
+      for (let i of respondersToDelete) {
+        user.responders.pull({ id: i.id });
         let responder = await UserModel.findOne({
           _id: new ObjectId(i.id)
         }).lean();
-        
+
         returnInfo.push({
           id: i.id,
           username: responder.username
         });
       }
+
       user.save();
       res.status(200).json({ respondersDeleted: returnInfo });
-
     } else {
-      handle.badRequest(res, "At least one of the responders is not valid to delete for this user");
+      handle.badRequest(
+        res,
+        "At least one of the responders is not valid to delete for this user"
+      );
     }
   } else {
     handle.notFound(res, "Cannot find requested user ID in database");
