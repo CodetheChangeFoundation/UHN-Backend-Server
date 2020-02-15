@@ -45,7 +45,8 @@ async function updateAlarmEndTime(logID, newTime) {
     return result;
 
   } catch (err) {
-    throw err;
+    let error = new Error("Cannot update alarm end time");
+    throw error;
   }
 }
 
@@ -66,7 +67,8 @@ async function updateAlarmSent(logID, status) {
     return result;
 
   } catch (err) {
-    throw err;
+    let error = new Error("Cannot update alarm sent status");
+    throw error;
   }
 }
 
