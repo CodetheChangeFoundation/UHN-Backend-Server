@@ -129,15 +129,31 @@ HTTP Response:
 }
 ```
 
-## Deleting a responder from a user
+## Deleting a responders from a user
+DELETE "/users/:id/responders"
 
-DELETE "/users/:id/responders/:responderid" :
+Request Body:
+```
+{
+    "respondersToDelete": [
+        {"id": string},
+        ...
+    ]
+}
+```
+
 
 HTTP Response:
 
 ```
 {
-    "id": string
+    "respondersDeleted": [
+        {
+            "id": string,
+            "username": string
+        }
+        ...
+    ]
 }
 ```
 
@@ -156,6 +172,55 @@ HTTP Response:
 ```
 {
     "count": int
+}
+```
+
+## Adding Help Request
+
+POST "/help-requests"
+
+Request Body:
+
+```
+{
+    "userId": string
+}
+```
+
+HTTP Response:
+
+```
+{
+    "id": string,
+    "userId": string,
+    "responderId": string || null (initialized, only filled when a responder accepts this request),
+    "status": enum["open", "sent_to_responder", "taken", "arrived", "resolved"] (initialized to "open"),
+    "responders: [
+        { id: string }
+        ...
+    ],
+    "createdAt": date,
+    "updatedAt": date
+}
+```
+## Adding Push Token
+
+POST "/user/{id}/notifications"
+
+Request Body:
+
+```
+{
+    "pushToken": string
+}
+```
+
+HTTP Response:
+
+```
+{
+    "id": string,
+    "pushToken": string
 }
 ```
 
