@@ -20,7 +20,8 @@ app.post("/login", validateLogin(), user.loginUser);
 
 app.post("/users/:id/responders", middleware.checkToken, user.addResponders);
 
-app.post("/users/:id/location", middleware.checkToken, user.addLocation);
+app.put("/users/:id/location", middleware.checkToken, user.updateLocation);
+app.get("/users/:id/location", middleware.checkToken, user.getLocation);
 
 app.post("/users/:id/status", middleware.checkToken, user.toggleStatus);
 
@@ -29,7 +30,7 @@ app.get("/users/search", middleware.checkToken, user.searchUsers);
 app.get("/users/:id", middleware.checkToken, user.userInfo);
 app.get("/users/:id/responders", middleware.checkToken, user.getResponders);
 app.get("/users/:id/responders/count",middleware.checkToken,user.getResponderCount);
-app.delete("/users/:id/responders/", middleware.checkToken, user.deleteResponders);
+app.delete("/users/:id/responders", middleware.checkToken, user.deleteResponders);
 
 app.listen(port, function () {
   console.log(`Server is running on port ${port}`);
