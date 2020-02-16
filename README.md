@@ -245,7 +245,7 @@ HTTP Response:
 ```
 {
     "alarmID": integer // keep returned id for future log updates
-    "username": string,
+    "userID": string,
     "startTime": string,
     "endTime": string 
 }
