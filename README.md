@@ -70,7 +70,7 @@ $ npm start
 
 7. Logout from postgres server and enter following command in the root directory to initalize database `psql --username=metric UHN-metrics < data.sql`
 
-To fill database with example data, uncomment bottom statements in data.sql and run command from step 6.
+To fill database with example data, uncomment bottom statements in data.sql and run command from step 7.
 
 
 ### Run tests
