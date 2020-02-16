@@ -36,7 +36,7 @@ async function loginUser(req, res) {
         OnlineService.setOnline(result._id.toString());
 
         try {
-          await metricService.updateUserLoginTime(data.username);
+          await metricService.updateUserLoginTime(username);
         } catch (err) {
           handle.notFound(res, 'Cannot find user in metrics database');
         }
@@ -87,16 +87,16 @@ async function signupUser(req, res) {
       return handle.internalServerError(res, "Cannot create user.");
     }
 
+    OnlineService.setOffline(newUser._id.toString());
+
+    let result = UserService.cleanUserAttributes(newUser.toJSON());
+
     try {
-      await metricService.addNewUserToMetrics(username);
+      await metricService.addNewUserToMetrics(result.id, username);
     } catch (err) {
       console.log(err)
       handle.internalServerError(res, "Cannot add new user to metrics database")
     }
-
-    OnlineService.setOffline(newUser._id.toString());
-
-    let result = UserService.cleanUserAttributes(newUser.toJSON());
 
     res.status(200).json(result);
   }

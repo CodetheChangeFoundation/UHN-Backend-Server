@@ -41,8 +41,8 @@ app.delete("/users/:id/responders", middleware.checkToken, user.deleteResponders
 app.post("/help-requests", middleware.checkToken, help_request.addHelpRequest);
 
 // Alarm metrics
-app.post("/metrics/alarm", alarmMetrics.alarmStart)
-app.put("/metrics/alarm/:id", alarmMetrics.alarmUpdate)
+app.post("/metrics/alarm", middleware.checkToken, alarmMetrics.alarmStart);
+app.put("/metrics/alarm/:alarmID", middleware.checkToken, alarmMetrics.alarmUpdate);
 
 // FOR TESTING ONLY
 app.get("/test-notif", notification.testSendNotification);

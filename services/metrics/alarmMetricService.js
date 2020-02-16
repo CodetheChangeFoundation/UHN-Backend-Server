@@ -6,7 +6,7 @@ let metricDB = metrics.getMetrics();
 async function createAlarmLog(userID, timeStart, timeEnd) {
   let alarmLogID = null;
 
-  let alarm = new AlarmMetricModel(null, parseInt(userID), timeStart, timeEnd, false);
+  let alarm = new AlarmMetricModel(null, userID.toString(), timeStart, timeEnd, false);
 
   try {
     await metricDB("alarmlog").insert({

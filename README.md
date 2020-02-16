@@ -234,7 +234,7 @@ Request Body:
 
 ```
 {
-    "username": string,
+    "userID": string, // Mongo ID
     "startTime": string, // get UTC string with: new Date().toUTCString()
     "endTime": string // get UTC string with: new Date().toUTCString()
 }
@@ -244,7 +244,7 @@ HTTP Response:
 
 ```
 {
-    "id": integer // keep returned id for future log updates
+    "alarmID": integer // keep returned id for future log updates
     "username": string,
     "startTime": string,
     "endTime": string 
@@ -253,7 +253,7 @@ HTTP Response:
 
 ## Update Alarm Log Properties
 
-PUT "/metrics/alarm/:id"
+PUT "/metrics/alarm/:alarmID"
 
 Request Body:
 
@@ -268,7 +268,7 @@ HTTP Response:
 
 ```
 {// returns alarmStatus if sentStatus was in body, same for alarmEnd and newEndTime
-    "id": integer,
+    "alarmID": integer,
     "alarmStatus": boolean,
     "alarmEnd": string 
 }

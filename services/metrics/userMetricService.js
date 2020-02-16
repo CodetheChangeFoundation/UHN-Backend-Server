@@ -6,7 +6,7 @@ let metricDB = metrics.getMetrics();
 async function updateUserLoginTime(username){
   let checkExists = null;
 
-  let user = new UserMetricModel(null, username, metricDB.fn.now());
+  let user = new UserMetricModel(null, null, username, metricDB.fn.now());
   try {
     await metricDB("users").where({
       username: user.name
@@ -26,27 +26,28 @@ async function updateUserLoginTime(username){
   }
 }
 
-async function addNewUserToMetrics(username) {
-  let user = new UserMetricModel(null, username, metricDB.fn.now());
+async function addNewUserToMetrics(mongoID, username) {
+  let user = new UserMetricModel(null, mongoID, username, metricDB.fn.now());
   try {
     await metricDB("users").insert({
-     username: user.name,
-     lastlogin: user.lastLogin
+      mongoid: user.mongoID.toString(),
+      username: user.name,
+      lastlogin: user.lastLogin
    }).returning("*").then(res => {
-     console.log(res);
+      console.log(res);
    })
   } catch (err) {
     throw err;
   }
 }
 
-async function getUserID(username) {
+async function getUserID(mongoID) {
   let foundID = null;
   
-  let user = new UserMetricModel(null, username, null);
+  let user = new UserMetricModel(null, mongoID.toString(), null, null);
   try {
     await metricDB("users").where({
-      username: user.name
+      mongoid: user.mongoID
     }).returning("*").then(res => {
       console.log(res);
       foundID = res;

@@ -5,20 +5,12 @@ const handle = require("../../Utils/error_handling");
 async function alarmStart(req, res) {
   let data = req.body;
 
-  let userID = null;
   try {
-    userID = await findUserID(data.username);
-    if (userID.length === 1) {
-      userID = userID[0].id;
-    } else {
-      handle.notFound(res, "Cannot find userID for username")
-    }
-
-    let alarmID = await alarmService.createAlarmLog(userID, data.startTime, data.endTime);
+    let alarmID = await alarmService.createAlarmLog(data.userID, data.startTime, data.endTime);
     console.log(alarmID);
     res.status(200).json({
-      id: alarmID,
-      username: data.username,
+      alarmID: alarmID,
+      userID: data.userID,
       startTime: data.startTime,
       endTime: data.endTime
     });
@@ -30,10 +22,10 @@ async function alarmStart(req, res) {
 
 async function alarmUpdate(req, res) {
   let data = req.body;
-  let id = req.params.id;
+  let id = req.params.alarmID;
   
   let result = {
-    id: id
+    alarmID: id
   };
   
   let updatedStatus = null;
