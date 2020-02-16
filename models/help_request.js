@@ -10,15 +10,14 @@ const arrayLimit = (val) => {
 const model = mongoose.model("help_requests", new Schema({
   userId: String,
   responderIds: {
-    [{ _id: false, id: String
-    }], // max of 6
+    type:[{_id: false, id: String}],
     validate: [arrayLimit, '{PATH} exceeds the limit of 6']
-  }
+  },
   status: {
     type: String,
     enum: ["open", "sent_to_responder", "taken", "arrived", "resolved"]
   },
-  responders: [{ _id: false, id: String }]
+  userResponders: [{ _id: false, id: String }]
 },
 {
   timestamps: {

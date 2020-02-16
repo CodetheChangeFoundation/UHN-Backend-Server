@@ -38,6 +38,7 @@ app.delete("/users/:id/responders", middleware.checkToken, user.deleteResponders
 
 // Help requests
 app.post("/help-requests", middleware.checkToken, help_request.addHelpRequest);
+app.put("/help-requests",middleware.checkToken,help_request.putHelpRequest);
 
 // FOR TESTING ONLY
 app.get("/test-notif", notification.testSendNotification);

@@ -5,6 +5,45 @@ var UserModel = require("../models/user").model;
 var NotificationService = require("../services/notification.service");
 var UserService = require("../services/user.service");
 
+const putHelpRequest = async (req, res) => {
+  let status = req.body.status;
+  let newResponder = req.body.newResponder;
+  let helpReqId = req.body.helpReqId;
+
+  if (!(status=="open"||status=="sent_to_responder"||status=="taken"||status=="arrived"||status=="resolved")){
+    handle.badRequest(res, "Incorrect status")
+  }
+  else{
+    try {
+      var help_request = await HelpRequestModel.findOne({
+        _id: new ObjectId(helpReqId)
+      })
+    } catch (err) {
+      handle.badRequest(res, err.message);
+    }
+
+    if (help_request==null)
+      handle.badRequest(res,"Help Request does not exist")
+    else{
+      help_request.responderIds.push({_id:false, id: newResponder});
+      if(status!=null)
+        help_request.status = status;
+      help_request.save();
+
+
+      res.status(200).json({
+        id: help_request._id.toString(),
+        userId: help_request.userId,
+        responderIds: help_request.responderIds,
+        status: help_request.status,
+        userResponders: help_request.userResponders,
+        createdAt: help_request.createdAt,
+        updatedAt: help_request.updatedAt
+      });
+    }
+  }
+}
+
 const addHelpRequest = async (req, res) => {
   let userId = req.body.userId;
   let user = null;
@@ -19,9 +58,9 @@ const addHelpRequest = async (req, res) => {
 
   let help_request = new HelpRequestModel({
     userId: userId,
-    responderId: null,
+    responderIds: [],
     status: "open",
-    responders: responders
+    userResponders: responders
   });
 
   try {
@@ -35,14 +74,15 @@ const addHelpRequest = async (req, res) => {
   res.status(200).json({
     id: help_request._id.toString(),
     userId: help_request.userId,
-    responderId: help_request.responderId,
+    responderIds: help_request.responderIds,
     status: help_request.status,
-    repsonders: help_request.responders,
+    userResponders: help_request.userResponders,
     createdAt: help_request.createdAt,
     updatedAt: help_request.updatedAt
   });
 };
 
 module.exports = {
-  addHelpRequest
+  addHelpRequest,
+  putHelpRequest
 };
