@@ -27,8 +27,8 @@ async function alarmUpdate(req, res) {
     alarmID: id
   };
   
-  let updatedStatus = null;
-  let updatedTime = null;
+  let updatedStatus = [];
+  let updatedTime = [];
 
   try {
     if (data.sentStatus) {
