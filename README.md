@@ -186,14 +186,13 @@ HTTP Response:
 
 ## Putting Help Request
 
-PUT "/help-requests"
+PUT "/help-requests/:help-req-id"
 
 Request Body:
 
 ```
 {
-	"helpReqId": "somehelpreqid",
-	"newResponder": "someresponderid",
+	"newResponder": "newResponderId",
 	"status": enum["open", "sent_to_responder", "taken", "arrived", "resolved"]
 }
 ```

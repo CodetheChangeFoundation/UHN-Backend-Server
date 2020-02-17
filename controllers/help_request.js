@@ -8,7 +8,7 @@ var UserService = require("../services/user.service");
 const putHelpRequest = async (req, res) => {
   let status = req.body.status;
   let newResponder = req.body.newResponder;
-  let helpReqId = req.params.id;
+  let helpReqId = req.params.help-req-id;
 
   if (!(status=="open"||status=="sent_to_responder"||status=="taken"||status=="arrived"||status=="resolved")){
     handle.badRequest(res, "Incorrect status")
