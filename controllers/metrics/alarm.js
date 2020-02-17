@@ -31,7 +31,7 @@ async function alarmUpdate(req, res) {
   let updatedTime = [];
 
   try {
-    if (data.sentStatus) {
+    if (data.sentStatus !== undefined) {
       updatedStatus = await alarmService.updateAlarmSent(id, data.sentStatus);
     }
     if (data.newEndTime) {
