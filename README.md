@@ -204,7 +204,10 @@ HTTP Response:
 {
     "id": string,
     "userId": string,
-    "responderId": string || null (initialized, only filled when a responder accepts this request),
+    "responderIds":[
+        { id: string }
+        ...
+    ],
     "status": enum["open", "sent_to_responder", "taken", "arrived", "resolved"] (initialized to "open"),
     "responders: [
         { id: string }
