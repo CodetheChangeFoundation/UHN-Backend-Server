@@ -186,7 +186,7 @@ HTTP Response:
 
 ## Putting Help Request
 
-PUT "/help-requests/:help-req-id"
+PUT "/help-requests/:helpReqId"
 
 Request Body:
 

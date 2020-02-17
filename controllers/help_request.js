@@ -8,10 +8,10 @@ var UserService = require("../services/user.service");
 const putHelpRequest = async (req, res) => {
   let status = req.body.status;
   let newResponder = req.body.newResponder;
-  let helpReqId = req.params.help-req-id;
+  let helpReqId = req.params.id;
 
-  if (!(status=="open"||status=="sent_to_responder"||status=="taken"||status=="arrived"||status=="resolved")){
-    handle.badRequest(res, "Incorrect status")
+  if ( (!(status==="open"||status==="sent_to_responder"||status==="taken"||status==="arrived"||status==="resolved")) ||newResponder==null||status==null ) {
+    handle.badRequest(res, "Incorrect request");
   }
   else{
     try {
@@ -25,21 +25,33 @@ const putHelpRequest = async (req, res) => {
     if (help_request==null)
       handle.badRequest(res,"Help Request does not exist")
     else{
-      help_request.responderIds.push({_id:false, id: newResponder});
-      if(status!=null)
-        help_request.status = status;
-      help_request.save();
+      let responderIds = help_request.responderIds;
+      if (responderIds.includes({id: newResponder}))
+        handle.badRequest(res,"Responder is already added");
+      else{
+        let limitReached = false;
+        try{
+          help_request.responderIds.push({_id:false, id: newResponder});
+          await help_request.save();
+          help_request.status = status;
+        }
+        catch(err){
+          limitReached = true
+          handle.badRequest(res,err.message);
+        }
 
-
-      res.status(200).json({
-        id: help_request._id.toString(),
-        userId: help_request.userId,
-        responderIds: help_request.responderIds,
-        status: help_request.status,
-        userResponders: help_request.userResponders,
-        createdAt: help_request.createdAt,
-        updatedAt: help_request.updatedAt
-      });
+        if (!limitReached){
+          res.status(200).json({
+            id: help_request._id.toString(),
+            userId: help_request.userId,
+            responderIds: help_request.responderIds,
+            status: help_request.status,
+            userResponders: help_request.userResponders,
+            createdAt: help_request.createdAt,
+            updatedAt: help_request.updatedAt
+          });
+        }
+      }
     }
   }
 }
