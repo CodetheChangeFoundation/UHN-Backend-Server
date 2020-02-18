@@ -26,52 +26,69 @@ async function createAlarmLog(userID, timeStart, timeEnd) {
   }
 }
 
-async function updateAlarmEndTime(logID, newTime) {
-  let result = null;
+async function getAlarmLogById(logID) {
+  let alarm = await metricDB("alarmlog").where({
+    id: logID
+  }).returning("*");
 
-  let alarm = new AlarmMetricModel(logID, null, null, newTime, null);
-  try {
-    await metricDB("alarmlog").where({
-      id: alarm.id
-    }).update({
-      alarmend: alarm.timeEnd
-    }).returning("alarmend").then(res => {
-      console.log(res);
-      result = res;
-    });
-
-    return result;
-
-  } catch (err) {
-    let error = new Error("Cannot update alarm end time");
-    throw error;
+  if (alarm.length === 0) {
+    throw new Error("Cannot find alarm with given ID");
+  } else {
+    return alarm[0];
   }
 }
 
-async function updateAlarmSent(logID, status) {
-  let result = null;
+async function getAndUpdateAlarmEndTime(logID, newTime) {
+  let newAlarmEndTime = null;
+  let alarm = null;
 
-  let alarm = new AlarmMetricModel(logID, null, null, null, status);
   try {
-    await metricDB("alarmlog").where({
+    alarm = await getAlarmLogById(logID);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+
+  try {
+    newAlarmEndTime = await metricDB("alarmlog").where({
       id: alarm.id
     }).update({
-      alarmsent: alarm.wasSent
-    }).returning("alarmsent").then(res => {
-      console.log(res);
-      result = res;
-    })
+      alarmend: newTime
+    }).returning("alarmend");
 
-    return result;
+    return newAlarmEndTime;
 
   } catch (err) {
-    let error = new Error("Cannot update alarm sent status");
-    throw error;
+    throw new Error("Cannot update alarm end time");
+  }
+}
+
+async function getAndUpdateAlarmSent(logID, status) {
+  let newAlarmSent = null;
+  let alarm = null;
+
+  try {
+    alarm = await getAlarmLogById(logID);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+
+  try {
+    newAlarmSent = await metricDB("alarmlog").where({
+      id: alarm.id
+    }).update({
+      alarmsent: status
+    }).returning("alarmsent");
+
+    return newAlarmSent;
+
+  } catch (err) {
+    throw new Error("Cannot update alarm sent status");
   }
 }
 
 module.exports = {
   createAlarmLog,
-  updateAlarmEndTime,
-  updateAlarmSent
+  getAlarmLogById,
+  getAndUpdateAlarmEndTime,
+  getAndUpdateAlarmSent
 }

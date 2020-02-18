@@ -20,39 +20,41 @@ async function alarmStart(req, res) {
 }
 
 async function alarmUpdate(req, res) {
-  let data = req.body;
+  let sentStatus = req.body.sentStatus;
+  let newEndTime = req.body.newEndTime;
   let id = req.params.alarmID;
-  
+
   let result = {
     alarmID: id
   };
-  
-  let updatedStatus = [];
-  let updatedTime = [];
+
+  if (sentStatus) {
+    sentStatus = sentStatus.toString()
+  }
+
+  let updatedStatus = null;
+  let updatedTime = null;
 
   try {
-    if (data.sentStatus) {
-      updatedStatus = await alarmService.updateAlarmSent(id, data.sentStatus);
+    if (sentStatus) {
+      updatedStatus = await alarmService.getAndUpdateAlarmSent(id, sentStatus);
     }
-    if (data.newEndTime) {
-      updatedTime = await alarmService.updateAlarmEndTime(id, data.newEndTime);
+    if (newEndTime) {
+      updatedTime = await alarmService.getAndUpdateAlarmEndTime(id, newEndTime);
     }
+
+    if (updatedStatus !== null) {
+      result.alarmStatus = updatedStatus[0];
+    }
+    if (updatedTime !== null) {
+      result.alarmEnd = updatedTime[0];
+    }
+
+    res.status(200).json(result);
+
   } catch (err) {
     handle.internalServerError(res, err.message)
   }
-
-  if (updatedStatus.length !== 1 && updatedTime.length !== 1) {
-    handle.notFound(res, "Cannot find alarm log with given ID");
-  }
-  
-  if (updatedStatus !== null) {
-    result.alarmStatus = updatedStatus[0];
-  }
-  if (updatedTime !== null) {
-    result.alarmEnd = updatedTime[0];
-  }
-
-  res.status(200).json(result);
 }
 
 module.exports = {
