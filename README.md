@@ -183,6 +183,40 @@ HTTP Response:
     "updatedAt": date
 }
 ```
+
+## Updating Help Request
+
+PUT "/help-requests/:helpReqId"
+
+Request Body:
+
+```
+{
+	"newResponderId": string,
+	"status": enum["open", "sent_to_responder", "taken", "arrived", "resolved"]
+}
+```
+
+HTTP Response:
+
+```
+{
+    "id": string,
+    "userId": string,
+    "responderIds":[
+        { id: string }
+        ...
+    ],
+    "status": enum["open", "sent_to_responder", "taken", "arrived", "resolved"] (initialized to "open"),
+    "responders: [
+        { id: string }
+        ...
+    ],
+    "createdAt": date,
+    "updatedAt": date
+}
+```
+
 ## Adding Push Token
 
 POST "/user/{id}/notifications"

@@ -1,4 +1,4 @@
-require("dotenv").config({path: __dirname + "/.env"});
+require("dotenv").config({ path: __dirname + "/.env" });
 const InitializationService = require("./services/initialization.service");
 InitializationService.initialize();
 const { validateSignup, validateLogin } = require("./utils/error_handling");
@@ -33,11 +33,12 @@ app.get("/users/search", middleware.checkToken, user.searchUsers);
 
 app.get("/users/:id", middleware.checkToken, user.userInfo);
 app.get("/users/:id/responders", middleware.checkToken, user.getResponders);
-app.get("/users/:id/responders/count",middleware.checkToken,user.getResponderCount);
+app.get("/users/:id/responders/count", middleware.checkToken, user.getResponderCount);
 app.delete("/users/:id/responders", middleware.checkToken, user.deleteResponders);
 
 // Help requests
-app.post("/help-requests", middleware.checkToken, help_request.addHelpRequest);
+app.post("/help-requests/", middleware.checkToken, help_request.addHelpRequest);
+app.put("/help-requests/:id", middleware.checkToken, help_request.putHelpRequest);
 
 // FOR TESTING ONLY
 app.get("/test-notif", notification.testSendNotification);
