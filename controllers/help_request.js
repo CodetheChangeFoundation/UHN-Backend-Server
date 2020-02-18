@@ -7,13 +7,13 @@ var UserService = require("../services/user.service");
 
 const putHelpRequest = async (req, res) => {
   let status = req.body.status;
-  let newResponder = req.body.newResponder;
+  let newResponderId = req.body.newResponderId;
   let helpReqId = req.params.id;
 
-  if ( (!(status==="open"||status==="sent_to_responder"||status==="taken"||status==="arrived"||status==="resolved")) ||newResponder==null||status==null ) {
+  if ((!(status === "open" || status === "sent_to_responder" || status === "taken" || status === "arrived" || status === "resolved")) || newResponderId == null || status == null) {
     handle.badRequest(res, "Incorrect request");
   }
-  else{
+  else {
     try {
       var help_request = await HelpRequestModel.findOne({
         _id: new ObjectId(helpReqId)
@@ -22,25 +22,25 @@ const putHelpRequest = async (req, res) => {
       handle.badRequest(res, err.message);
     }
 
-    if (help_request==null)
-      handle.badRequest(res,"Help Request does not exist")
-    else{
+    if (help_request == null)
+      handle.badRequest(res, "Help Request does not exist")
+    else {
       let responderIds = help_request.responderIds;
-      if (responderIds.includes({id: newResponder}))
-        handle.badRequest(res,"Responder is already added");
-      else{
+      if (responderIds.some(r => r.id === newResponderId))
+        handle.badRequest(res, "Responder has already been added");
+      else {
         let limitReached = false;
-        try{
-          help_request.responderIds.push({_id:false, id: newResponder});
+        try {
+          help_request.responderIds.push({ _id: false, id: newResponderId });
           await help_request.save();
           help_request.status = status;
         }
-        catch(err){
+        catch (err) {
           limitReached = true
-          handle.badRequest(res,err.message);
+          handle.badRequest(res, err.message);
         }
 
-        if (!limitReached){
+        if (!limitReached) {
           res.status(200).json({
             id: help_request._id.toString(),
             userId: help_request.userId,
