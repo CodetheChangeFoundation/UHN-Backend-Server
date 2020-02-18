@@ -28,7 +28,7 @@ async function alarmUpdate(req, res) {
     alarmID: id
   };
 
-  if (sentStatus) {
+  if (sentStatus !== undefined) {
     sentStatus = sentStatus.toString()
   }
 
