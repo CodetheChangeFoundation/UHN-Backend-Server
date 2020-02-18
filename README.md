@@ -51,6 +51,28 @@ Make sure you are in project directory and run, it will automatically detect any
 $ npm start
 ```
 
+### Starting PostgreSQL Metrics Database
+1. [Download](https://www.postgresql.org/download/) and install Postgres 12 (Older versions cannot use Postgres 12 databases). Remember superuser password.
+
+2. Make sure your system environment variables contain the PATH to the "bin" folder in PostgresQL's install location, or else "pg_ctl" command may not be found.
+
+3. Start server with `pg_ctl -D "PathToPostgresInstall" start` 
+
+    (Default windows path: "C:/Program Files/PostgreSQL/12/data")
+
+    Stop server with `pg_ctl -D "PathToPostgresInstall" stop`
+
+4. Once server has started, enter postgres CLI with superuser account 'postgres' `psql postgres postgres`. Enter your superuser password when prompted. 
+
+5. Create database called "UHN-metrics" `CREATE DATABASE "UHN-metrics";`
+
+6. Create user named metric with password pwctcuhn `CREATE ROLE metric WITH LOGIN PASSWORD 'pwctcuhn';`
+
+7. Logout from postgres server and enter following command in the root directory to initalize database `psql --username=metric UHN-metrics < data.sql`
+
+To fill database with example data, uncomment bottom statements in data.sql and run command from step 7.
+
+
 ### Run tests
 
 Make sure you are in project directory and run
@@ -235,5 +257,53 @@ HTTP Response:
 {
     "id": string,
     "pushToken": string
+}
+```
+
+## Adding Alarm Metric Log
+
+POST "/metrics/alarm"
+
+Request Body:
+
+```
+{
+    "userID": string, // Mongo ID
+    "startTime": string, // get UTC string with: new Date().toUTCString()
+    "endTime": string // get UTC string with: new Date().toUTCString()
+}
+```
+
+HTTP Response:
+
+```
+{
+    "alarmID": integer // keep returned id for future log updates
+    "userID": string,
+    "startTime": string,
+    "endTime": string 
+}
+```
+
+## Update Alarm Log Properties
+
+PUT "/metrics/alarm/:alarmID"
+
+Request Body:
+
+```
+{// requires one of sentStatus or newEndTime but also supports updating both at once
+    "sentStatus": boolean,
+    "newEndTime": string // get UTC string with: new Date().toUTCString()
+}
+```
+
+HTTP Response:
+
+```
+{// returns alarmStatus if sentStatus was in body, same for alarmEnd and newEndTime
+    "alarmID": integer,
+    "alarmStatus": boolean,
+    "alarmEnd": string 
 }
 ```

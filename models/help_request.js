@@ -1,5 +1,5 @@
-var database = require("../database/database");
-var mongoose = database.getmongoose();
+var mongoose = require("../database/mongoose");
+var mongoose = mongoose.getmongoose();
 var Schema = mongoose.Schema;
 
 const arrayLimit = (val) => {

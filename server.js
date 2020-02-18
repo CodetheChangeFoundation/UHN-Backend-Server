@@ -3,6 +3,7 @@ const InitializationService = require("./services/initialization.service");
 InitializationService.initialize();
 const { validateSignup, validateLogin } = require("./utils/error_handling");
 const user = require("./controllers/user");
+const alarmMetrics = require("./controllers/metrics/alarm");
 const notification = require("./controllers/notification");
 const help_request = require("./controllers/help_request")
 var express = require("express");
@@ -39,6 +40,10 @@ app.delete("/users/:id/responders", middleware.checkToken, user.deleteResponders
 // Help requests
 app.post("/help-requests/", middleware.checkToken, help_request.addHelpRequest);
 app.put("/help-requests/:id", middleware.checkToken, help_request.putHelpRequest);
+
+// Alarm metrics
+app.post("/metrics/alarm", middleware.checkToken, alarmMetrics.alarmStart);
+app.put("/metrics/alarm/:alarmID", middleware.checkToken, alarmMetrics.alarmUpdate);
 
 // FOR TESTING ONLY
 app.get("/test-notif", notification.testSendNotification);
