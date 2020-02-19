@@ -6,6 +6,7 @@ const user = require("./controllers/user");
 const alarmMetrics = require("./controllers/metrics/alarm");
 const responseMetrics = require("./controllers/metrics/response");
 const arrivalMetrics = require("./controllers/metrics/arrival");
+const treatementMetrics = require("./controllers/metrics/treatment");
 const notification = require("./controllers/notification");
 const help_request = require("./controllers/help_request")
 var express = require("express");
@@ -52,6 +53,9 @@ app.post("/metrics/response", middleware.checkToken, responseMetrics.recordRespo
 
 // Arrival metrics
 app.post("/metrics/arrival", middleware.checkToken, arrivalMetrics.responderArrival);
+
+// Treatement metrics
+app.post("/metrics/treatment", middleware.checkToken, treatementMetrics.recordTreatment);
 
 // FOR TESTING ONLY
 app.get("/test-notif", notification.testSendNotification);

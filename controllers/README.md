@@ -288,3 +288,26 @@ HTTP Response:
     "arrivalTime": string
 }
 ```
+
+## Add Treatment Metric Log
+
+POST "/metrics/treatment"
+
+Request Body:
+
+```
+{
+    "alarmID": integer,
+    "alarmSuccess": boolean,
+}
+```
+
+HTTP Response:
+
+```
+{
+    "id": integer,
+    "alarmID": integer,
+    "alarmSuccess": boolean
+}
+```
