@@ -2,15 +2,17 @@ let treatmentService = require("../../Services/metrics/treatmentMetricService");
 const handle = require("../../Utils/error_handling");
 
 async function recordTreatment(req, res) {
-  let alarmID = req.body.alarmID;
+  let responseID = req.body.responseID;
   let alarmSuccess = req.body.alarmSuccess.toString();
+  let treatmentTime = req.body.treatmentTime;
   
   try {
-    let treatmentID = await treatmentService.createTreatmentLog(alarmID, alarmSuccess);
+    let treatmentID = await treatmentService.createTreatmentLog(responseID, alarmSuccess, treatmentTime);
     res.status(200).json({
       id: treatmentID,
-      alarmID: alarmID,
-      alarmSuccess: alarmSuccess
+      responseID: responseID,
+      alarmSuccess: alarmSuccess,
+      treatmentTime: treatmentTime
     });
 
   } catch (err) {

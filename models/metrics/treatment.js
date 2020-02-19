@@ -1,7 +1,8 @@
 export default class TreatmentMetricModel {
-  constructor(id, alarmID, successful) {
+  constructor(id, responseID, successful, time) {
     this.id = id;
-    this.alarmID = alarmID;
+    this.responseID = responseID;
     this.successful = successful;
+    this.time = time;
   }
 }

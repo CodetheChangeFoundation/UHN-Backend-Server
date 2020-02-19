@@ -258,7 +258,7 @@ HTTP Response:
 
 ```
 {
-    "id": integer, // keep returned ID for future arrival log
+    "id": integer, // keep returned ID for future arrival and treatment logs
     "userID": string,
     "alarmID": integer,
     "response": boolean,
@@ -297,8 +297,9 @@ Request Body:
 
 ```
 {
-    "alarmID": integer,
+    "responseID": integer,
     "alarmSuccess": boolean,
+    "treatmentTime": string // get UTC string with: new Date().toUTCString()
 }
 ```
 
@@ -307,7 +308,8 @@ HTTP Response:
 ```
 {
     "id": integer,
-    "alarmID": integer,
-    "alarmSuccess": boolean
+    "responseID": integer,
+    "alarmSuccess": boolean,
+    "treatmentTime": string
 }
 ```
