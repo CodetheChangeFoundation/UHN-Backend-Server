@@ -241,7 +241,7 @@ HTTP Response:
 ```
 ## Add Response Metric Log
 
-POST "/metrics/response/"
+POST "/metrics/response"
 
 Request Body:
 
@@ -258,10 +258,33 @@ HTTP Response:
 
 ```
 {
-    "id": integer,
+    "id": integer, // keep returned ID for future arrival log
     "userID": string,
     "alarmID": integer,
     "response": boolean,
     "responseTime": string
+}
+```
+
+## Add Arrival Metric Log
+
+POST "/metrics/arrival"
+
+Request Body:
+
+```
+{
+    "responseID": integer,
+    "arrivalTime": string // get UTC string with: new Date().toUTCString()
+}
+```
+
+HTTP Response:
+
+```
+{
+    "id": integer,
+    "responseID": integer,
+    "arrivalTime": string
 }
 ```

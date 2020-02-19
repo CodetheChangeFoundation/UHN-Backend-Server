@@ -37,7 +37,7 @@ CREATE TABLE ResponseLog (
 -- Responders verify when they have arrived to help another user
 CREATE TABLE ArrivalLog (
     ID serial PRIMARY KEY,
-    ResponseID Integer NOT NULL,
+    ResponseID Integer NOT NULL UNIQUE, -- users arrive for an alert only once
     ArrivalTime timestamptz NOT NULL,
     FOREIGN KEY (ResponseID) REFERENCES ResponseLog(ID) ON DELETE CASCADE
 );
@@ -50,7 +50,7 @@ CREATE TABLE TreatmentLog (
     FOREIGN KEY (AlarmID) REFERENCES ALarmLog(ID) ON DELETE CASCADE
 );
 
-/* Uncomment section to fill database with example data
+--/* Uncomment section to fill database with example data
 INSERT INTO Users (Username, MongoID, LastLogin) VALUES ('John', 'j', NOW());
 INSERT INTO Users (Username, MongoID, LastLogin) VALUES ('Alice', 'a', '2020-01-30 09:45:00-05');
 INSERT INTO Users (Username, MongoID, LastLogin) VALUES ('Bob', 'b', '2020-02-01 15:05:00-08');
@@ -72,4 +72,4 @@ INSERT INTO ArrivalLog (ResponseID, ArrivalTIme) VALUES (4, '2020-02-01 18:39:28
 
 INSERT INTO TreatmentLog (AlarmID, AlertSuccessful) VALUES (1, FALSE);
 INSERT INTO TreatmentLog (AlarmID, AlertSuccessful) VALUES (2, FALSE);
-*/
+--*/
