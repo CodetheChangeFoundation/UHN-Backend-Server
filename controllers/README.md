@@ -239,3 +239,29 @@ HTTP Response:
     "alarmEnd": string 
 }
 ```
+## Add Response Metric Log
+
+POST "/metrics/response/"
+
+Request Body:
+
+```
+{
+    "userID": string, // MongoID
+    "alarmID": integer,
+    "response": boolean,
+    "responseTime": string // get UTC string with: new Date().toUTCString()
+}
+```
+
+HTTP Response:
+
+```
+{
+    "id": integer,
+    "userID": string,
+    "alarmID": integer,
+    "response": boolean,
+    "responseTime": string
+}
+```

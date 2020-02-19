@@ -4,6 +4,7 @@ InitializationService.initialize();
 const { validateSignup, validateLogin } = require("./utils/error_handling");
 const user = require("./controllers/user");
 const alarmMetrics = require("./controllers/metrics/alarm");
+const responseMetrics = require("./controllers/metrics/response");
 const notification = require("./controllers/notification");
 const help_request = require("./controllers/help_request")
 var express = require("express");
@@ -44,6 +45,9 @@ app.put("/help-requests/:id", middleware.checkToken, help_request.putHelpRequest
 // Alarm metrics
 app.post("/metrics/alarm", middleware.checkToken, alarmMetrics.alarmStart);
 app.put("/metrics/alarm/:alarmID", middleware.checkToken, alarmMetrics.alarmUpdate);
+
+// Response metrics
+app.post("/metrics/response", middleware.checkToken, responseMetrics.recordResponse);
 
 // FOR TESTING ONLY
 app.get("/test-notif", notification.testSendNotification);

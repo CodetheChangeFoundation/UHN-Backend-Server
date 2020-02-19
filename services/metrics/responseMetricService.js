@@ -4,7 +4,7 @@ import metrics from "../../database/postgres";
 let metricDB = metrics.getMetrics();
 
 async function createResponseLog(alarmID, userID, response, time) {
-  let newResponse = null;
+  let newResponseiD = null;
   let responseModel = new ResponseMetricModel(null, userID, alarmID, response, time);
 
   try {
@@ -15,13 +15,15 @@ async function createResponseLog(alarmID, userID, response, time) {
       responsetime: responseModel.responseTime
     }).returning("*").then(res => {
       console.log(res)
-      newResponse = res;
+      newResponseID = res[0].id;
     });
+
+    return newResponseID;
+
   } catch (err) {
     throw err;
   }
   
-  return newResponse;
 }
 
 module.exports = {
