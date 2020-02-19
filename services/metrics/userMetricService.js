@@ -1,5 +1,6 @@
 import UserMetricModel from "../../Models/metrics/user";
 import metrics from "../../database/postgres";
+let findUserByUsername = require("../user.service").findUserByUsername;
 
 let metricDB = metrics.getMetrics();
 
@@ -15,7 +16,8 @@ async function updateUserLoginTime(username){
     }).returning("*");
 
     if (checkExists.length < 1) {
-      addNewUserToMetrics(username);
+      let mongoUser = await findUserByUsername(username, false);
+      addNewUserToMetrics(mongoUser._id, username);
     }
 
   } catch (err) {
