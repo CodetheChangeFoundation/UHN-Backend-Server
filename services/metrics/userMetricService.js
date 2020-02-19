@@ -8,21 +8,18 @@ async function updateUserLoginTime(username){
 
   let user = new UserMetricModel(null, null, username, metricDB.fn.now());
   try {
-    await metricDB("users").where({
+    checkExists = await metricDB("users").where({
       username: user.name
     }).update({
       lastlogin: user.lastLogin
-    }).returning("*").then(res => {
-      checkExists = res;
-      console.log(checkExists);
+    }).returning("*");
 
-      if (checkExists.length < 1) {
-        addNewUserToMetrics(username);
-      }
-    });
+    if (checkExists.length < 1) {
+      addNewUserToMetrics(username);
+    }
 
   } catch (err) {
-    throw err;
+    throw new Error(err.message);
   }
 }
 
@@ -33,11 +30,10 @@ async function addNewUserToMetrics(mongoID, username) {
       mongoid: user.mongoID.toString(),
       username: user.name,
       lastlogin: user.lastLogin
-   }).returning("*").then(res => {
-      console.log(res);
-   })
+   }).returning("*");
+
   } catch (err) {
-    throw err;
+    throw new Error(err.message);
   }
 }
 
