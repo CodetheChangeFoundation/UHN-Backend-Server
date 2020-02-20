@@ -3,7 +3,11 @@ const handle = require("../../Utils/error_handling");
 
 async function recordResponse(req, res) {
   let data = req.body;
-  let response = req.body.response.toString();
+  let response = req.body.response;
+
+  if (response !== undefined) {
+    response = response.toString();
+  }
 
   try {
     let responseID = await responseService.createResponseLog(data.alarmID, data.userID, response, data.responseTime);
@@ -11,7 +15,7 @@ async function recordResponse(req, res) {
       id: responseID,
       userID: data.userID,
       alarmID: data.alarmID,
-      response: response,
+      response: req.body.response,
       responseTime: data.responseTime
     });
   } catch (err) {

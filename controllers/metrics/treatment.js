@@ -3,15 +3,18 @@ const handle = require("../../Utils/error_handling");
 
 async function recordTreatment(req, res) {
   let responseID = req.body.responseID;
-  let alarmSuccess = req.body.alarmSuccess.toString();
+  let alarmSuccess = req.body.alarmSuccess;
   let treatmentTime = req.body.treatmentTime;
   
+  if (alarmSuccess !== undefined) {
+    alarmSuccess = alarmSuccess.toString();
+  }
   try {
     let treatmentID = await treatmentService.createTreatmentLog(responseID, alarmSuccess, treatmentTime);
     res.status(200).json({
       id: treatmentID,
       responseID: responseID,
-      alarmSuccess: alarmSuccess,
+      alarmSuccess: req.body.alarmSuccess,
       treatmentTime: treatmentTime
     });
 
