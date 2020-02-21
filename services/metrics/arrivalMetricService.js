@@ -11,9 +11,9 @@ async function createArrivalLog(responseID, arrivalTime) {
     arrivalID = await metricDB("arrivallog").insert({
       responseid: arrival.responseID,
       arrivaltime: arrival.arrivalTime
-    }).returning("*");
+    }).returning("id");
 
-    return arrivalID[0].id;
+    return arrivalID[0];
 
   } catch (err) {
     throw new Error(err.message);

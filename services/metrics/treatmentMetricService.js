@@ -12,9 +12,9 @@ async function createTreatmentLog(responseID, successful, treatmentTime) {
       responseid: treatment.responseID,
       alertsuccessful: treatment.successful,
       treatmenttime: treatment.time
-    }).returning("*");
+    }).returning("id");
 
-    return newLog[0].id;
+    return newLog[0];
 
   } catch (err) {
     throw new Error(err.message);

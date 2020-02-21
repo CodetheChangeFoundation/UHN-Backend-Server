@@ -14,9 +14,9 @@ async function createAlarmLog(userID, timeStart, timeEnd) {
       alarmstart: alarm.timeStart,
       alarmend: alarm.timeEnd,
       alarmsent: alarm.wasSent
-    }).returning("*")
+    }).returning("id");
 
-    return alarmLogID[0].id;
+    return alarmLogID[0];
 
   } catch (err) {
     throw err;

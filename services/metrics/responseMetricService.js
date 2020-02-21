@@ -13,9 +13,9 @@ async function createResponseLog(alarmID, userID, response, time) {
       alarmid: responseModel.alarmID,
       alertresponse: responseModel.alertResponse,
       responsetime: responseModel.responseTime
-    }).returning("*");
+    }).returning("id");
 
-    return newResponseID[0].id;
+    return newResponseID[0];
 
   } catch (err) {
     throw new Error(err.message);

@@ -13,7 +13,7 @@ async function updateUserLoginTime(username){
       username: user.name
     }).update({
       lastlogin: user.lastLogin
-    }).returning("*");
+    }).returning("id");
 
     if (checkExists.length < 1) {
       let mongoUser = await findUserByUsername(username, false);
