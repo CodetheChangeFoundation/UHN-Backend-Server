@@ -110,6 +110,7 @@ const getHelpRequestResponderCount = async (req,res) => {
     count: help_request.responderIds.length
   });
 
+}
 
 module.exports = {
   addHelpRequest,
