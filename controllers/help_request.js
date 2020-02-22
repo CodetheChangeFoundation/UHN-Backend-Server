@@ -114,4 +114,5 @@ const getHelpRequestResponderCount = async (req,res) => {
 module.exports = {
   addHelpRequest,
   putHelpRequest
+  getHelpRequestResponderCount
 };
