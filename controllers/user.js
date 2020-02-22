@@ -78,7 +78,8 @@ async function signupUser(req, res) {
       username: username,
       email: email,
       password: bcrypt.hashSync(pass, 10),
-      phone: phone
+      phone: phone,
+      avaliability: false
     });
 
     try {
@@ -370,6 +371,27 @@ async function addPushToken(req, res) {
   });
 }
 
+async function updateAvaliability(req, res) {
+  // User is avaliable when the user is online and have the avalibile-with-Naloxone switched on
+  var query = { _id: new ObjectId(req.params.id) };
+  try {
+    var result = await UserModel.findOneAndUpdate(
+      query,
+      {
+        avaliability: req.body.online && req.body.switchedOn
+      },
+      { new: true }
+    ).lean();
+  } catch {
+    handle.internalServerError("Avalibility could not be updated");
+  }
+  console.log(result);
+  res.status(200).json({
+    id: result._id,
+    availibility: result.avaliability,
+  });
+}
+
 module.exports = {
   signupUser,
   loginUser,
@@ -382,5 +404,6 @@ module.exports = {
   updateLocation,
   getLocation,
   getResponderCount,
-  addPushToken
+  addPushToken,
+  updateAvaliability
 };
