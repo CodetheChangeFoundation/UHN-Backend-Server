@@ -113,6 +113,6 @@ const getHelpRequestResponderCount = async (req,res) => {
 
 module.exports = {
   addHelpRequest,
-  putHelpRequest
+  putHelpRequest,
   getHelpRequestResponderCount
 };
