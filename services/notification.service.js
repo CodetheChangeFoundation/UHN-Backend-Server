@@ -21,19 +21,29 @@ const sendBatchNotifications = async (user, help_request) => {
     }
   }
 
+  let notificationBody = `${user.get("username")} is unresponsive. Please help!`;
+  let notificationData = {
+    user: {
+      id: user.get("id"),
+      username: user.get("username"),
+      location: user.get("location")
+    },
+    helpRequestId: help_request.get("id")
+  }
+
   for (let pt of pushTokens) {
     if (!Expo.isExpoPushToken(pt)) {
       console.error(`Push token ${pt} is not a valid Expo push token`);
       continue;
-    }
+    } 
 
     let notification = {
       to: pt,
       sound: "default",
       // TODO: Missing location details
-      body: `${user.get("username")} is unresponsive. Please help!`,
+      body: notificationBody,
       // TODO: Pending to change to actual data passed by notification
-      data: { user: UserService.cleanUserAttributes(user.toJSON()) }
+      data: notificationData
     };
 
     notifications.push(notification);
