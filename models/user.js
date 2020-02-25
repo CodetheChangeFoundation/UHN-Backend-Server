@@ -14,7 +14,6 @@ const model = mongoose.model("users", new Schema({
     },
     note: String,
   },
-  avaliability: Boolean,
   responders: [{ _id: false, id: String }],
   pushToken: String
 }, { versionKey: false }));
