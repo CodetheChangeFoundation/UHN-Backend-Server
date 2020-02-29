@@ -169,6 +169,17 @@ HTTP Response:
 }
 ```
 
+GET "/help-requests/:helpReqId/responders/count"
+
+HTTP Response:
+
+```
+{
+    "count": int
+}
+```
+
+
 ### Adding Push Token
 
 POST "/user/{id}/notifications"
@@ -213,7 +224,7 @@ HTTP Response:
     "alarmID": integer // keep returned id for future log updates
     "userID": string,
     "startTime": string,
-    "endTime": string 
+    "endTime": string
 }
 ```
 
@@ -236,7 +247,7 @@ HTTP Response:
 {// returns alarmStatus if sentStatus was in body, same for alarmEnd and newEndTime
     "alarmID": integer,
     "alarmStatus": boolean,
-    "alarmEnd": string 
+    "alarmEnd": string
 }
 ```
 ## Add Response Metric Log
