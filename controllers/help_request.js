@@ -4,6 +4,7 @@ var HelpRequestModel = require("../models/help_request").model;
 var UserModel = require("../models/user").model;
 var NotificationService = require("../services/notification.service");
 var UserService = require("../services/user.service");
+const status = require("./status_codes")
 
 const putHelpRequest = async (req, res) => {
   let status = req.body.status;
@@ -11,7 +12,7 @@ const putHelpRequest = async (req, res) => {
   let helpReqId = req.params.id;
 
   if ((!(status === "open" || status === "sent_to_responder" || status === "taken" || status === "arrived" || status === "resolved")) || newResponderId == null || status == null) {
-    handle.badRequest(res, "Incorrect request");
+    handle.badRequest(res, "Incorrect request", status.statusError );
   }
   else {
     try {
@@ -19,15 +20,15 @@ const putHelpRequest = async (req, res) => {
         _id: new ObjectId(helpReqId)
       })
     } catch (err) {
-      handle.badRequest(res, err.message);
+      handle.internalServerError(res, err.message);
     }
 
     if (help_request == null)
-      handle.badRequest(res, "Help Request does not exist")
+      handle.badRequest(res, "Help Request does not exist", status.helpReqNotFound)
     else {
       let responderIds = help_request.responderIds;
       if (responderIds.some(r => r.id === newResponderId))
-        handle.badRequest(res, "Responder has already been added");
+        handle.badRequest(res, "Responder has already been added", status.dupResponder);
       else {
         let limitReached = false;
         try {
@@ -37,7 +38,7 @@ const putHelpRequest = async (req, res) => {
         }
         catch (err) {
           limitReached = true
-          handle.badRequest(res, err.message);
+          handle.badRequest(res, err.message,status.responderLimitReached);
         }
 
         if (!limitReached) {
@@ -63,7 +64,7 @@ const addHelpRequest = async (req, res) => {
   try {
     user = await UserService.findUserById(userId);
   } catch (err) {
-    handle.badRequest(res, err.message);
+    handle.internalServerError(res, err.message);
   }
 
   const responders = user.responders;

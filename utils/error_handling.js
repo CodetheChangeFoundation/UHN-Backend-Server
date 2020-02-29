@@ -7,8 +7,10 @@ class ErrorFormat {
   }
 }
 
-function badRequest(res, details) {
-  res.status(400).json({ errors: [new ErrorFormat(details)] })
+function badRequest(res, details, statusType) {
+  res.status(400).json({ errors: [new ErrorFormat(details)],
+  status: statusType
+  })
 }
 
 function unauthorized(res, details) {
