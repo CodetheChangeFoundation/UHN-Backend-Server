@@ -7,6 +7,7 @@ University Health Network API Endpoint Backend Server
 1. Install Node.js through online browser
 2. Install MongoDB through online browser, specifically the MongoDB Community Server
 3. Create a ".env" file with SECRET defined as one of the environment variables
+4. In ".env", define DATABASE_URL with format: `"postgresql://<username>:<password>@<host>:5432/UHN-metrics"`
 
 ## Run
 
@@ -71,6 +72,8 @@ $ npm start
 7. Logout from postgres server and enter following command in the root directory to initalize database `psql --username=metric UHN-metrics < data.sql`
 
 To fill database with example data, uncomment bottom statements in data.sql and run command from step 7.
+
+For help with DATABASE_URL fields, go to root directory, connect to postgres with `psql --username=metric UHN-metrics` and enter `\conninfo`
 
 
 ### Run tests
