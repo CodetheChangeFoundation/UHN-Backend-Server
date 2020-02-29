@@ -112,7 +112,7 @@ async function userInfo(req, res) {
 
   var onlineStatus = await OnlineService.checkOnlineStatus(user._id);
 
-  let result = UserService.cleanUser(user);
+  let result = UserService.cleanUserAttributes(user);
   result.onlineStatus = onlineStatus;
   res.status(200).json(result);
 }

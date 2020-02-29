@@ -94,7 +94,26 @@ const addHelpRequest = async (req, res) => {
   });
 };
 
+
+const getHelpRequestResponderCount = async (req,res) => {
+  let helpReqId = req.params.id;
+
+  try {
+    var help_request = await HelpRequestModel.findOne({
+      _id: new ObjectId(helpReqId)
+    })
+  } catch (err) {
+    handle.badRequest(res, err.message);
+  }
+
+  res.status(200).json({
+    count: help_request.responderIds.length
+  });
+
+}
+
 module.exports = {
   addHelpRequest,
-  putHelpRequest
+  putHelpRequest,
+  getHelpRequestResponderCount
 };
