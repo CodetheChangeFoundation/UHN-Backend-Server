@@ -1,6 +1,6 @@
 // Status codes
 
-CONST statusError = 100
+CONST fieldError= 100
 CONST retrievalError = 110
 CONST helpReqNotFound = 101
 CONST dupResponder = 111
