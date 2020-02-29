@@ -1,6 +1,7 @@
 require("dotenv").config({ path: __dirname + "/.env" });
 const InitializationService = require("./services/initialization.service");
 InitializationService.initialize();
+InitializationService.refreshConns;
 const { validateSignup, validateLogin } = require("./utils/error_handling");
 const user = require("./controllers/user");
 const alarmMetrics = require("./controllers/metrics/alarm");

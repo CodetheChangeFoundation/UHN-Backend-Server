@@ -17,11 +17,16 @@ function getdb() {
   return db;
 }
 
+function isConnected() {
+  return mongoose.connection.readyState === 1;
+}
+
 function getmongoose() {
   return mongoose;
 }
 
 module.exports = {
+  isConnected: isConnected,
   connect: connect,
   getdb: getdb,
   getmongoose: getmongoose
