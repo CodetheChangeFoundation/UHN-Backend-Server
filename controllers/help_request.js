@@ -4,15 +4,15 @@ var HelpRequestModel = require("../models/help_request").model;
 var UserModel = require("../models/user").model;
 var NotificationService = require("../services/notification.service");
 var UserService = require("../services/user.service");
-const status = require("./status_codes_help_req")
+import * as StatusCodes from "../utils/status_codes_help_req"
 
 const putHelpRequest = async (req, res) => {
   let status = req.body.status;
   let newResponderId = req.body.newResponderId;
   let helpReqId = req.params.id;
 
-  if ((!(status === "open" || status === "sent_to_responder" || status === "taken" || status === "arrived" || status === "resolved")) || newResponderId == null || status == null) {
-    handle.badRequestHelpReq(res, "Incorrect request", status.fieldError );
+  if ((!(status === "open" || status === "sent_to_responder" || status === "taken" || status === "arrived" || status === "resolved")) || (newResponderId == null && status == null)) {
+    handle.badRequestHelpReq(res, "Incorrect request", statusCodes.fieldError);
   }
   else {
     try {
@@ -24,24 +24,34 @@ const putHelpRequest = async (req, res) => {
     }
 
     if (help_request == null)
-      handle.badRequestHelpReq(res, "Help Request does not exist", status.helpReqNotFound)
+      handle.badRequestHelpReq(res, "Help Request does not exist", statusCodes.helpReqNotFound)
     else {
       let responderIds = help_request.responderIds;
       if (responderIds.some(r => r.id === newResponderId))
-        handle.badRequestHelpReq(res, "Responder has already been added", status.dupResponder);
+        handle.badRequestHelpReq(res, "Responder has already been added", statusCodes.dupResponder);
       else {
         let limitReached = false;
         try {
-          help_request.responderIds.push({ _id: false, id: newResponderId });
-          await help_request.save();
-          help_request.status = status;
+          if(newResponderId){
+            help_request.responderIds.push({ _id: false, id: newResponderId });
+            await help_request.save();
+        }
         }
         catch (err) {
           limitReached = true
-          handle.badRequestHelpReq(res, err.message,status.responderLimitReached, status.responderLimitReached);
+          handle.badRequestHelpReq(res, err.message, StatusCodes.responderLimitReached);
         }
 
         if (!limitReached) {
+          if(status){
+              help_request.status = status;
+              try{
+                await help_request.save();
+              }
+              catch(err){
+                    handle.internalServerError(res, err.message);
+              }
+          }
           res.status(200).json({
             id: help_request._id.toString(),
             userId: help_request.userId,

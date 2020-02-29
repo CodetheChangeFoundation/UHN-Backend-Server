@@ -1,13 +1,7 @@
 // Status codes
 
-CONST fieldError= 100
-CONST retrievalError = 110
-CONST helpReqNotFound = 101
-CONST dupResponder = 111
-CONST responderLimitReached = 200
-
-
-
-module.exports = {
-  statusError,retrievalError,helpReqNotFound,dupResponder,responderLimitReached,helpReqCreationError
-};
+export const fieldError = 400100
+export const retrievalError = 400110
+export const helpReqNotFound = 400101
+export const dupResponder = 400111
+export const responderLimitReached = 400200

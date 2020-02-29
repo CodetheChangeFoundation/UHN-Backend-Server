@@ -8,14 +8,14 @@ class ErrorFormat {
 }
 
 function badRequest(res, details) {
-  res.status(400).json({ errors: [new ErrorFormat(details)],
-  status: statusType
+  res.status(400).json({ errors: [new ErrorFormat(details)]
   })
 }
 
 function badRequestHelpReq(res, details, statusType) {
-  res.status(400).json({ errors: [new ErrorFormat(details)],
-  status_code: statusType
+  res.status(400).json({
+    errors: [new ErrorFormat(details)],
+    statusCode: statusType
   })
 }
 
@@ -69,7 +69,7 @@ function validateLogin() {
 }
 
 module.exports = {
-  badRequest, unauthorized, internalServerError, notFound,
+  badRequestHelpReq, badRequest, unauthorized, internalServerError, notFound,
   customValidationResult,
   validateSignup, validateLogin
 }

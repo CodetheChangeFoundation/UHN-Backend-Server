@@ -148,6 +148,18 @@ Request Body:
 	"status": enum["open", "sent_to_responder", "taken", "arrived", "resolved"]
 }
 ```
+or
+```
+{
+	"status": enum["open", "sent_to_responder", "taken", "arrived", "resolved"]
+}
+```
+or
+```
+{
+	"newResponderId": string
+}
+```
 
 HTTP Response:
 
@@ -168,6 +180,26 @@ HTTP Response:
     "updatedAt": date
 }
 ```
+
+Responder Reached HTTP Response:
+```
+{
+    "errors": [
+        {
+            "message": "help_requests validation failed: responderIds: responderIds exceeds the limit of 6"
+        }
+    ],
+    "statusCode": 400200
+}
+```
+Other Codes:
+fieldError = 400100
+retrievalError = 400110
+helpReqNotFound = 400101
+dupResponder = 400111
+responderLimitReached = 400200
+
+
 
 ### Adding Push Token
 
@@ -213,7 +245,7 @@ HTTP Response:
     "alarmID": integer // keep returned id for future log updates
     "userID": string,
     "startTime": string,
-    "endTime": string 
+    "endTime": string
 }
 ```
 
@@ -236,6 +268,6 @@ HTTP Response:
 {// returns alarmStatus if sentStatus was in body, same for alarmEnd and newEndTime
     "alarmID": integer,
     "alarmStatus": boolean,
-    "alarmEnd": string 
+    "alarmEnd": string
 }
 ```
