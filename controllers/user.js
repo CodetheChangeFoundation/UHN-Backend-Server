@@ -4,7 +4,7 @@ var ObjectId = require("mongodb").ObjectId;
 var handle = require("../utils/error_handling");
 const { customValidationResult } = require("../utils/error_handling");
 
-let metricService = require("../Services/metrics/userMetricService");
+let metricService = require("../services/metrics/userMetricService");
 
 var UserModel = require("../models/user").model;
 var OnlineService = require("../services/online.service");
@@ -335,7 +335,7 @@ async function toggleOnlineAndNaloxoneAvailabilityStatus(req, res) {
         { new: true }
       ).lean();
     } catch {
-      handle.internalServerError("Location could not be updated");
+      handle.internalServerError("Naloxone could not be updated");
     }
 
     try {

@@ -18,6 +18,8 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
+app.get("/", (req, res) => res.send("Server is up"))
+
 app.post("/signup", validateSignup(), user.signupUser);
 app.post("/login", validateLogin(), user.loginUser);
 

@@ -1,4 +1,4 @@
-import UserMetricModel from "../../Models/metrics/user";
+import UserMetricModel from "../../models/metrics/user";
 import metrics from "../../database/postgres";
 
 let metricDB = metrics.getMetrics();
