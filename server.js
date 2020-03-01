@@ -28,7 +28,7 @@ app.post("/users/:id/notification-token", user.addPushToken);
 app.put("/users/:id/location", middleware.checkToken, user.updateLocation);
 app.get("/users/:id/location", middleware.checkToken, user.getLocation);
 
-app.post("/users/:id/status", middleware.checkToken, user.toggleStatus);
+app.post("/users/:id/status", middleware.checkToken, user.toggleOnlineAndNaloxoneAvailabilityStatus);
 
 app.get("/users/search", middleware.checkToken, user.searchUsers);
 
@@ -40,6 +40,7 @@ app.delete("/users/:id/responders", middleware.checkToken, user.deleteResponders
 // Help requests
 app.post("/help-requests/", middleware.checkToken, help_request.addHelpRequest);
 app.put("/help-requests/:id", middleware.checkToken, help_request.putHelpRequest);
+app.get("/help-requests/:id/responders/count",middleware.checkToken,help_request.getHelpRequestResponderCount)
 
 // Alarm metrics
 app.post("/metrics/alarm", middleware.checkToken, alarmMetrics.alarmStart);

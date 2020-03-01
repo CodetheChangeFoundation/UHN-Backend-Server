@@ -37,7 +37,7 @@ async function loginUser(req, res) {
         try {
           await OnlineService.setOnline(result._id.toString());
           var onlineStatus = await OnlineService.checkOnlineStatus(result._id.toString());
-          if (onlineStatus && req.body.naloxoneAvailability) {
+          if (onlineStatus && result.naloxoneAvailability) {
             AvailbilityService.setAvailable(result._id.toString());
           } else {
             AvailbilityService.setUnavailable(result._id.toString());
@@ -56,7 +56,8 @@ async function loginUser(req, res) {
           success: true,
           message: "Authentication successful!",
           token: token,
-          id: result._id
+          id: result._id,
+          naloxoneAvailability: result.naloxoneAvailability
         });
       } else {
         handle.unauthorized(res, "Username or password incorrect");
@@ -89,7 +90,8 @@ async function signupUser(req, res) {
       username: username,
       email: email,
       password: bcrypt.hashSync(pass, 10),
-      phone: phone
+      phone: phone,
+      naloxoneAvailability: false
     });
 
     try {
@@ -308,22 +310,48 @@ async function searchUsers(req, res) {
   }
 }
 
-async function toggleStatus(req, res) {
-  try {
-    if (req.body.naloxoneAvailability) {
-      var onlineStatus = await OnlineService.checkOnlineStatus(req.params.id);
-      if (onlineStatus && req.body.naloxoneAvailability) {
-        AvailbilityService.setAvailable(req.params.id);
-      }
-    } else {
+async function toggleOnlineAndNaloxoneAvailabilityStatus(req, res) {
+  // request body should conntain only "online" or "naloxoneAvailability"
+  if (req.body.online != undefined && !req.body.online) {
+    try {
+      OnlineService.setOffline(req.params.id);
       AvailbilityService.setUnavailable(req.params.id);
+      res.status(200).json({
+        id: req.params.id,
+        online: false
+      });
     }
-    res.status(200).json({
-      naloxoneAvailability: await AvailbilityService.checkAvailabilityStatus(req.params.id),
-      message: "Availability status has been changed"
-    });
-  } catch {
-    handle.internalServerError("Failed to set naloxone availability status.");
+    catch {
+      handle.internalServerError("Failed to set offline status.");
+    }
+  } else {
+    var query = { _id: new ObjectId(req.params.id) };
+    try {
+      var result = await UserModel.findOneAndUpdate(
+        query,
+        {
+          naloxoneAvailability: req.body.naloxoneAvailability
+        },
+        { new: true }
+      ).lean();
+    } catch {
+      handle.internalServerError("Location could not be updated");
+    }
+
+    try {
+      var onlineStatus = await OnlineService.checkOnlineStatus(result._id.toString());
+      if (req.body.naloxoneAvailability && onlineStatus) {
+        AvailbilityService.setAvailable(req.params.id);
+      } else {
+        AvailbilityService.setUnavailable(req.params.id);
+      }
+      res.status(200).json({
+        naloxoneAvailability: await AvailbilityService.checkAvailabilityStatus(req.params.id),
+        message: "Availability status has been changed"
+      });
+    } catch {
+      handle.internalServerError("Failed to set naloxone availability status.");
+    }
   }
 }
 
@@ -394,7 +422,7 @@ module.exports = {
   addResponders,
   deleteResponders,
   searchUsers,
-  toggleStatus,
+  toggleOnlineAndNaloxoneAvailabilityStatus,
   updateLocation,
   getLocation,
   getResponderCount,

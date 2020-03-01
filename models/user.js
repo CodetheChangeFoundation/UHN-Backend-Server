@@ -15,7 +15,8 @@ const model = mongoose.model("users", new Schema({
     note: String,
   },
   responders: [{ _id: false, id: String }],
-  pushToken: String
+  pushToken: String,
+  naloxoneAvailability: Boolean
 }, { versionKey: false }));
 
 module.exports = {
