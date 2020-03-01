@@ -166,18 +166,7 @@ Request Body:
 	"status": enum["open", "sent_to_responder", "taken", "arrived", "resolved"]
 }
 ```
-or
-```
-{
-	"status": enum["open", "sent_to_responder", "taken", "arrived", "resolved"]
-}
-```
-or
-```
-{
-	"newResponderId": string
-}
-```
+or separately
 
 HTTP Response:
 
