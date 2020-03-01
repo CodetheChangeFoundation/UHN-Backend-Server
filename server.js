@@ -28,7 +28,7 @@ app.post("/users/:id/notification-token", user.addPushToken);
 app.put("/users/:id/location", middleware.checkToken, user.updateLocation);
 app.get("/users/:id/location", middleware.checkToken, user.getLocation);
 
-app.post("/users/:id/status", middleware.checkToken, user.toggleStatus);
+app.post("/users/:id/status", middleware.checkToken, user.toggleOnlineAndNaloxoneAvailabilityStatus);
 
 app.get("/users/search", middleware.checkToken, user.searchUsers);
 
