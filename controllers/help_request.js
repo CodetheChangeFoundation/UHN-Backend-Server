@@ -10,7 +10,7 @@ const putHelpRequest = async (req, res) => {
   let newResponderId = req.body.newResponderId;
   let helpReqId = req.params.id;
 
-  if ((!(status === "open" || status === "sent_to_responder" || status === "taken" || status === "arrived" || status === "resolved")) || (newResponderId == null && status == null)) {
+  if ((!(status === "open" || status === "sent_to_responder" || status === "taken" || status === "arrived" || status === "resolved" || status == null)) || (!newResponderId && !status)) {
     handle.badRequest(res, "Incorrect request", StatusCodes.fieldError);
   }
   else {
