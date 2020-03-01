@@ -8,6 +8,24 @@ Please be mindful of the sections I have created for the endpoints:
 
 Add new endpoint documentations to the respective section.
 
+## Error Status Codes
+
+Whenever there are multiple errors that can be thrown on an endpoint with the same http code (e.g. 400, 404, 500), the endpoint will also return an error status code. We will reference this list as `StatusCodes`
+- `400100`: Field Error (e.g. Missing a field)
+- `400111`: Duplicate Error (e.g. object already exists, responder already added)
+- `400200`: Limit Reached Error (e.g. Maximum number of entries for a particular field was filled, 6 responders have already accepted the help request)
+
+```
+{
+    "errors": [
+        {
+            "message": string
+        }
+    ],
+    "statusCode": enum[StatusCodes]
+}
+```
+
 ## Users
 
 ### Getting responders of a user
@@ -148,6 +166,7 @@ Request Body:
 	"status": enum["open", "sent_to_responder", "taken", "arrived", "resolved"]
 }
 ```
+or separately
 
 HTTP Response:
 
@@ -168,6 +187,8 @@ HTTP Response:
     "updatedAt": date
 }
 ```
+
+### Getting Number of Responders
 
 GET "/help-requests/:helpReqId/responders/count"
 
