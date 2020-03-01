@@ -1,4 +1,4 @@
-import ResponseMetricModel from "../../Models/metrics/response";
+import ResponseMetricModel from "../../models/metrics/response";
 import metrics from "../../database/postgres";
 
 let metricDB = metrics.getMetrics();

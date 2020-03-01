@@ -4,7 +4,7 @@ var ObjectId = require("mongodb").ObjectId;
 var handle = require("../utils/error_handling");
 const { customValidationResult } = require("../utils/error_handling");
 
-let metricService = require("../Services/metrics/userMetricService");
+let metricService = require("../services/metrics/userMetricService");
 
 var UserModel = require("../models/user").model;
 var OnlineService = require("../services/online.service");
@@ -31,7 +31,6 @@ async function loginUser(req, res) {
         let token = jwt.sign({ id: result._id }, process.env.SECRET, {
           expiresIn: "24h"
         });
-
 
         OnlineService.setOnline(result._id.toString());
 
@@ -113,7 +112,7 @@ async function userInfo(req, res) {
 
   var onlineStatus = await OnlineService.checkOnlineStatus(user._id);
 
-  let result = UserService.cleanUser(user);
+  let result = UserService.cleanUserAttributes(user);
   result.onlineStatus = onlineStatus;
   res.status(200).json(result);
 }
