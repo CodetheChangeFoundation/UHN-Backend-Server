@@ -13,6 +13,7 @@ client.on("error", (err) => {
 const saddAsync = promisify(client.sadd).bind(client);
 const sismemberAsync = promisify(client.sismember).bind(client);
 const sremAsync = promisify(client.srem).bind(client);
+const hsetAsync = promisify(client.hset).bind(client);
 const pingAsync = promisify(client.ping).bind(client);
 
 function getClient() {
@@ -33,5 +34,6 @@ module.exports = {
   isHealthy,
   saddAsync,
   sismemberAsync,
-  sremAsync
+  sremAsync,
+  hsetAsync
 }

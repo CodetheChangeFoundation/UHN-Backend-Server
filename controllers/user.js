@@ -1,15 +1,15 @@
 let jwt = require("jsonwebtoken");
 var bcrypt = require("bcrypt");
+const randToken = require("rand-token");
 var ObjectId = require("mongodb").ObjectId;
 var handle = require("../utils/error_handling");
 const { customValidationResult } = require("../utils/error_handling");
-
 let metricService = require("../services/metrics/userMetricService");
-
 var UserModel = require("../models/user").model;
 var OnlineService = require("../services/online.service");
 var UserService = require("../services/user.service");
 var AvailbilityService = require("../services/availability.service");
+var RefreshTokenService = require("../services/refresh-token.service");
 
 
 async function loginUser(req, res) {
@@ -34,6 +34,9 @@ async function loginUser(req, res) {
           expiresIn: "24h"
         });
 
+        let refreshToken = randToken.uid(256)
+        RefreshTokenService.addRefreshToken(result._id, refreshToken)
+
         try {
           await OnlineService.setOnline(result._id.toString());
           var onlineStatus = await OnlineService.checkOnlineStatus(result._id.toString());
@@ -56,6 +59,7 @@ async function loginUser(req, res) {
           success: true,
           message: "Authentication successful!",
           token: token,
+          refreshToken: refreshToken,
           id: result._id,
           naloxoneAvailability: result.naloxoneAvailability
         });
