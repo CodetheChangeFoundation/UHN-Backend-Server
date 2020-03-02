@@ -3,17 +3,17 @@ const availableUsers = "available_users";
 
 async function setAvailable(userId) {
   try {
-    const res = await redis.saddAsync(availableUsers, userId);
+    await redis.saddAsync(availableUsers, userId);
   } catch(err) {
-    console.log("redis setAvailable error: ", err.message);
+    console.error("redis setAvailable error: ", err.message);
   }
 }
 
 async function setUnavailable(userId) {
   try {
-    const res = await redis.sremAsync(availableUsers, userId);
+    await redis.sremAsync(availableUsers, userId);
   } catch(err) {
-    console.log("redis setUnavailable error: ", err.message);
+    console.error("redis setUnavailable error: ", err.message);
   }
 }
 
@@ -22,7 +22,7 @@ async function checkAvailabilityStatus(userId) {
     const res = await redis.sismemberAsync(availableUsers, userId);
     return res ? true : false;
   } catch(err) {
-    console.log("redis checkAvailabilityStatus error: ", err.message);
+    console.error("redis checkAvailabilityStatus error: ", err.message);
     return false;
   }
 }

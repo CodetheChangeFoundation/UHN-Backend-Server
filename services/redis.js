@@ -14,6 +14,9 @@ const saddAsync = promisify(client.sadd).bind(client);
 const sismemberAsync = promisify(client.sismember).bind(client);
 const sremAsync = promisify(client.srem).bind(client);
 const hsetAsync = promisify(client.hset).bind(client);
+const hexistsAsync = promisify(client.hexists).bind(client);
+const hgetAsync = promisify(client.hget).bind(client);
+const hdelAsync = promisify(client.hdel).bind(client);
 const pingAsync = promisify(client.ping).bind(client);
 
 function getClient() {
@@ -35,5 +38,8 @@ module.exports = {
   saddAsync,
   sismemberAsync,
   sremAsync,
-  hsetAsync
+  hsetAsync,
+  hexistsAsync,
+  hgetAsync,
+  hdelAsync,
 }
