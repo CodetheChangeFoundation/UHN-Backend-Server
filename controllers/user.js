@@ -4,11 +4,13 @@ var ObjectId = require("mongodb").ObjectId;
 var handle = require("../utils/error_handling");
 const { customValidationResult } = require("../utils/error_handling");
 
-let metricService = require("../Services/metrics/userMetricService");
+let metricService = require("../services/metrics/userMetricService");
 
 var UserModel = require("../models/user").model;
 var OnlineService = require("../services/online.service");
 var UserService = require("../services/user.service");
+var AvailbilityService = require("../services/availability.service");
+
 
 async function loginUser(req, res) {
   const errors = customValidationResult(req);
@@ -32,14 +34,24 @@ async function loginUser(req, res) {
           expiresIn: "24h"
         });
 
-
-        OnlineService.setOnline(result._id.toString());
+        try {
+          await OnlineService.setOnline(result._id.toString());
+          var onlineStatus = await OnlineService.checkOnlineStatus(result._id.toString());
+          if (onlineStatus && result.naloxoneAvailability) {
+            AvailbilityService.setAvailable(result._id.toString());
+          } else {
+            AvailbilityService.setUnavailable(result._id.toString());
+          }
+        } catch (err) {
+          console.log("redis error: ", err.message);
+        }
 
         let data = {
           success: true,
           message: "Authentication successful!",
           token: token,
-          id: result._id
+          id: result._id,
+          naloxoneAvailability: result.naloxoneAvailability
         }
 
         try {
@@ -80,7 +92,8 @@ async function signupUser(req, res) {
       username: username,
       email: email,
       password: bcrypt.hashSync(pass, 10),
-      phone: phone
+      phone: phone,
+      naloxoneAvailability: false
     });
 
     try {
@@ -131,11 +144,11 @@ async function getResponders(req, res) {
       var responder = await UserModel.findOne({
         _id: new ObjectId(r.id)
       }).lean();
-      let onlineStatus = await OnlineService.checkOnlineStatus(r.id);
+      let availbilityStatus = await AvailbilityService.checkAvailabilityStatus(r.id);
       returnInfo.push({
         id: r.id,
         username: responder.username,
-        onlineStatus: onlineStatus
+        availbilityStatus: availbilityStatus
       });
     }
     res.status(200).json({ responders: returnInfo });
@@ -159,8 +172,8 @@ async function getResponderCount(req, res) {
         var responder = await UserModel.findOne({
           _id: new ObjectId(r.id)
         }).lean();
-        let onlineStatus = await OnlineService.checkOnlineStatus(r.id);
-        if (onlineStatus == true) count++;
+        let availbilityStatus = await AvailbilityService.checkAvailabilityStatus(r.id);
+        if (availbilityStatus == true) count++;
       }
       res.status(200).json({ count: count });
     }
@@ -171,12 +184,10 @@ async function getResponderCount(req, res) {
 
 async function addResponders(req, res) {
   var respondersToAdd = req.body.respondersToAdd;
-
   if (respondersToAdd == null) {
     handle.badRequest(res, "The attribute 'respondersToAdd' is required.");
   } else {
     const user = await UserModel.findOne({ _id: new ObjectId(req.params.id) });
-
     var validFlag = true;
 
     if (user) {
@@ -300,15 +311,48 @@ async function searchUsers(req, res) {
   }
 }
 
-async function toggleStatus(req, res) {
-  if (req.body.request == "online") {
-    OnlineService.setOnline(req.params.id);
-    res.status(200).send("User now online");
-  } else if (req.body.request == "offline") {
-    OnlineService.setOffline(req.params.id);
-    res.status(200).send("User now offline");
+async function toggleOnlineAndNaloxoneAvailabilityStatus(req, res) {
+  // request body should conntain only "online" or "naloxoneAvailability"
+  if (req.body.online != undefined && !req.body.online) {
+    try {
+      OnlineService.setOffline(req.params.id);
+      AvailbilityService.setUnavailable(req.params.id);
+      res.status(200).json({
+        id: req.params.id,
+        online: false
+      });
+    }
+    catch {
+      handle.internalServerError("Failed to set offline status.");
+    }
   } else {
-    handle.badRequest(res, "Invalid status toggle request");
+    var query = { _id: new ObjectId(req.params.id) };
+    try {
+      var result = await UserModel.findOneAndUpdate(
+        query,
+        {
+          naloxoneAvailability: req.body.naloxoneAvailability
+        },
+        { new: true }
+      ).lean();
+    } catch {
+      handle.internalServerError("Naloxone could not be updated");
+    }
+
+    try {
+      var onlineStatus = await OnlineService.checkOnlineStatus(result._id.toString());
+      if (req.body.naloxoneAvailability && onlineStatus) {
+        AvailbilityService.setAvailable(req.params.id);
+      } else {
+        AvailbilityService.setUnavailable(req.params.id);
+      }
+      res.status(200).json({
+        naloxoneAvailability: await AvailbilityService.checkAvailabilityStatus(req.params.id),
+        message: "Availability status has been changed"
+      });
+    } catch {
+      handle.internalServerError("Failed to set naloxone availability status.");
+    }
   }
 }
 
@@ -379,9 +423,9 @@ module.exports = {
   addResponders,
   deleteResponders,
   searchUsers,
-  toggleStatus,
+  toggleOnlineAndNaloxoneAvailabilityStatus,
   updateLocation,
   getLocation,
   getResponderCount,
-  addPushToken
+  addPushToken,
 };

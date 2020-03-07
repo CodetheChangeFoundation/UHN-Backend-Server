@@ -1,4 +1,4 @@
-import AlarmMetricModel from "../../Models/metrics/alarm";
+import AlarmMetricModel from "../../models/metrics/alarm";
 import metrics from "../../database/postgres";
 
 let metricDB = metrics.getMetrics();
