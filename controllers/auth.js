@@ -13,6 +13,7 @@ var AvailbilityService = require("../services/availability.service");
 var OnlineService = require("../services/online.service");
 var UserService = require("../services/user.service");
 
+const TOKEN_DURATION = "24h";
 
 async function login(req, res) {
   const errors = customValidationResult(req);
@@ -33,7 +34,7 @@ async function login(req, res) {
     try {
       if (bcrypt.compareSync(password, result.password)) {
         let token = jwt.sign({ id: result._id }, process.env.SECRET, {
-          expiresIn: "10m"
+          expiresIn: TOKEN_DURATION
         });
 
         let refreshToken = randToken.uid(128)
@@ -122,6 +123,7 @@ async function signup(req, res) {
 }
 
 async function useRefreshToken(req, res) {
+  console.log("useRefreshToken endpoint hit");
   const errors = customValidationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -130,7 +132,7 @@ async function useRefreshToken(req, res) {
     let refreshToken = req.body.refreshToken;
     if (await RefreshTokenService.checkRefreshToken(userId, refreshToken)) {
       let token = jwt.sign({ id: userId }, process.env.SECRET, {
-        expiresIn: "10m"
+        expiresIn: TOKEN_DURATION
       });
       
       res.status(200).json({ token: token });
