@@ -3,12 +3,11 @@ var bcrypt = require("bcrypt");
 var ObjectId = require("mongodb").ObjectId;
 var handle = require("../utils/error_handling");
 const { customValidationResult } = require("../utils/error_handling");
-
 let metricService = require("../Services/metrics/userMetricService");
-
 var UserModel = require("../models/user").model;
 var OnlineService = require("../services/online.service");
 var UserService = require("../services/user.service");
+var HelpRequestModel = require("../models/help_request").model;
 
 async function loginUser(req, res) {
   const errors = customValidationResult(req);
@@ -101,6 +100,7 @@ async function signupUser(req, res) {
     res.status(200).json(result);
   }
 }
+
 
 async function userInfo(req, res) {
   var user = null;
@@ -370,6 +370,34 @@ async function addPushToken(req, res) {
   });
 }
 
+async function respondingTo(req, res){
+  const userId = req.params.id
+
+  var query = HelpRequestModel.find({
+      responderIds: {
+        $elemMatch: {id: userId}
+    }
+  });
+
+  try{
+    let docs = await query.exec()
+    let userRespondingToIds = []
+
+    for (let i of docs){
+      userRespondingToIds.push({id: i.userId, availabilityStatus: true})
+    }
+    res.status(200).json({
+      Responding_To_Ids: userRespondingToIds
+    });
+  }
+  catch(err){
+    console.log(err)
+    handle.internalServerError(res,"Failed to query Help Request database")
+  }
+
+
+}
+
 module.exports = {
   signupUser,
   loginUser,
@@ -382,5 +410,6 @@ module.exports = {
   updateLocation,
   getLocation,
   getResponderCount,
-  addPushToken
+  addPushToken,
+  respondingTo
 };
