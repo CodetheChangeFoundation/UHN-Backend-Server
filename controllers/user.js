@@ -35,18 +35,20 @@ async function loginUser(req, res) {
 
         OnlineService.setOnline(result._id.toString());
 
-        try {
-          await metricService.updateUserLoginTime(username);
-        } catch (err) {
-          handle.notFound(res, 'Cannot find user in metrics database');
-        }
-
-        res.status(200).json({
+        let data = {
           success: true,
           message: "Authentication successful!",
           token: token,
           id: result._id
-        });
+        }
+
+        try {
+          await metricService.updateUserLoginTime(username);
+        } catch (err) {
+          data.metricError = err.message;
+        }
+
+        res.status(200).json(data);
       } else {
         handle.unauthorized(res, "Username or password incorrect");
       }
@@ -94,8 +96,7 @@ async function signupUser(req, res) {
     try {
       await metricService.addNewUserToMetrics(result.id, username);
     } catch (err) {
-      console.log(err)
-      handle.internalServerError(res, "Cannot add new user to metrics database")
+      result.metricError = err.message
     }
 
     res.status(200).json(result);
