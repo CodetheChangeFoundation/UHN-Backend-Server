@@ -10,9 +10,9 @@ client.on("error", (err) => {
   console.log("redis connection error: ", err);
 });
 
-const getAsync = promisify(client.get).bind(client);
-const setAsync = promisify(client.set).bind(client);
-const delAsync = promisify(client.del).bind(client);
+const saddAsync = promisify(client.sadd).bind(client);
+const sismemberAsync = promisify(client.sismember).bind(client);
+const sremAsync = promisify(client.srem).bind(client);
 const pingAsync = promisify(client.ping).bind(client);
 
 function getClient() {
@@ -31,7 +31,7 @@ async function isHealthy() {
 module.exports = {
   getClient,
   isHealthy,
-  getAsync,
-  setAsync,
-  delAsync,
+  saddAsync,
+  sismemberAsync,
+  sremAsync
 }

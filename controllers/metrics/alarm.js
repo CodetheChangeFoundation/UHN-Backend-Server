@@ -1,5 +1,5 @@
-let alarmService = require("../../Services/metrics/alarmMetricService");
-const handle = require("../../Utils/error_handling");
+let alarmService = require("../../services/metrics/alarmMetricService");
+const handle = require("../../utils/error_handling");
 
 async function alarmStart(req, res) {
   let data = req.body;
