@@ -8,11 +8,13 @@ const notification = require("./controllers/notification");
 const help_request = require("./controllers/help_request")
 var express = require("express");
 var bodyParser = require("body-parser");
+var logger = require("morgan")
 let middleware = require("./middleware");
 const port = process.env.PORT || 3000;
 const app = express()
 app.use(express.static(__dirname + "/../public"));
 app.use(bodyParser.json());
+app.use(logger("dev"))
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({
   extended: true
