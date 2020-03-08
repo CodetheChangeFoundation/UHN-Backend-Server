@@ -114,8 +114,26 @@ const getHelpRequestResponderCount = async (req,res) => {
 
 }
 
+const getHelpRequest = async (req,res) => {
+  let helpReqId = req.params.id;
+
+  try {
+    var help_request = await HelpRequestModel.findOne({
+      _id: new ObjectId(helpReqId)
+    })
+  } catch (err) {
+    handle.badRequest(res, err.message);
+  }
+
+  res.status(200).json({
+    helpRequest: help_request
+  });
+
+}
+
 module.exports = {
   addHelpRequest,
   putHelpRequest,
+  getHelpRequest,
   getHelpRequestResponderCount
 };
