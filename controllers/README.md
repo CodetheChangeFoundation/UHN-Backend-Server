@@ -222,6 +222,27 @@ HTTP Response:
 }
 ```
 
+
+### Getting the responding to list of a userRespondingTo
+
+GET "/users/{id}/responding_to"
+
+HTTP Response:
+
+```
+{
+    "Responding_To": [
+        {
+            "username": string,
+            "id": string,
+            "naloxoneAvailability": boolean
+        }
+    ]
+}
+```
+
+
+
 ## Metrics
 
 ### Adding Alarm Metric Log
