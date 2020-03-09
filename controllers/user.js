@@ -3,22 +3,12 @@ var bcrypt = require("bcrypt");
 var ObjectId = require("mongodb").ObjectId;
 var handle = require("../utils/error_handling");
 const { customValidationResult } = require("../utils/error_handling");
-<<<<<<< HEAD
-let metricService = require("../Services/metrics/userMetricService");
-var UserModel = require("../models/user").model;
-var OnlineService = require("../services/online.service");
-var UserService = require("../services/user.service");
-var HelpRequestModel = require("../models/help_request").model;
-=======
-
 let metricService = require("../services/metrics/userMetricService");
-
 var UserModel = require("../models/user").model;
 var OnlineService = require("../services/online.service");
 var UserService = require("../services/user.service");
 var AvailbilityService = require("../services/availability.service");
 
->>>>>>> master
 
 async function loginUser(req, res) {
   const errors = customValidationResult(req);
@@ -426,25 +416,25 @@ async function addPushToken(req, res) {
 async function respondingTo(req, res){
   const userId = req.params.id
 
-  var query = HelpRequestModel.find({
-      responderIds: {
+  var query = UserModel.find({
+      responders: {
         $elemMatch: {id: userId}
     }
   });
 
   try{
     let docs = await query.exec()
-    let userRespondingToIds = []
+    let userRespondingTo = []
 
     for (let i of docs){
-      userRespondingToIds.push({id: i.userId, availabilityStatus: true})
+      userRespondingTo.push({username: i.username, id: i._id, naloxoneAvailability: await AvailbilityService.checkAvailabilityStatus(userId)});
     }
+
     res.status(200).json({
-      Responding_To_Ids: userRespondingToIds
+      Responding_To: userRespondingTo
     });
   }
   catch(err){
-    console.log(err)
     handle.internalServerError(res,"Failed to query Help Request database")
   }
 
