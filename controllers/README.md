@@ -234,8 +234,7 @@ HTTP Response:
     "respondingTo": [
         {
             "username": string,
-            "id": string,
-            "naloxoneAvailability": boolean
+            "id": string
         }
     ]
 }
