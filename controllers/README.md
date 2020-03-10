@@ -225,7 +225,7 @@ HTTP Response:
 
 ### Getting the users a responder is watching for
 
-GET "/users/{id}/responding_to"
+GET "/users/{id}/responding-to"
 
 HTTP Response:
 
