@@ -223,7 +223,7 @@ HTTP Response:
 ```
 
 
-### Getting the responding to list of a userRespondingTo
+### Getting the users a responder is watching for
 
 GET "/users/{id}/responding_to"
 
