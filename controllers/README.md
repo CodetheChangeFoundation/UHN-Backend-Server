@@ -231,7 +231,7 @@ HTTP Response:
 
 ```
 {
-    "Responding_To": [
+    "respondingTo": [
         {
             "username": string,
             "id": string,
