@@ -427,7 +427,7 @@ async function respondingTo(req, res){
     let userRespondingTo = []
 
     for (let i of docs){
-      userRespondingTo.push({username: i.username, id: i._id, naloxoneAvailability: await AvailbilityService.checkAvailabilityStatus(userId)});
+      userRespondingTo.push({username: i.username, id: i._id});
     }
 
     res.status(200).json({
