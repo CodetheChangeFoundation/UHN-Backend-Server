@@ -39,7 +39,7 @@ app.get("/users/search", middleware.checkToken, user.searchUsers);
 app.get("/users/:id", middleware.checkToken, user.userInfo);
 app.get("/users/:id/responders", middleware.checkToken, user.getResponders);
 app.get("/users/:id/responders/count", middleware.checkToken, user.getResponderCount);
-app.get("/users/:id/responding_to",middleware.checkToken,user.respondingTo);
+app.get("/users/:id/responding-to",middleware.checkToken,user.respondingTo);
 app.delete("/users/:id/responders", middleware.checkToken, user.deleteResponders);
 
 // Help requests

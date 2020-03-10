@@ -431,7 +431,7 @@ async function respondingTo(req, res){
     }
 
     res.status(200).json({
-      Responding_To: userRespondingTo
+      respondingTo: userRespondingTo
     });
   }
   catch(err){
