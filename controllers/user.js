@@ -177,7 +177,7 @@ async function getResponderCount(req, res) {
 async function addResponders(req, res) {
   var respondersToAdd = req.body.respondersToAdd;
   if (respondersToAdd == null) {
-    handle.badRequest(res, "The attribute 'respondersToAdd' is required.");
+    handle.badRequest(res, "The attribute "respondersToAdd" is required.");
   } else {
     const user = await UserModel.findOne({ _id: new ObjectId(req.params.id) });
     var validFlag = true;
@@ -388,7 +388,7 @@ async function addPushToken(req, res) {
       { new: true }
     ).lean();
   } catch (err) {
-    handle.internalServerError(res, "Cannot update user's push token");
+    handle.internalServerError(res, "Cannot update user"s push token");
   }
 
   res.status(200).json({

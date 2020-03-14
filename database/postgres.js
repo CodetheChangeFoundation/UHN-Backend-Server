@@ -1,9 +1,9 @@
-var knex = require('knex')
+var knex = require("knex")
 let metricDB;
 
 async function connect() {
   metricDB = knex({
-    client: 'pg',
+    client: "pg",
     connection: process.env.DATABASE_URL
   });
 
