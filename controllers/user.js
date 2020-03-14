@@ -9,7 +9,6 @@ var OnlineService = require("../services/online.service");
 var UserService = require("../services/user.service");
 var AvailbilityService = require("../services/availability.service");
 
-
 async function loginUser(req, res) {
   const errors = customValidationResult(req);
   if (!errors.isEmpty()) {
@@ -47,7 +46,7 @@ async function loginUser(req, res) {
         try {
           await metricService.updateUserLoginTime(username);
         } catch (err) {
-          handle.notFound(res, 'Cannot find user in metrics database');
+          handle.notFound(res, "Cannot find user in metrics database");
         }
 
         res.status(200).json({
@@ -105,14 +104,13 @@ async function signupUser(req, res) {
     try {
       await metricService.addNewUserToMetrics(result.id, username);
     } catch (err) {
-      console.log(err)
-      handle.internalServerError(res, "Cannot add new user to metrics database")
+      console.log(err);
+      handle.internalServerError(res, "Cannot add new user to metrics database");
     }
 
     res.status(200).json(result);
   }
 }
-
 
 async function userInfo(req, res) {
   var user = null;
@@ -196,10 +194,7 @@ async function addResponders(req, res) {
           break;
         }
 
-        if (
-          foundUser == null ||
-          user.responders.find(e => e.id === foundUser.id)
-        ) {
+        if (foundUser == null || user.responders.find(e => e.id === foundUser.id)) {
           validFlag = false; //does not exist in database
           break;
         }
@@ -214,9 +209,7 @@ async function addResponders(req, res) {
             _id: new ObjectId(respondersToAdd[i].id)
           }).lean();
 
-          let onlineStatus = await OnlineService.checkOnlineStatus(
-            respondersToAdd[i].id
-          );
+          let onlineStatus = await OnlineService.checkOnlineStatus(respondersToAdd[i].id);
           returnInfo.push({
             id: respondersToAdd[i].id,
             username: responder.username,
@@ -251,11 +244,8 @@ async function deleteResponders(req, res) {
   var responders = user.get("responders");
   let respondersToDeleteAreValid = true;
   for (let i of respondersToDelete) {
-    respondersToDeleteAreValid = responders.some(
-      responder => responder["id"] === i.id
-    );
-    if (!respondersToDeleteAreValid)
-      break;
+    respondersToDeleteAreValid = responders.some(responder => responder["id"] === i.id);
+    if (!respondersToDeleteAreValid) break;
   }
 
   if (respondersToDeleteAreValid) {
@@ -272,7 +262,6 @@ async function deleteResponders(req, res) {
     }
     user.save();
     res.status(200).json({ respondersDeleted: returnInfo });
-
   } else {
     handle.badRequest(res, "At least one of the responders is not valid to delete for this user");
   }
@@ -315,8 +304,7 @@ async function toggleOnlineAndNaloxoneAvailabilityStatus(req, res) {
         id: req.params.id,
         online: false
       });
-    }
-    catch {
+    } catch {
       handle.internalServerError("Failed to set offline status.");
     }
   } else {
@@ -409,32 +397,29 @@ async function addPushToken(req, res) {
   });
 }
 
-async function respondingTo(req, res){
-  const userId = req.params.id
+async function respondingTo(req, res) {
+  const userId = req.params.id;
 
   var query = UserModel.find({
-      responders: {
-        $elemMatch: {id: userId}
+    responders: {
+      $elemMatch: { id: userId }
     }
   });
 
-  try{
-    let docs = await query.exec()
-    let userRespondingTo = []
+  try {
+    let docs = await query.exec();
+    let userRespondingTo = [];
 
-    for (let i of docs){
-      userRespondingTo.push({username: i.username, id: i._id});
+    for (let i of docs) {
+      userRespondingTo.push({ username: i.username, id: i._id });
     }
 
     res.status(200).json({
       respondingTo: userRespondingTo
     });
+  } catch (err) {
+    handle.internalServerError(res, "Failed to query Help Request database");
   }
-  catch(err){
-    handle.internalServerError(res,"Failed to query Help Request database")
-  }
-
-
 }
 
 module.exports = {
