@@ -202,18 +202,18 @@ async function addResponders(req, res) {
 
       if (validFlag == true) {
         let returnInfo = [];
-
-        for (var i = 0, len = respondersToAdd.length; i < len; i++) {
+          
+        for (let i in respondersToAdd) {
           user.responders.push(respondersToAdd[i]);
           let responder = await UserModel.findOne({
             _id: new ObjectId(respondersToAdd[i].id)
           }).lean();
 
-          let onlineStatus = await OnlineService.checkOnlineStatus(respondersToAdd[i].id);
+          let availabilityStatus = await AvailbilityService.checkAvailabilityStatus(respondersToAdd[i].id);
           returnInfo.push({
             id: respondersToAdd[i].id,
             username: responder.username,
-            onlineStatus: onlineStatus
+            availabilityStatus: availabilityStatus
           });
         }
 
@@ -295,7 +295,7 @@ async function searchUsers(req, res) {
 }
 
 async function toggleOnlineAndNaloxoneAvailabilityStatus(req, res) {
-  // request body should conntain only "online" or "naloxoneAvailability"
+  // request body should contain only "online" or "naloxoneAvailability"
   if (req.body.online != undefined && !req.body.online) {
     try {
       OnlineService.setOffline(req.params.id);
