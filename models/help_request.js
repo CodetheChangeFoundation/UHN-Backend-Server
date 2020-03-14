@@ -1,7 +1,7 @@
 var mongoose = require("../database/mongoose");
 var mongoose = mongoose.getmongoose();
 var Schema = mongoose.Schema;
-const { HELP_REQUEST_STATUS, HELP_REQUEST_LIMIT } = require('../constants/help_request')
+const { HELP_REQUEST_STATUS, HELP_REQUEST_LIMIT } = require("../constants/help_request")
 
 const arrayLimit = (val) => {
   return val.length <= HELP_REQUEST_LIMIT;

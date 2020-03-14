@@ -39,13 +39,14 @@ app.get("/users/search", middleware.checkToken, user.searchUsers);
 app.get("/users/:id", middleware.checkToken, user.userInfo);
 app.get("/users/:id/responders", middleware.checkToken, user.getResponders);
 app.get("/users/:id/responders/count", middleware.checkToken, user.getResponderCount);
+app.get("/users/:id/responding-to", middleware.checkToken, user.respondingTo);
 app.delete("/users/:id/responders", middleware.checkToken, user.deleteResponders);
 
 // Help requests
 app.post("/help-requests/", middleware.checkToken, help_request.addHelpRequest);
-app.get("/help-requests/:id",middleware.checkToken,help_request.getHelpRequest)
+app.get("/help-requests/:id", middleware.checkToken, help_request.getHelpRequest)
 app.put("/help-requests/:id", middleware.checkToken, help_request.putHelpRequest);
-app.get("/help-requests/:id/responders/count",middleware.checkToken,help_request.getHelpRequestResponderCount)
+app.get("/help-requests/:id/responders/count", middleware.checkToken, help_request.getHelpRequestResponderCount)
 
 // Alarm metrics
 app.post("/metrics/alarm", middleware.checkToken, alarmMetrics.alarmStart);

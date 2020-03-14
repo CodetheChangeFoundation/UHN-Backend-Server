@@ -4,7 +4,7 @@ var HelpRequestModel = require("../models/help_request").model;
 var NotificationService = require("../services/notification.service");
 var UserService = require("../services/user.service");
 import * as StatusCodes from "../utils/error_status_codes"
-const { HELP_REQUEST_STATUS, HELP_REQUEST_LIMIT } = require('../constants/help_request')
+const { HELP_REQUEST_STATUS, HELP_REQUEST_LIMIT } = require("../constants/help_request")
 
 const putHelpRequest = async (req, res) => {
   const status = req.body.status;
@@ -43,7 +43,7 @@ const putHelpRequest = async (req, res) => {
         userId: help_request.userId,
         responderIds: help_request.responderIds,
         status: help_request.status,
-        // unsure if we need 'userResponders' still
+        // unsure if we need "userResponders" still
         userResponders: help_request.userResponders,
         createdAt: help_request.createdAt,
         updatedAt: help_request.updatedAt

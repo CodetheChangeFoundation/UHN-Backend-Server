@@ -222,6 +222,26 @@ HTTP Response:
 }
 ```
 
+
+### Getting the users a responder is watching for
+
+GET "/users/{id}/responding-to"
+
+HTTP Response:
+
+```
+{
+    "respondingTo": [
+        {
+            "username": string,
+            "id": string
+        }
+    ]
+}
+```
+
+
+
 ## Metrics
 
 ### Adding Alarm Metric Log
