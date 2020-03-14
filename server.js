@@ -44,6 +44,7 @@ app.delete("/users/:id/responders", middleware.checkToken, user.deleteResponders
 
 // Help requests
 app.post("/help-requests/", middleware.checkToken, help_request.addHelpRequest);
+app.get("/help-requests/:id",middleware.checkToken,help_request.getHelpRequest)
 app.put("/help-requests/:id", middleware.checkToken, help_request.putHelpRequest);
 app.get("/help-requests/:id/responders/count",middleware.checkToken,help_request.getHelpRequestResponderCount)
 

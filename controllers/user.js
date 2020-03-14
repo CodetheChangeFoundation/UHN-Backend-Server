@@ -162,19 +162,15 @@ async function getResponderCount(req, res) {
 
   if (user) {
     let responders = user.responders;
-    if (req.query.online == "false" || Object.entries(req.query).length == 0) {
-      res.status(200).json({ count: responders.length });
-    } else {
-      let count = 0;
-      for (let r of responders) {
-        var responder = await UserModel.findOne({
-          _id: new ObjectId(r.id)
-        }).lean();
-        let availbilityStatus = await AvailbilityService.checkAvailabilityStatus(r.id);
-        if (availbilityStatus == true) count++;
-      }
-      res.status(200).json({ count: count });
+    let count = 0;
+    for (let r of responders) {
+      var responder = await UserModel.findOne({
+        _id: new ObjectId(r.id)
+      }).lean();
+      let availbilityStatus = await AvailbilityService.checkAvailabilityStatus(r.id);
+      if (availbilityStatus == true) count++;
     }
+    res.status(200).json({ count: count });
   } else {
     handle.notFound(res, "Cannot find requested user ID in database");
   }
