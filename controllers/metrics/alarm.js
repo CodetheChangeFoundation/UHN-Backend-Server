@@ -1,22 +1,24 @@
 let alarmService = require("../../services/metrics/alarmMetricService");
-const handle = require("../../utils/error_handling");
 
 async function alarmStart(req, res) {
   let data = req.body;
 
+  let result = {
+    userID: data.userID,
+    startTime: data.startTime,
+    endTime: data.endTime
+  };
+
   try {
     let alarmID = await alarmService.createAlarmLog(data.userID, data.startTime, data.endTime);
     console.log(alarmID);
-    res.status(200).json({
-      alarmID: alarmID,
-      userID: data.userID,
-      startTime: data.startTime,
-      endTime: data.endTime
-    });
+    result.alarmID = alarmID;
+
   } catch (err) {
     console.log(err)
-    handle.internalServerError(res, "Cannot create metrics alarm log for user");
+    result.metricError = "Cannot create metrics alarm log for user";
   }
+  res.status(200).json(result);
 }
 
 async function alarmUpdate(req, res) {
@@ -50,11 +52,11 @@ async function alarmUpdate(req, res) {
       result.alarmEnd = updatedTime[0];
     }
 
-    res.status(200).json(result);
-
   } catch (err) {
-    handle.internalServerError(res, err.message)
+    result.metricError = err.message;
   }
+  
+  res.status(200).json(result);
 }
 
 module.exports = {
