@@ -53,7 +53,8 @@ async function alarmUpdate(req, res) {
     }
 
   } catch (err) {
-    result.metricError = err.message;
+    console.log(err.message)
+    result.metricError = "Cannot update metrics alarm log properties";
   }
   
   res.status(200).json(result);
