@@ -1,4 +1,5 @@
 let arrivalService = require("../../Services/metrics/arrivalMetricService");
+let handle = require("../../utils/error_handling");
 
 async function responderArrival(req, res) {
   let responseID = req.body.responseID;
@@ -12,13 +13,13 @@ async function responderArrival(req, res) {
   try {
     let arrivalID = await arrivalService.createArrivalLog(responseID, arrivalTime);
     result.id = arrivalID;
+  
+    res.status(200).json(result);
 
   } catch (err) {
-    console.log(err)
-    result.metricError = "Cannot create metrics arrival log";
+    console.log(err);
+    handle.internalServerError(res, "Cannot create metrics arrival log")
   }
-  
-  res.status(200).json(result);
 }
 
 module.exports = {

@@ -265,8 +265,7 @@ HTTP Response:
     "alarmID": integer // appears if successful. Keep returned id for future log updates
     "userID": string,
     "startTime": string,
-    "endTime": string,
-    "metricError": string // appears if issue occurs with postgres metric database
+    "endTime": string
 }
 ```
 
@@ -289,8 +288,7 @@ HTTP Response:
 {// returns alarmStatus if sentStatus was in body, same for alarmEnd and newEndTime
     "alarmID": integer,
     "alarmStatus": boolean,
-    "alarmEnd": string,
-    "metricError": string // appears if issue occurs with postgres metric database
+    "alarmEnd": string
 }
 ```
 ## Add Response Metric Log
@@ -316,8 +314,7 @@ HTTP Response:
     "userID": string,
     "alarmID": integer,
     "response": boolean,
-    "responseTime": string,
-    "metricError": string // appears if issue occurs with postgres metric database
+    "responseTime": string
 }
 ```
 
@@ -340,8 +337,7 @@ HTTP Response:
 {
     "id": integer, // appears if successful
     "responseID": integer,
-    "arrivalTime": string,
-    "metricError": string // appears if issue occurs with postgres metric database
+    "arrivalTime": string
 }
 ```
 
@@ -366,7 +362,6 @@ HTTP Response:
     "id": integer, // appears if successful
     "responseID": integer,
     "alarmSuccess": boolean,
-    "treatmentTime": string,
-    "metricError": string // appears if issue occurs with postgres metric database
+    "treatmentTime": string
 }
 ```

@@ -1,4 +1,5 @@
 let responseService = require("../../Services/metrics/responseMetricService");
+let handle = require("../../utils/error_handling");
 
 async function recordResponse(req, res) {
   let data = req.body;
@@ -18,12 +19,14 @@ async function recordResponse(req, res) {
   try {
     let responseID = await responseService.createResponseLog(data.alarmID, data.userID, response, data.responseTime);
     result.id = responseID;
+
+    res.status(200).json(result);
+
   } catch (err) {
-    console.log(err)
-    result.metricError = "Cannot create response log";
+    console.log(err);
+    handle.internalServerError(res, "Cannot create response log");
   }
   
-  res.status(200).json(result);
 }
 
 module.exports = {
