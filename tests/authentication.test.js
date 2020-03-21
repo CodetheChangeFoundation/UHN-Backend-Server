@@ -1,7 +1,7 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
 import app from "../server";
-var database = require("../database");
+var database = require("../database/mongoose");
 var db = database.getdb();
 
 chai.use(chaiHttp);
