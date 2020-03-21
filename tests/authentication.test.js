@@ -3,8 +3,8 @@ import chaiHttp from "chai-http";
 import app from "../server";
 import metrics from "../database/postgres"
 
-const InitializationService = require("../services/initialization.service");
-InitializationService.initialize();
+// const InitializationService = require("../services/initialization.service");
+// InitializationService.initialize();
 
 var metricdb = metrics.getMetrics();
 var UserModel = require("../models/user").model;
@@ -148,11 +148,11 @@ describe("Create 2 accounts and tests for search and responding",() => {
 
   it("should add B as a responder for user A", (done) =>{
     let respondersToAddArr = [{id: BuserID}];
-    console.log(respondersToAddArr)
+
     chai.request(app)
-      .post("/users/${userId}/responders")
+      .post(`/users/${userId}/responders`)
       .set("Authorization", `Bearer ${token}`)
-      .send({respondersToAdd : respondersToAddArr})
+      .send({respondersToAdd: respondersToAddArr})
       .end((err, res) => {
         console.log(res.body);
         res.should.have.status(200);
