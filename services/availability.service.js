@@ -19,7 +19,7 @@ async function setUnavailable(userId) {
 
 async function checkAvailabilityStatus(userId) {
   try {
-    const res = await redis.sismemberAsync(availableUsers, userId);
+    const res = await redis.sismemberAsync(availableUsers, userId.toString() );
     return res ? true : false;
   } catch(err) {
     console.log("redis checkAvailabilityStatus error: ", err.message);

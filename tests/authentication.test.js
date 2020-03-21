@@ -1,8 +1,13 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
 import app from "../server";
-var database = require("../database/mongoose");
-var db = database.getdb();
+import metrics from "../database/postgres"
+
+const InitializationService = require("../services/initialization.service");
+InitializationService.initialize();
+
+var metricdb = metrics.getMetrics();
+var UserModel = require("../models/user").model;
 
 chai.use(chaiHttp);
 chai.should();
@@ -58,10 +63,14 @@ describe("Sign up and Login", () => {
 
   after(async () => {
     try {
-      await db.collection("users").deleteOne({ username: username })
+      await UserModel.deleteMany({username:username});
+      await metricdb('users')
+        .whereIn('username', [username])
+        .del()
       console.log("Processed after()");
     } catch (err) {
       console.log("Failed to delete created user");
+      console.log(err)
     }
   })
 })
@@ -139,12 +148,13 @@ describe("Create 2 accounts and tests for search and responding",() => {
 
   it("should add B as a responder for user A", (done) =>{
     let respondersToAddArr = [{id: BuserID}];
-    console.log(respondersToAddArr);
+    console.log(respondersToAddArr)
     chai.request(app)
       .post("/users/${userId}/responders")
       .set("Authorization", `Bearer ${token}`)
-      .send({respondersToAdd: respondersToAddArr})
+      .send({respondersToAdd : respondersToAddArr})
       .end((err, res) => {
+        console.log(res.body);
         res.should.have.status(200);
         res.body.should.be.a("object");
         done();
@@ -154,10 +164,14 @@ describe("Create 2 accounts and tests for search and responding",() => {
 
 after(async () => {
   try {
-    await db.collection("users").deleteMany({username: { $in: ["Busername","Ausername"]}});
+    await UserModel.deleteMany({username: { $in: ["Busername","Ausername"]}});
+    await metricdb('users')
+    .whereIn('username', ["Busername","Ausername"])
+    .del()
     console.log("Processed after()");
   } catch (err) {
     console.log("Failed to delete created user");
+    console.log(err)
   }
 
 })
