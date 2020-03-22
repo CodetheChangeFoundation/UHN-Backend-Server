@@ -9,17 +9,14 @@ async function createAlarmLog(userID, timeStart, timeEnd) {
   let alarm = new AlarmMetricModel(null, userID.toString(), timeStart, timeEnd, false);
 
   try {
-    await metricDB("alarmlog").insert({
+    alarmLogID = await metricDB("alarmlog").insert({
       userid: alarm.userid,
       alarmstart: alarm.timeStart,
       alarmend: alarm.timeEnd,
       alarmsent: alarm.wasSent
-    }).returning("*").then(res => {
-      console.log(res);
-      alarmLogID = res[0].id;
-    });
+    }).returning("id");
 
-    return alarmLogID;
+    return alarmLogID[0];
 
   } catch (err) {
     throw err;
