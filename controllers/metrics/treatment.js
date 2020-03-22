@@ -1,4 +1,4 @@
-let treatmentService = require("../../Services/metrics/treatmentMetricService");
+let treatmentService = require("../../services/metrics/treatmentMetricService");
 let handle = require("../../utils/error_handling");
 
 async function recordTreatment(req, res) {

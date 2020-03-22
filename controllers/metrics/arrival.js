@@ -1,4 +1,4 @@
-let arrivalService = require("../../Services/metrics/arrivalMetricService");
+let arrivalService = require("../../services/metrics/arrivalMetricService");
 let handle = require("../../utils/error_handling");
 
 async function responderArrival(req, res) {

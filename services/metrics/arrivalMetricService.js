@@ -1,4 +1,4 @@
-import ArrivalMetricModel from "../../Models/metrics/arrival";
+import ArrivalMetricModel from "../../models/metrics/arrival";
 import metrics from "../../database/postgres";
 
 let metricDB = metrics.getMetrics();

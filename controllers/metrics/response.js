@@ -1,4 +1,4 @@
-let responseService = require("../../Services/metrics/responseMetricService");
+let responseService = require("../../services/metrics/responseMetricService");
 let handle = require("../../utils/error_handling");
 
 async function recordResponse(req, res) {
