@@ -123,6 +123,16 @@ describe("Create 2 accounts and tests for search and responding",() => {
       })
   })
 
+  it("should authenticate B with correct credentials and turn it online", (done) => {
+    chai.request(app)
+      .post("/login")
+      .send({ username: "Busername", password: "Buserpassword" })
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.a("object");
+        done();
+      })
+  })
   var users = [];
   var BuserID;
 

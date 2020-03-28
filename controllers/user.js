@@ -162,12 +162,23 @@ async function getResponderCount(req, res) {
   if (user) {
     let responders = user.responders;
     let count = 0;
+    console.log(responders);
     for (let r of responders) {
       var responder = await UserModel.findOne({
         _id: new ObjectId(r.id)
       }).lean();
+<<<<<<< Updated upstream
       let availbilityStatus = await AvailbilityService.checkAvailabilityStatus(r.id);
       if (availbilityStatus == true) count++;
+=======
+      try{
+        let availbilityStatus = await AvailbilityService.checkAvailabilityStatus(r.id);
+        if (availbilityStatus) count++;
+      }
+      catch(err){
+        console.log(err);
+      }
+>>>>>>> Stashed changes
     }
     res.status(200).json({ count: count });
   } else {
