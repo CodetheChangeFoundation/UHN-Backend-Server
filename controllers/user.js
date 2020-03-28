@@ -141,7 +141,7 @@ async function getResponders(req, res) {
       var responder = await UserModel.findOne({
         _id: new ObjectId(r.id)
       }).lean();
-      let availbilityStatus = await AvailbilityService(r.id);
+      let availbilityStatus = await AvailbilityService.checkAvailabilityStatus(r.id);
       returnInfo.push({
         id: r.id,
         username: responder.username,
@@ -166,7 +166,7 @@ async function getResponderCount(req, res) {
       var responder = await UserModel.findOne({
         _id: new ObjectId(r.id)
       }).lean();
-      let availbilityStatus = await AvailbilityService(r.id);
+      let availbilityStatus = await AvailbilityService.checkAvailabilityStatus(r.id);
       if (availbilityStatus == true) count++;
     }
     res.status(200).json({ count: count });
