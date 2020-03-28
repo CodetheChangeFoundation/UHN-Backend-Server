@@ -3,9 +3,6 @@ import chaiHttp from "chai-http";
 import app from "../server";
 import metrics from "../database/postgres"
 
-// const InitializationService = require("../services/initialization.service");
-// InitializationService.initialize();
-
 var metricdb = metrics.getMetrics();
 var UserModel = require("../models/user").model;
 
@@ -157,6 +154,19 @@ describe("Create 2 accounts and tests for search and responding",() => {
         console.log(res.body);
         res.should.have.status(200);
         res.body.should.be.a("object");
+        done();
+      })
+  })
+
+  it("should have 1 responder count for user A", (done) => {
+    chai.request(app)
+      .get(`/users/${userId}/responders/count`)
+      .set("Authorization", `Bearer ${token}`)
+      .end((err, res) => {
+        console.log(res.body);
+        res.should.have.status(200);
+        res.body.should.be.a("object");
+        console.log(res.body);
         done();
       })
   })
