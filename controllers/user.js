@@ -43,19 +43,21 @@ async function loginUser(req, res) {
           console.log("redis error: ", err.message);
         }
 
-        try {
-          await metricService.updateUserLoginTime(username);
-        } catch (err) {
-          handle.notFound(res, "Cannot find user in metrics database");
-        }
-
-        res.status(200).json({
+        let data = {
           success: true,
           message: "Authentication successful!",
           token: token,
           id: result._id,
           naloxoneAvailability: result.naloxoneAvailability
-        });
+        }
+
+        try {
+          await metricService.updateUserLoginTime(username);
+        } catch (err) {
+          data.metricError = err.message;
+        }
+
+        res.status(200).json(data);
       } else {
         handle.unauthorized(res, "Username or password incorrect");
       }
@@ -104,8 +106,7 @@ async function signupUser(req, res) {
     try {
       await metricService.addNewUserToMetrics(result.id, username);
     } catch (err) {
-      console.log(err);
-      handle.internalServerError(res, "Cannot add new user to metrics database");
+      result.metricError = err.message
     }
 
     res.status(200).json(result);
@@ -202,18 +203,18 @@ async function addResponders(req, res) {
 
       if (validFlag == true) {
         let returnInfo = [];
-
-        for (var i = 0, len = respondersToAdd.length; i < len; i++) {
+          
+        for (let i in respondersToAdd) {
           user.responders.push(respondersToAdd[i]);
           let responder = await UserModel.findOne({
             _id: new ObjectId(respondersToAdd[i].id)
           }).lean();
 
-          let onlineStatus = await OnlineService.checkOnlineStatus(respondersToAdd[i].id);
+          let availabilityStatus = await AvailbilityService.checkAvailabilityStatus(respondersToAdd[i].id);
           returnInfo.push({
             id: respondersToAdd[i].id,
             username: responder.username,
-            onlineStatus: onlineStatus
+            availabilityStatus: availabilityStatus
           });
         }
 
@@ -295,7 +296,7 @@ async function searchUsers(req, res) {
 }
 
 async function toggleOnlineAndNaloxoneAvailabilityStatus(req, res) {
-  // request body should conntain only "online" or "naloxoneAvailability"
+  // request body should contain only "online" or "naloxoneAvailability"
   if (req.body.online != undefined && !req.body.online) {
     try {
       OnlineService.setOffline(req.params.id);

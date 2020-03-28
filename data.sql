@@ -37,7 +37,7 @@ CREATE TABLE ResponseLog (
 -- Responders verify when they have arrived to help another user
 CREATE TABLE ArrivalLog (
     ID serial PRIMARY KEY,
-    ResponseID Integer NOT NULL,
+    ResponseID Integer NOT NULL UNIQUE, -- users arrive for an alert only once
     ArrivalTime timestamptz NOT NULL,
     FOREIGN KEY (ResponseID) REFERENCES ResponseLog(ID) ON DELETE CASCADE
 );
@@ -45,9 +45,10 @@ CREATE TABLE ArrivalLog (
 -- Record if User was saved from an alarm timeout alert
 CREATE TABLE TreatmentLog (
     ID serial PRIMARY KEY,
-    AlarmID Integer NOT NULL,
+    ResponseID Integer NOT NULL,
     AlertSuccessful Boolean NOT NULL,
-    FOREIGN KEY (AlarmID) REFERENCES ALarmLog(ID) ON DELETE CASCADE
+    TreatmentTime timestamptz NOT NULL,
+    FOREIGN KEY (ResponseID) REFERENCES ResponseLog(ID) ON DELETE CASCADE
 );
 
 /* Uncomment section to fill database with example data
@@ -70,6 +71,6 @@ INSERT INTO ArrivalLog (ResponseID, ArrivalTIme) VALUES (2, NOW() + INTERVAL '5 
 INSERT INTO ArrivalLog (ResponseID, ArrivalTIme) VALUES (3, NOW() + INTERVAL '17 minutes');
 INSERT INTO ArrivalLog (ResponseID, ArrivalTIme) VALUES (4, '2020-02-01 18:39:28-08');
 
-INSERT INTO TreatmentLog (AlarmID, AlertSuccessful) VALUES (1, FALSE);
-INSERT INTO TreatmentLog (AlarmID, AlertSuccessful) VALUES (2, FALSE);
+INSERT INTO TreatmentLog (ResponseID, AlertSuccessful, TreatmentTime) VALUES (1, FALSE, NOW());
+INSERT INTO TreatmentLog (ResponseID, AlertSuccessful, TreatmentTIme) VALUES (2, FALSE, NOW());
 */
