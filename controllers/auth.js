@@ -123,7 +123,6 @@ async function signup(req, res) {
 }
 
 async function useRefreshToken(req, res) {
-  console.log("useRefreshToken endpoint hit");
   const errors = customValidationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -142,21 +141,8 @@ async function useRefreshToken(req, res) {
   }
 }
 
-async function deleteRefreshToken(req, res) {
-  const errors = customValidationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  } else {
-    let refreshToken = req.body.refreshToken;
-    await RefreshTokenService.deleteRefreshToken(refreshToken);
-
-    res.send(204);
-  }
-}
-
 module.exports = {
   login,
   signup,
   useRefreshToken,
-  deleteRefreshToken,
 }

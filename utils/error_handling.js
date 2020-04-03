@@ -95,15 +95,6 @@ function validateUseRefreshToken() {
   ];
 }
 
-function validateDeleteRefreshToken() {
-  return [
-    body("refreshToken")
-      .exists()
-      .bail()
-      .withMessage(msg.REFRESH_TOKEN_MANDATORY)
-  ]
-}
-
 module.exports = {
   badRequest,
   unauthorized,
@@ -113,5 +104,4 @@ module.exports = {
   validateSignup,
   validateLogin,
   validateUseRefreshToken,
-  validateDeleteRefreshToken,
 };

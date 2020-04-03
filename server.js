@@ -29,7 +29,6 @@ app.get("/", (req, res) => res.send("Server is up"))
 app.post("/signup", validateSignup(), auth.signup);
 app.post("/login", validateLogin(), auth.login);
 app.post("/refresh-token", validateUseRefreshToken(), auth.useRefreshToken);
-app.delete("/refresh-token", validateDeleteRefreshToken(), auth.deleteRefreshToken)
 
 app.post("/users/:id/responders", middleware.checkToken, user.addResponders);
 

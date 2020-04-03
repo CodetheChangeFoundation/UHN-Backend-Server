@@ -26,6 +26,27 @@ Whenever there are multiple errors that can be thrown on an endpoint with the sa
 }
 ```
 
+## Authentication
+
+### Using refresh token to get new access token
+
+POST "/refresh-token" :
+
+Request Body:
+```
+{
+    "userId": string,
+    "refreshToken": string
+}
+```
+
+HTTP Response:
+```
+{
+    "token": string
+}
+```
+
 ## Users
 
 ### Getting responders of a user
