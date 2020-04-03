@@ -11,7 +11,6 @@ let checkToken = (req, res, next) => {
   if (token) {
     jwt.verify(token, process.env.SECRET, (err, decoded) => {
       if (err) {
-        console.log("middle ware token error");
         return res.status(401).json({
           success: false,
           message: "Token is not valid"
