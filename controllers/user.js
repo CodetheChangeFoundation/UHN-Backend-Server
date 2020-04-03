@@ -73,7 +73,6 @@ async function signupUser(req, res) {
     return res.status(400).json({ errors: errors.array() });
   } else {
     var username = req.body.username;
-    var email = req.body.email;
     var pass = req.body.password;
     var phone = req.body.phone;
     try {
@@ -87,7 +86,6 @@ async function signupUser(req, res) {
 
     let newUser = new UserModel({
       username: username,
-      email: email,
       password: bcrypt.hashSync(pass, 10),
       phone: phone,
       naloxoneAvailability: false

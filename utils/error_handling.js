@@ -54,13 +54,6 @@ function validateSignup() {
       .isLength({ min: 5 })
       .bail()
       .withMessage(msg.USERNAME_CONDITION),
-    body("email")
-      .exists()
-      .bail()
-      .withMessage(msg.EMAIL_MANDATORY)
-      .isEmail()
-      .bail()
-      .withMessage(msg.EMAIL_CONDITION),
     body("password")
       .exists()
       .bail()
