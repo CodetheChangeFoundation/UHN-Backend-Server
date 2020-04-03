@@ -13,7 +13,7 @@ var AvailbilityService = require("../services/availability.service");
 var OnlineService = require("../services/online.service");
 var UserService = require("../services/user.service");
 
-const TOKEN_DURATION = "24h";
+const TOKEN_DURATION = "15m";
 
 async function login(req, res) {
   const errors = customValidationResult(req);

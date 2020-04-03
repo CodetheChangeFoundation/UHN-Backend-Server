@@ -222,6 +222,26 @@ HTTP Response:
 }
 ```
 
+
+### Getting the users a responder is watching for
+
+GET "/users/{id}/responding-to"
+
+HTTP Response:
+
+```
+{
+    "respondingTo": [
+        {
+            "username": string,
+            "id": string
+        }
+    ]
+}
+```
+
+
+
 ## Metrics
 
 ### Adding Alarm Metric Log
@@ -242,7 +262,7 @@ HTTP Response:
 
 ```
 {
-    "alarmID": integer // keep returned id for future log updates
+    "alarmID": integer // appears if successful. Keep returned id for future log updates
     "userID": string,
     "startTime": string,
     "endTime": string
@@ -269,5 +289,79 @@ HTTP Response:
     "alarmID": integer,
     "alarmStatus": boolean,
     "alarmEnd": string
+}
+```
+## Add Response Metric Log
+
+POST "/metrics/response"
+
+Request Body:
+
+```
+{
+    "userID": string, // MongoID
+    "alarmID": integer,
+    "response": boolean,
+    "responseTime": string // get UTC string with: new Date().toUTCString()
+}
+```
+
+HTTP Response:
+
+```
+{
+    "id": integer, // appears if successful. Keep returned ID for future arrival and treatment logs
+    "userID": string,
+    "alarmID": integer,
+    "response": boolean,
+    "responseTime": string
+}
+```
+
+## Add Arrival Metric Log
+
+POST "/metrics/arrival"
+
+Request Body:
+
+```
+{
+    "responseID": integer,
+    "arrivalTime": string // get UTC string with: new Date().toUTCString()
+}
+```
+
+HTTP Response:
+
+```
+{
+    "id": integer, // appears if successful
+    "responseID": integer,
+    "arrivalTime": string
+}
+```
+
+## Add Treatment Metric Log
+
+POST "/metrics/treatment"
+
+Request Body:
+
+```
+{
+    "responseID": integer,
+    "alarmSuccess": boolean,
+    "treatmentTime": string // get UTC string with: new Date().toUTCString()
+}
+```
+
+HTTP Response:
+
+```
+{
+    "id": integer, // appears if successful
+    "responseID": integer,
+    "alarmSuccess": boolean,
+    "treatmentTime": string
 }
 ```

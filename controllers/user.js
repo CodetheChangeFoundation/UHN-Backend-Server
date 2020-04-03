@@ -54,19 +54,15 @@ async function getResponderCount(req, res) {
 
   if (user) {
     let responders = user.responders;
-    if (req.query.online == "false" || Object.entries(req.query).length == 0) {
-      res.status(200).json({ count: responders.length });
-    } else {
-      let count = 0;
-      for (let r of responders) {
-        var responder = await UserModel.findOne({
-          _id: new ObjectId(r.id)
-        }).lean();
-        let availbilityStatus = await AvailbilityService.checkAvailabilityStatus(r.id);
-        if (availbilityStatus == true) count++;
-      }
-      res.status(200).json({ count: count });
+    let count = 0;
+    for (let r of responders) {
+      var responder = await UserModel.findOne({
+        _id: new ObjectId(r.id)
+      }).lean();
+      let availbilityStatus = await AvailbilityService.checkAvailabilityStatus(r.id);
+      if (availbilityStatus == true) count++;
     }
+    res.status(200).json({ count: count });
   } else {
     handle.notFound(res, "Cannot find requested user ID in database");
   }
@@ -92,10 +88,7 @@ async function addResponders(req, res) {
           break;
         }
 
-        if (
-          foundUser == null ||
-          user.responders.find(e => e.id === foundUser.id)
-        ) {
+        if (foundUser == null || user.responders.find(e => e.id === foundUser.id)) {
           validFlag = false; //does not exist in database
           break;
         }
@@ -103,20 +96,18 @@ async function addResponders(req, res) {
 
       if (validFlag == true) {
         let returnInfo = [];
-
-        for (var i = 0, len = respondersToAdd.length; i < len; i++) {
+          
+        for (let i in respondersToAdd) {
           user.responders.push(respondersToAdd[i]);
           let responder = await UserModel.findOne({
             _id: new ObjectId(respondersToAdd[i].id)
           }).lean();
 
-          let onlineStatus = await OnlineService.checkOnlineStatus(
-            respondersToAdd[i].id
-          );
+          let availabilityStatus = await AvailbilityService.checkAvailabilityStatus(respondersToAdd[i].id);
           returnInfo.push({
             id: respondersToAdd[i].id,
             username: responder.username,
-            onlineStatus: onlineStatus
+            availabilityStatus: availabilityStatus
           });
         }
 
@@ -147,11 +138,8 @@ async function deleteResponders(req, res) {
   var responders = user.get("responders");
   let respondersToDeleteAreValid = true;
   for (let i of respondersToDelete) {
-    respondersToDeleteAreValid = responders.some(
-      responder => responder["id"] === i.id
-    );
-    if (!respondersToDeleteAreValid)
-      break;
+    respondersToDeleteAreValid = responders.some(responder => responder["id"] === i.id);
+    if (!respondersToDeleteAreValid) break;
   }
 
   if (respondersToDeleteAreValid) {
@@ -168,7 +156,6 @@ async function deleteResponders(req, res) {
     }
     user.save();
     res.status(200).json({ respondersDeleted: returnInfo });
-
   } else {
     handle.badRequest(res, "At least one of the responders is not valid to delete for this user");
   }
@@ -202,7 +189,7 @@ async function searchUsers(req, res) {
 }
 
 async function toggleOnlineAndNaloxoneAvailabilityStatus(req, res) {
-  // request body should conntain only "online" or "naloxoneAvailability"
+  // request body should contain only "online" or "naloxoneAvailability"
   if (req.body.online != undefined && !req.body.online) {
     try {
       OnlineService.setOffline(req.params.id);
@@ -211,8 +198,7 @@ async function toggleOnlineAndNaloxoneAvailabilityStatus(req, res) {
         id: req.params.id,
         online: false
       });
-    }
-    catch {
+    } catch {
       handle.internalServerError("Failed to set offline status.");
     }
   } else {
@@ -305,6 +291,31 @@ async function addPushToken(req, res) {
   });
 }
 
+async function respondingTo(req, res) {
+  const userId = req.params.id;
+
+  var query = UserModel.find({
+    responders: {
+      $elemMatch: { id: userId }
+    }
+  });
+
+  try {
+    let docs = await query.exec();
+    let userRespondingTo = [];
+
+    for (let i of docs) {
+      userRespondingTo.push({ username: i.username, id: i._id });
+    }
+
+    res.status(200).json({
+      respondingTo: userRespondingTo
+    });
+  } catch (err) {
+    handle.internalServerError(res, "Failed to query Help Request database");
+  }
+}
+
 module.exports = {
   userInfo,
   getResponders,
@@ -316,4 +327,5 @@ module.exports = {
   getLocation,
   getResponderCount,
   addPushToken,
+  respondingTo
 };
