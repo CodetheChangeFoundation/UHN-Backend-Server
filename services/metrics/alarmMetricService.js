@@ -83,9 +83,27 @@ async function getAndUpdateAlarmSent(logID, status) {
   }
 }
 
+async function getLatestAlarmLogIdForUser(userID) {
+  let latestLog = null;
+
+  try {
+    latestLog = await metricDB("alarmlog").where({
+      userid: userID,
+      alarmsent: "true"
+    }).orderBy("alarmstart", "desc")
+    .select("id");
+    return latestLog;
+  }
+  catch (err) {
+    console.log(err)
+    throw new Error("Cannot get latest alarm log for user");
+  }
+}
+
 module.exports = {
   createAlarmLog,
   getAlarmLogById,
   getAndUpdateAlarmEndTime,
-  getAndUpdateAlarmSent
+  getAndUpdateAlarmSent,
+  getLatestAlarmLogIdForUser
 }
