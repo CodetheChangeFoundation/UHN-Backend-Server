@@ -133,8 +133,8 @@ async function getResponders(req, res) {
   }).lean();
 
   if (user.location){
-    var userLat = user.location.coords.lat;
-    var userLng = user.location.coords.lng;
+    const userLat = user.location.coords.lat;
+    const userLng = user.location.coords.lng;
   }
 
 
@@ -170,8 +170,8 @@ async function getResponderCount(req, res) {
   }).lean();
 
   if (user.location){
-    var userLat = user.location.coords.lat;
-    var userLng = user.location.coords.lng;
+    const userLat = user.location.coords.lat;
+    const userLng = user.location.coords.lng;
   }
 
  
