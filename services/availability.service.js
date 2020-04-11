@@ -1,6 +1,7 @@
 var redis = require("./redis");
 const availableUsers = "available_users";
 var UserModel = require("../models/user").model;
+var ObjectId = require("mongodb").ObjectId;
 
 async function setAvailable(userId) {
   try {
@@ -20,9 +21,6 @@ async function setUnavailable(userId) {
 
 
 async function checkNaloxoneAvailabilityStatus(userId) {
-  var responder = await UserModel.findOne({
-    _id: new ObjectId(userId)
-  }).lean();
 
   try {
     const res = await redis.sismemberAsync(availableUsers, userId);
@@ -36,17 +34,18 @@ async function checkNaloxoneAvailabilityStatus(userId) {
 
 
 async function checkResponderAvailabilityStatus(userId,userLat,userLng) {
+
   var responder = await UserModel.findOne({
     _id: new ObjectId(userId)
   }).lean();
 
-  let responder_coords = responder.location.coords;
-  let distance = distance(userLat,userLng,responder_coords.lat,responder_coords.lng,"K");
-  
+  let responderCoords = responder.location.coords;
+
+  let distance = findDistance(responderCoords.lat,responderCoords.lng,userLat,userLng,"K")
+  console.log(distance)
   try {
     const res = await redis.sismemberAsync(availableUsers, userId);
     return (res && (distance<0.5)) ? true : false;
-    
   } catch(err) {
     console.log("redis checkAvailabilityStatus error: ", err.message);
     return false;
@@ -56,7 +55,7 @@ async function checkResponderAvailabilityStatus(userId,userLat,userLng) {
 
 
 
-function distance(lat1, lon1, lat2, lon2, unit) {
+function findDistance(lat1, lon1, lat2, lon2, unit) {
 	if ((lat1 == lat2) && (lon1 == lon2)) {
 		return 0;
 	}

@@ -132,8 +132,11 @@ async function getResponders(req, res) {
     _id: new ObjectId(req.params.id)
   }).lean();
 
- let userLat = user.location.coords.lat;
- let userLng = user.location.coords.lng;
+  if (user.location){
+    var userLat = user.location.coords.lat;
+    var userLng = user.location.coords.lng;
+  }
+
 
   var returnInfo = [];
   if (user) {
@@ -142,8 +145,12 @@ async function getResponders(req, res) {
       var responder = await UserModel.findOne({
         _id: new ObjectId(r.id)
       }).lean();
-      let availbilityStatus = await AvailbilityService.checkResponderAvailabilityStatus(r.id,userLat,userLng);
+
+      let availbilityStatus = false;
       
+      if (responder.location)
+        availbilityStatus = await AvailbilityService.checkResponderAvailabilityStatus(r.id,userLat,userLng);
+
       returnInfo.push({
         id: r.id,
         username: responder.username,
@@ -212,6 +219,7 @@ async function addResponders(req, res) {
           
         for (let i in respondersToAdd) {
           user.responders.push(respondersToAdd[i]);
+
           let responder = await UserModel.findOne({
             _id: new ObjectId(respondersToAdd[i].id)
           }).lean();
