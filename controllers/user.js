@@ -147,7 +147,7 @@ async function getResponders(req, res) {
       }).lean();
 
       let availbilityStatus = false;
-      
+
       if (responder.location)
         availbilityStatus = await AvailbilityService.checkResponderAvailabilityStatus(r.id,userLat,userLng);
 
@@ -179,7 +179,12 @@ async function getResponderCount(req, res) {
       var responder = await UserModel.findOne({
         _id: new ObjectId(r.id)
       }).lean();
-      let availbilityStatus = await AvailbilityService.checkResponderAvailabilityStatus(r.id,userLat,userLng);
+
+      let availbilityStatus = false;
+
+      if (responder.location)
+        availbilityStatus = await AvailbilityService.checkResponderAvailabilityStatus(r.id,userLat,userLng);
+      
       if (availbilityStatus == true) count++;
     }
     res.status(200).json({ count: count });

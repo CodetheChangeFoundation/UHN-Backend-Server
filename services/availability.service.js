@@ -42,7 +42,7 @@ async function checkResponderAvailabilityStatus(userId,userLat,userLng) {
   let responderCoords = responder.location.coords;
 
   let distance = findDistance(responderCoords.lat,responderCoords.lng,userLat,userLng,"K")
-  console.log(distance)
+
   try {
     const res = await redis.sismemberAsync(availableUsers, userId);
     return (res && (distance<0.5)) ? true : false;
