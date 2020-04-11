@@ -9,7 +9,6 @@ chai.should();
 
 describe("Sign up and Login", () => {
   const username = "TEST_USER_1";
-  const email = "testuser@gmail.com";
   const phone = "7781231234";
   const plainTextPassword = "testuser1password";
   var token = "";
@@ -19,8 +18,7 @@ describe("Sign up and Login", () => {
     chai.request(app)
       .post("/signup")
       .send({ 
-        username: username, 
-        email: email,
+        username: username,
         password: plainTextPassword,
         phone: phone,
       })

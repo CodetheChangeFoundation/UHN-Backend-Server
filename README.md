@@ -76,10 +76,14 @@ To fill database with example data, uncomment bottom statements in data.sql and 
 For help with DATABASE_URL fields, go to root directory, connect to postgres with `psql --username=metric UHN-metrics` and enter `\conninfo`
 
 
-### Run tests
+## Run tests
 
 Make sure you are in project directory and run
 
 ```(bash)
 $ npm test
 ```
+
+## Migrations
+
+1. Remove email field: `db.users.update({}, {$unset: {email: true}}, {multi: true, safe: true}) `

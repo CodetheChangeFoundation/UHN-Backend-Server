@@ -5,7 +5,6 @@ var Schema = mongoose.Schema;
 const model = mongoose.model("users", new Schema({
   username: String,
   password: String,
-  email: String,
   phone: String,
   location: {
     coords: {
