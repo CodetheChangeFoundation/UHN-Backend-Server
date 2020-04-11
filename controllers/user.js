@@ -129,12 +129,13 @@ async function userInfo(req, res) {
   res.status(200).json(result);
 }
 async function getResponders(req, res) {
-  var user_lat = req.body.lat;
-  var user_lng = req.body.lng;
 
   const user = await UserModel.findOne({
     _id: new ObjectId(req.params.id)
   }).lean();
+
+ let userLat = user.location.coords.lat;
+ let userLng = user.location.coords.lng;
 
   var returnInfo = [];
   if (user) {
@@ -143,14 +144,12 @@ async function getResponders(req, res) {
       var responder = await UserModel.findOne({
         _id: new ObjectId(r.id)
       }).lean();
-      let availbilityStatus = await AvailbilityService.checkAvailabilityStatus(r.id);
-      let responder_coords = responder.location.coords;
-      let distance = distance(user_lat,user_lng,responder_coords.lat,responder_coords.lng,"K");
-
+      let availbilityStatus = await AvailbilityService.checkResponderAvailabilityStatus(r.id,userLat,userLng);
+      
       returnInfo.push({
         id: r.id,
         username: responder.username,
-        availbilityStatus: (availbilityStatus&&(distance<=0.5))
+        availbilityStatus: availbilityStatus
       });
     }
     res.status(200).json({ responders: returnInfo });
@@ -159,32 +158,15 @@ async function getResponders(req, res) {
   }
 }
 
-function distance(lat1, lon1, lat2, lon2, unit) {
-	if ((lat1 == lat2) && (lon1 == lon2)) {
-		return 0;
-	}
-	else {
-		var radlat1 = Math.PI * lat1/180;
-		var radlat2 = Math.PI * lat2/180;
-		var theta = lon1-lon2;
-		var radtheta = Math.PI * theta/180;
-		var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-		if (dist > 1) {
-			dist = 1;
-		}
-		dist = Math.acos(dist);
-		dist = dist * 180/Math.PI;
-		dist = dist * 60 * 1.1515;
-		if (unit=="K") { dist = dist * 1.609344 }
-		if (unit=="N") { dist = dist * 0.8684 }
-		return dist;
-	}
-}
+
 async function getResponderCount(req, res) {
   const user = await UserModel.findOne({
     _id: new ObjectId(req.params.id)
   }).lean();
 
+  let userLat = user.location.coords.lat;
+  let userLng = user.location.coords.lng;
+ 
   if (user) {
     let responders = user.responders;
     let count = 0;
@@ -192,7 +174,7 @@ async function getResponderCount(req, res) {
       var responder = await UserModel.findOne({
         _id: new ObjectId(r.id)
       }).lean();
-      let availbilityStatus = await AvailbilityService.checkAvailabilityStatus(r.id);
+      let availbilityStatus = await AvailbilityService.checkResponderAvailabilityStatus(r.id,userLat,userLng);
       if (availbilityStatus == true) count++;
     }
     res.status(200).json({ count: count });
@@ -236,7 +218,7 @@ async function addResponders(req, res) {
             _id: new ObjectId(respondersToAdd[i].id)
           }).lean();
 
-          let availabilityStatus = await AvailbilityService.checkAvailabilityStatus(respondersToAdd[i].id);
+          let availabilityStatus = await AvailbilityService.checkNaloxoneAvailabilityStatus(respondersToAdd[i].id);
           returnInfo.push({
             id: respondersToAdd[i].id,
             username: responder.username,
@@ -356,7 +338,7 @@ async function toggleOnlineAndNaloxoneAvailabilityStatus(req, res) {
         AvailbilityService.setUnavailable(req.params.id);
       }
       res.status(200).json({
-        naloxoneAvailability: await AvailbilityService.checkAvailabilityStatus(req.params.id),
+        naloxoneAvailability: await AvailbilityService.checkNaloxoneAvailabilityStatus(req.params.id),
         message: "Availability status has been changed"
       });
     } catch {
