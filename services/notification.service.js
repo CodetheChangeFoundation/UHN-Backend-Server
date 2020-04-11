@@ -16,14 +16,11 @@ const sendBatchNotifications = async (user, help_request) => {
 
     try {
       responder = await UserService.findUserById(r.id);
-      console.log(responder)
       pushTokens.push(responder.pushToken);
     } catch (err) {
       console.error(err.message + "\nSkipping to the next one.");
     }
   }
-
-  console.log(pushTokens, notifications, responders)
 
   let notificationBody = `${user.get("username")} is unresponsive. Please help!`;
   let alarmMetricID = await getAlarmMetricIdHelper(user.get("id"));
@@ -42,8 +39,6 @@ const sendBatchNotifications = async (user, help_request) => {
       console.error(`Push token ${pt} is not a valid Expo push token`);
       continue;
     } 
-
-    console.log('test')
 
     let notification = {
       to: pt,
