@@ -133,8 +133,8 @@ async function useRefreshToken(req, res) {
       let token = jwt.sign({ id: userId }, process.env.SECRET, {
         expiresIn: TOKEN_DURATION
       });
-      
-      res.status(200).json({ token: token });
+
+      res.status(200).json({ token: token, refreshToken: refreshToken });
     } else {
       handle.unauthorized(res, "Refresh token and user id do not match")
     }
