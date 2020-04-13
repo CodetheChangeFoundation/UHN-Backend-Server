@@ -43,8 +43,7 @@ Request Body:
 HTTP Response:
 ```
 {
-    "token": string,
-    "refreshToken": string
+    "token": string
 }
 ```
 

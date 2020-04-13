@@ -38,6 +38,7 @@ async function login(req, res) {
         });
 
         let refreshToken = randToken.uid(128)
+        RefreshTokenService.deleteRefreshToken(result._id)
         RefreshTokenService.addRefreshToken(result._id, refreshToken)
 
         try {
@@ -134,7 +135,8 @@ async function useRefreshToken(req, res) {
         expiresIn: TOKEN_DURATION
       });
 
-      res.status(200).json({ token: token, refreshToken: refreshToken });
+      // Consider generating new refresh token and returning it so that refresh token will also expire
+      res.status(200).json({ token: token });
     } else {
       handle.unauthorized(res, "Refresh token and user id do not match")
     }
