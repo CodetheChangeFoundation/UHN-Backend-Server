@@ -105,6 +105,22 @@ HTTP Response:
 }
 ```
 
+## Updating location of a user
+
+PUT "/users/:id/location"
+
+Request Body:
+```
+{
+    coords: {
+        lat: float,
+        lng: float
+    },
+    notes: string
+}
+```
+
+
 ### Getting Responder Count
 
 GET "/user/:id/responders/count"

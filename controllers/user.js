@@ -126,11 +126,14 @@ async function userInfo(req, res) {
   result.onlineStatus = onlineStatus;
   res.status(200).json(result);
 }
-
 async function getResponders(req, res) {
+
   const user = await UserModel.findOne({
     _id: new ObjectId(req.params.id)
   }).lean();
+
+  const userLat = user.location ? user.location.coords.lat : null;
+  const userLng = user.location ? user.location.coords.lng : null;
 
   var returnInfo = [];
   if (user) {
@@ -139,7 +142,12 @@ async function getResponders(req, res) {
       var responder = await UserModel.findOne({
         _id: new ObjectId(r.id)
       }).lean();
-      let availbilityStatus = await AvailbilityService.checkAvailabilityStatus(r.id);
+
+      let availbilityStatus = false;
+
+      if (responder.location && user.location)
+        availbilityStatus = await AvailbilityService.checkAvailabilityStatusWithDistance(r.id, userLat, userLng);
+
       returnInfo.push({
         id: r.id,
         username: responder.username,
@@ -152,10 +160,14 @@ async function getResponders(req, res) {
   }
 }
 
+
 async function getResponderCount(req, res) {
   const user = await UserModel.findOne({
     _id: new ObjectId(req.params.id)
   }).lean();
+
+  const userLat = user.location ? user.location.coords.lat : null;
+  const userLng = user.location ? user.location.coords.lng : null;
 
   if (user) {
     let responders = user.responders;
@@ -164,7 +176,12 @@ async function getResponderCount(req, res) {
       var responder = await UserModel.findOne({
         _id: new ObjectId(r.id)
       }).lean();
-      let availbilityStatus = await AvailbilityService.checkAvailabilityStatus(r.id);
+
+      let availbilityStatus = false;
+
+      if (responder.location && user.location)
+        availbilityStatus = await AvailbilityService.checkAvailabilityStatusWithDistance(r.id, userLat, userLng);
+
       if (availbilityStatus == true) count++;
     }
     res.status(200).json({ count: count });
@@ -201,9 +218,10 @@ async function addResponders(req, res) {
 
       if (validFlag == true) {
         let returnInfo = [];
-          
+
         for (let i in respondersToAdd) {
           user.responders.push(respondersToAdd[i]);
+
           let responder = await UserModel.findOne({
             _id: new ObjectId(respondersToAdd[i].id)
           }).lean();
