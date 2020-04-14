@@ -132,11 +132,8 @@ async function getResponders(req, res) {
     _id: new ObjectId(req.params.id)
   }).lean();
 
-  if (user.location){
-    const userLat = user.location.coords.lat;
-    const userLng = user.location.coords.lng;
-  }
-
+  const userLat = user.location ? user.location.coords.lat : null;
+  const userLng = user.location ? user.location.coords.lng : null;
 
   var returnInfo = [];
   if (user) {
@@ -147,9 +144,9 @@ async function getResponders(req, res) {
       }).lean();
 
       let availbilityStatus = false;
-      
+
       if (responder.location && user.location)
-        availbilityStatus = await AvailbilityService.checkResponderAvailabilityStatus(r.id,userLat,userLng);
+        availbilityStatus = await AvailbilityService.checkAvailabilityStatusWithDistance(r.id, userLat, userLng);
 
       returnInfo.push({
         id: r.id,
@@ -169,12 +166,12 @@ async function getResponderCount(req, res) {
     _id: new ObjectId(req.params.id)
   }).lean();
 
-  if (user.location){
+  if (user.location) {
     const userLat = user.location.coords.lat;
     const userLng = user.location.coords.lng;
   }
 
- 
+
   if (user) {
     let responders = user.responders;
     let count = 0;
@@ -186,8 +183,8 @@ async function getResponderCount(req, res) {
       let availbilityStatus = false;
 
       if (responder.location && user.location)
-        availbilityStatus = await AvailbilityService.checkResponderAvailabilityStatus(r.id,userLat,userLng);
-      
+        availbilityStatus = await AvailbilityService.checkAvailabilityStatusWithDistance(r.id, userLat, userLng);
+
       if (availbilityStatus == true) count++;
     }
     res.status(200).json({ count: count });
@@ -224,7 +221,7 @@ async function addResponders(req, res) {
 
       if (validFlag == true) {
         let returnInfo = [];
-          
+
         for (let i in respondersToAdd) {
           user.responders.push(respondersToAdd[i]);
 
@@ -232,7 +229,7 @@ async function addResponders(req, res) {
             _id: new ObjectId(respondersToAdd[i].id)
           }).lean();
 
-          let availabilityStatus = await AvailbilityService.checkNaloxoneAvailabilityStatus(respondersToAdd[i].id);
+          let availabilityStatus = await AvailbilityService.checkAvailabilityStatus(respondersToAdd[i].id);
           returnInfo.push({
             id: respondersToAdd[i].id,
             username: responder.username,
@@ -352,7 +349,7 @@ async function toggleOnlineAndNaloxoneAvailabilityStatus(req, res) {
         AvailbilityService.setUnavailable(req.params.id);
       }
       res.status(200).json({
-        naloxoneAvailability: await AvailbilityService.checkNaloxoneAvailabilityStatus(req.params.id),
+        naloxoneAvailability: await AvailbilityService.checkAvailabilityStatus(req.params.id),
         message: "Availability status has been changed"
       });
     } catch {

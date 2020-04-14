@@ -112,7 +112,10 @@ PUT "/users/:id/location"
 Request Body:
 ```
 {
-    coords: {lat: int,lng: int},
+    coords: {
+        lat: float,
+        lng: float
+    },
     notes: string
 }
 ```
