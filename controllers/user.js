@@ -166,11 +166,8 @@ async function getResponderCount(req, res) {
     _id: new ObjectId(req.params.id)
   }).lean();
 
-  if (user.location) {
-    const userLat = user.location.coords.lat;
-    const userLng = user.location.coords.lng;
-  }
-
+  const userLat = user.location ? user.location.coords.lat : null;
+  const userLng = user.location ? user.location.coords.lng : null;
 
   if (user) {
     let responders = user.responders;
