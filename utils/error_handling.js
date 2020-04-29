@@ -82,6 +82,19 @@ function validateLogin() {
   ];
 }
 
+function validateUseRefreshToken() {
+  return [
+    body("userId")
+      .exists()
+      .bail()
+      .withMessage(msg.USER_ID_MANDATORY),
+    body("refreshToken")
+      .exists()
+      .bail()
+      .withMessage(msg.REFRESH_TOKEN_MANDATORY)
+  ];
+}
+
 module.exports = {
   badRequest,
   unauthorized,
@@ -89,5 +102,6 @@ module.exports = {
   notFound,
   customValidationResult,
   validateSignup,
-  validateLogin
+  validateLogin,
+  validateUseRefreshToken,
 };

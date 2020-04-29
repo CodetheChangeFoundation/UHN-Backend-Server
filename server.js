@@ -1,9 +1,9 @@
 require("dotenv").config({ path: __dirname + "/.env" });
 const InitializationService = require("./services/initialization.service");
 InitializationService.initialize();
-InitializationService.refreshConns;
-const { validateSignup, validateLogin } = require("./utils/error_handling");
+const { validateSignup, validateLogin, validateUseRefreshToken, validateDeleteRefreshToken } = require("./utils/error_handling");
 const user = require("./controllers/user");
+const auth = require("./controllers/auth");
 const alarmMetrics = require("./controllers/metrics/alarm");
 const responseMetrics = require("./controllers/metrics/response");
 const arrivalMetrics = require("./controllers/metrics/arrival");
@@ -26,8 +26,9 @@ app.use(bodyParser.urlencoded({
 
 app.get("/", (req, res) => res.send("Server is up"))
 
-app.post("/signup", validateSignup(), user.signupUser);
-app.post("/login", validateLogin(), user.loginUser);
+app.post("/signup", validateSignup(), auth.signup);
+app.post("/login", validateLogin(), auth.login);
+app.post("/refresh-token", validateUseRefreshToken(), auth.useRefreshToken);
 
 app.post("/users/:id/responders", middleware.checkToken, user.addResponders);
 

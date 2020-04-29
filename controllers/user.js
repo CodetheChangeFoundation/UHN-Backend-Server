@@ -1,115 +1,10 @@
-let jwt = require("jsonwebtoken");
-var bcrypt = require("bcrypt");
+
 var ObjectId = require("mongodb").ObjectId;
 var handle = require("../utils/error_handling");
-const { customValidationResult } = require("../utils/error_handling");
-let metricService = require("../services/metrics/userMetricService");
 var UserModel = require("../models/user").model;
 var OnlineService = require("../services/online.service");
 var UserService = require("../services/user.service");
 var AvailbilityService = require("../services/availability.service");
-
-async function loginUser(req, res) {
-  const errors = customValidationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  } else {
-    var username = req.body.username;
-    var password = req.body.password;
-
-    var result = null;
-
-    try {
-      result = await UserService.findUserByUsername(username, password);
-    } catch (err) {
-      handle.notFound(res, err.message);
-    }
-
-    try {
-      if (bcrypt.compareSync(password, result.password)) {
-        let token = jwt.sign({ id: result._id }, process.env.SECRET, {
-          expiresIn: "24h"
-        });
-
-        try {
-          await OnlineService.setOnline(result._id.toString());
-          var onlineStatus = await OnlineService.checkOnlineStatus(result._id.toString());
-          if (onlineStatus && result.naloxoneAvailability) {
-            AvailbilityService.setAvailable(result._id.toString());
-          } else {
-            AvailbilityService.setUnavailable(result._id.toString());
-          }
-        } catch (err) {
-          console.log("redis error: ", err.message);
-        }
-
-        let data = {
-          success: true,
-          message: "Authentication successful!",
-          token: token,
-          id: result._id,
-          naloxoneAvailability: result.naloxoneAvailability
-        }
-
-        try {
-          await metricService.updateUserLoginTime(username);
-        } catch (err) {
-          data.metricError = err.message;
-        }
-
-        res.status(200).json(data);
-      } else {
-        handle.unauthorized(res, "Username or password incorrect");
-      }
-    } catch (err) {
-      handle.internalServerError(res, "Bcrypt compareSync failed");
-    }
-  }
-}
-
-async function signupUser(req, res) {
-  const errors = customValidationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  } else {
-    var username = req.body.username;
-    var pass = req.body.password;
-    var phone = req.body.phone;
-    try {
-      let foundUser = await UserModel.findOne({ username: username }).exec();
-      if (foundUser) {
-        return handle.badRequest(res, "username already exists");
-      }
-    } catch {
-      handle.internalServerError(res, "cannot query database");
-    }
-
-    let newUser = new UserModel({
-      username: username,
-      password: bcrypt.hashSync(pass, 10),
-      phone: phone,
-      naloxoneAvailability: false
-    });
-
-    try {
-      await newUser.save();
-    } catch (err) {
-      return handle.internalServerError(res, "Cannot create user.");
-    }
-
-    OnlineService.setOffline(newUser._id.toString());
-
-    let result = UserService.cleanUserAttributes(newUser.toJSON());
-
-    try {
-      await metricService.addNewUserToMetrics(result.id, username);
-    } catch (err) {
-      result.metricError = err.message
-    }
-
-    res.status(200).json(result);
-  }
-}
 
 async function userInfo(req, res) {
   var user = null;
@@ -440,8 +335,6 @@ async function respondingTo(req, res) {
 }
 
 module.exports = {
-  signupUser,
-  loginUser,
   userInfo,
   getResponders,
   addResponders,
