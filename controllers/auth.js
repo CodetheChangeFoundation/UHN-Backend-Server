@@ -38,51 +38,55 @@ async function login(req, res) {
     );
 
     try {
-      if (
-        !bcrypt.compareSync(password, result.password) &&
-        !bcrypt.compareSync(password, temporaryPassword)
-      ) {
+      let passwordCompare = bcrypt.compareSync(password, result.password);
+      let temporaryPasswordCompare = bcrypt.compareSync(
+        password,
+        temporaryPassword
+      );
+
+      if (!passwordCompare && !temporaryPasswordCompare) {
         return handle.unauthorized(res, "Username or password incorrect");
-      } else {
-        let token = jwt.sign({ id: result._id }, process.env.SECRET, {
-          expiresIn: TOKEN_DURATION,
-        });
-
-        let refreshToken = randToken.uid(128);
-        RefreshTokenService.deleteRefreshToken(result._id);
-        RefreshTokenService.addRefreshToken(result._id, refreshToken);
-
-        try {
-          await OnlineService.setOnline(result._id.toString());
-          var onlineStatus = await OnlineService.checkOnlineStatus(
-            result._id.toString()
-          );
-          if (onlineStatus && result.naloxoneAvailability) {
-            AvailbilityService.setAvailable(result._id.toString());
-          } else {
-            AvailbilityService.setUnavailable(result._id.toString());
-          }
-        } catch (err) {
-          console.log("redis error: ", err.message);
-        }
-
-        try {
-          await metricService.updateUserLoginTime(username);
-        } catch (err) {
-          handle.notFound(res, "Cannot find user in metrics database");
-        }
-
-        await ResetPasswordService.removeTemporaryPassword(username);
-
-        res.status(200).json({
-          success: true,
-          message: "Authentication successful!",
-          token: token,
-          refreshToken: refreshToken,
-          id: result._id,
-          naloxoneAvailability: result.naloxoneAvailability,
-        });
       }
+
+      let token = jwt.sign({ id: result._id }, process.env.SECRET, {
+        expiresIn: TOKEN_DURATION,
+      });
+
+      let refreshToken = randToken.uid(128);
+      RefreshTokenService.deleteRefreshToken(result._id);
+      RefreshTokenService.addRefreshToken(result._id, refreshToken);
+
+      try {
+        await OnlineService.setOnline(result._id.toString());
+        var onlineStatus = await OnlineService.checkOnlineStatus(
+          result._id.toString()
+        );
+        if (onlineStatus && result.naloxoneAvailability) {
+          AvailbilityService.setAvailable(result._id.toString());
+        } else {
+          AvailbilityService.setUnavailable(result._id.toString());
+        }
+      } catch (err) {
+        console.log("redis error: ", err.message);
+      }
+
+      try {
+        await metricService.updateUserLoginTime(username);
+      } catch (err) {
+        handle.notFound(res, "Cannot find user in metrics database");
+      }
+
+      await ResetPasswordService.removeTemporaryPassword(username);
+
+      res.status(200).json({
+        success: true,
+        message: "Authentication successful!",
+        token: token,
+        refreshToken: refreshToken,
+        id: result._id,
+        naloxoneAvailability: result.naloxoneAvailability,
+        usedTemporaryPassword: temporaryPasswordCompare,
+      });
     } catch (err) {
       handle.internalServerError(res, "Bcrypt compareSync failed");
     }
