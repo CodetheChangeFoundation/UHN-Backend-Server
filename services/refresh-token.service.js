@@ -11,7 +11,7 @@ async function addRefreshToken(userId, refreshToken) {
 
 async function checkRefreshToken(userId, refreshToken) {
   try {
-    const tokenExists = await redis.hexistsAsync(refreshTokens, userId);
+    const tokenExists = await redis.hexistsAsync(refreshTokens, userId.toString());
     if (tokenExists) {
       return await redis.hgetAsync(refreshTokens, userId.toString()) == refreshToken;
     }

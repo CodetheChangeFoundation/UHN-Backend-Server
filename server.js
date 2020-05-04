@@ -1,7 +1,7 @@
 require("dotenv").config({ path: __dirname + "/.env" });
 const InitializationService = require("./services/initialization.service");
 InitializationService.initialize();
-const { validateSignup, validateLogin, validateUseRefreshToken, validateDeleteRefreshToken } = require("./utils/error_handling");
+const { validateSignup, validateLogin, validateUseRefreshToken, validateResetPassword } = require("./utils/validations");
 const user = require("./controllers/user");
 const auth = require("./controllers/auth");
 const alarmMetrics = require("./controllers/metrics/alarm");
@@ -29,6 +29,7 @@ app.get("/", (req, res) => res.send("Server is up"))
 app.post("/signup", validateSignup(), auth.signup);
 app.post("/login", validateLogin(), auth.login);
 app.post("/refresh-token", validateUseRefreshToken(), auth.useRefreshToken);
+app.post("/reset-password", validateResetPassword(), auth.resetPassword);
 
 app.post("/users/:id/responders", middleware.checkToken, user.addResponders);
 
@@ -38,6 +39,7 @@ app.put("/users/:id/location", middleware.checkToken, user.updateLocation);
 app.get("/users/:id/location", middleware.checkToken, user.getLocation);
 
 app.post("/users/:id/status", middleware.checkToken, user.toggleOnlineAndNaloxoneAvailabilityStatus);
+
 
 app.get("/users/search", middleware.checkToken, user.searchUsers);
 

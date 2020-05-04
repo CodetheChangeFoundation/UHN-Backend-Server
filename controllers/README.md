@@ -47,6 +47,25 @@ HTTP Response:
 }
 ```
 
+### Apply for a temporary password (Forgot Password)
+
+POST "/reset-password"
+
+Request Body:
+```
+{
+    "username": string,
+    "phone": string,
+}
+```
+
+HTTP Response:
+```
+{
+    "temporaryPassword": string
+}
+```
+
 ## Users
 
 ### Getting responders of a user
