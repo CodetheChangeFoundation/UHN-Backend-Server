@@ -145,7 +145,7 @@ HTTP Response:
 }
 ```
 
-## Updating location of a user
+### Updating location of a user
 
 PUT "/users/:id/location"
 
@@ -160,6 +160,16 @@ Request Body:
 }
 ```
 
+### Update attributes of a user
+
+PUT "/users/:id/password"
+
+Request Body:
+```
+{
+    password: string
+}
+```
 
 ### Getting Responder Count
 

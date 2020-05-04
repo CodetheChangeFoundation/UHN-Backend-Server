@@ -74,6 +74,14 @@ const validateResetPassword = () => {
   ];
 }
 
+const validateUpdateUserPassword = () => {
+  return [
+    body("password")
+      .exists()
+      .bail()
+      .withMessage(msg.PASSWORD_MANDATORY)
+  ]
+}
 
 module.exports = {
   customValidationResult,

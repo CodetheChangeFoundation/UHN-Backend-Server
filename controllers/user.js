@@ -1,4 +1,6 @@
 
+const bcrypt = require("bcrypt");
+
 var ObjectId = require("mongodb").ObjectId;
 var handle = require("../utils/error_handling");
 var UserModel = require("../models/user").model;
@@ -250,6 +252,22 @@ async function toggleOnlineAndNaloxoneAvailabilityStatus(req, res) {
   }
 }
 
+async function updateUserPassword(req, res) {
+  let password = req.body.password;
+  let attributesToUpdate = {
+    password: bcrypt.hashSync(password, 10)
+  }
+  try {
+    await UserService.updateUserById(req.params.id, attributesToUpdate);
+  } catch(err) {
+    return handle.notFound(res, err.message);
+  }
+
+  res.status(200).json({
+    message: "User password updated"
+  })
+}
+
 async function updateLocation(req, res) {
   var query = { _id: new ObjectId(req.params.id) };
   try {
@@ -341,6 +359,7 @@ module.exports = {
   deleteResponders,
   searchUsers,
   toggleOnlineAndNaloxoneAvailabilityStatus,
+  updateUserPassword,
   updateLocation,
   getLocation,
   getResponderCount,
