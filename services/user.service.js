@@ -61,7 +61,7 @@ const updateUserById = async (
   }
 
   if (!user) {
-    throw new Error(`User with user id ${userId} cannot be updated`)
+    throw new Error(`User with user id ${userId} cannot be updated`);
   } else {
     return user;
   }

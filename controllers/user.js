@@ -1,4 +1,3 @@
-
 const bcrypt = require("bcrypt");
 
 var ObjectId = require("mongodb").ObjectId;
@@ -24,9 +23,8 @@ async function userInfo(req, res) {
   res.status(200).json(result);
 }
 async function getResponders(req, res) {
-
   const user = await UserModel.findOne({
-    _id: new ObjectId(req.params.id)
+    _id: new ObjectId(req.params.id),
   }).lean();
 
   const userLat = user.location ? user.location.coords.lat : null;
@@ -37,18 +35,22 @@ async function getResponders(req, res) {
     let responders = user.responders;
     for (let r of responders) {
       var responder = await UserModel.findOne({
-        _id: new ObjectId(r.id)
+        _id: new ObjectId(r.id),
       }).lean();
 
       let availbilityStatus = false;
 
       if (responder.location && user.location)
-        availbilityStatus = await AvailbilityService.checkAvailabilityStatusWithDistance(r.id, userLat, userLng);
+        availbilityStatus = await AvailbilityService.checkAvailabilityStatusWithDistance(
+          r.id,
+          userLat,
+          userLng
+        );
 
       returnInfo.push({
         id: r.id,
         username: responder.username,
-        availbilityStatus: availbilityStatus
+        availbilityStatus: availbilityStatus,
       });
     }
     res.status(200).json({ responders: returnInfo });
@@ -57,10 +59,9 @@ async function getResponders(req, res) {
   }
 }
 
-
 async function getResponderCount(req, res) {
   const user = await UserModel.findOne({
-    _id: new ObjectId(req.params.id)
+    _id: new ObjectId(req.params.id),
   }).lean();
 
   const userLat = user.location ? user.location.coords.lat : null;
@@ -71,13 +72,17 @@ async function getResponderCount(req, res) {
     let count = 0;
     for (let r of responders) {
       var responder = await UserModel.findOne({
-        _id: new ObjectId(r.id)
+        _id: new ObjectId(r.id),
       }).lean();
 
       let availbilityStatus = false;
 
       if (responder.location && user.location)
-        availbilityStatus = await AvailbilityService.checkAvailabilityStatusWithDistance(r.id, userLat, userLng);
+        availbilityStatus = await AvailbilityService.checkAvailabilityStatusWithDistance(
+          r.id,
+          userLat,
+          userLng
+        );
 
       if (availbilityStatus == true) count++;
     }
@@ -100,14 +105,17 @@ async function addResponders(req, res) {
         //validating responders to be added
         try {
           var foundUser = await UserModel.findOne({
-            _id: new ObjectId(respondersToAdd[i].id)
+            _id: new ObjectId(respondersToAdd[i].id),
           });
         } catch {
           validFlag = false; //not single String of 12 bytes or a string of 24 hex characters
           break;
         }
 
-        if (foundUser == null || user.responders.find(e => e.id === foundUser.id)) {
+        if (
+          foundUser == null ||
+          user.responders.find((e) => e.id === foundUser.id)
+        ) {
           validFlag = false; //does not exist in database
           break;
         }
@@ -120,14 +128,16 @@ async function addResponders(req, res) {
           user.responders.push(respondersToAdd[i]);
 
           let responder = await UserModel.findOne({
-            _id: new ObjectId(respondersToAdd[i].id)
+            _id: new ObjectId(respondersToAdd[i].id),
           }).lean();
 
-          let availabilityStatus = await AvailbilityService.checkAvailabilityStatus(respondersToAdd[i].id);
+          let availabilityStatus = await AvailbilityService.checkAvailabilityStatus(
+            respondersToAdd[i].id
+          );
           returnInfo.push({
             id: respondersToAdd[i].id,
             username: responder.username,
-            availabilityStatus: availabilityStatus
+            availabilityStatus: availabilityStatus,
           });
         }
 
@@ -158,7 +168,9 @@ async function deleteResponders(req, res) {
   var responders = user.get("responders");
   let respondersToDeleteAreValid = true;
   for (let i of respondersToDelete) {
-    respondersToDeleteAreValid = responders.some(responder => responder["id"] === i.id);
+    respondersToDeleteAreValid = responders.some(
+      (responder) => responder["id"] === i.id
+    );
     if (!respondersToDeleteAreValid) break;
   }
 
@@ -166,18 +178,21 @@ async function deleteResponders(req, res) {
     for (let i of respondersToDelete) {
       user.responders.pull({ id: i.id });
       let responder = await UserModel.findOne({
-        _id: new ObjectId(i.id)
+        _id: new ObjectId(i.id),
       }).lean();
 
       returnInfo.push({
         id: i.id,
-        username: responder.username
+        username: responder.username,
       });
     }
     user.save();
     res.status(200).json({ respondersDeleted: returnInfo });
   } else {
-    handle.badRequest(res, "At least one of the responders is not valid to delete for this user");
+    handle.badRequest(
+      res,
+      "At least one of the responders is not valid to delete for this user"
+    );
   }
 }
 
@@ -216,7 +231,7 @@ async function toggleOnlineAndNaloxoneAvailabilityStatus(req, res) {
       AvailbilityService.setUnavailable(req.params.id);
       res.status(200).json({
         id: req.params.id,
-        online: false
+        online: false,
       });
     } catch {
       handle.internalServerError("Failed to set offline status.");
@@ -227,7 +242,7 @@ async function toggleOnlineAndNaloxoneAvailabilityStatus(req, res) {
       var result = await UserModel.findOneAndUpdate(
         query,
         {
-          naloxoneAvailability: req.body.naloxoneAvailability
+          naloxoneAvailability: req.body.naloxoneAvailability,
         },
         { new: true }
       ).lean();
@@ -236,15 +251,19 @@ async function toggleOnlineAndNaloxoneAvailabilityStatus(req, res) {
     }
 
     try {
-      var onlineStatus = await OnlineService.checkOnlineStatus(result._id.toString());
+      var onlineStatus = await OnlineService.checkOnlineStatus(
+        result._id.toString()
+      );
       if (req.body.naloxoneAvailability && onlineStatus) {
         AvailbilityService.setAvailable(req.params.id);
       } else {
         AvailbilityService.setUnavailable(req.params.id);
       }
       res.status(200).json({
-        naloxoneAvailability: await AvailbilityService.checkAvailabilityStatus(req.params.id),
-        message: "Availability status has been changed"
+        naloxoneAvailability: await AvailbilityService.checkAvailabilityStatus(
+          req.params.id
+        ),
+        message: "Availability status has been changed",
       });
     } catch {
       handle.internalServerError("Failed to set naloxone availability status.");
@@ -255,17 +274,17 @@ async function toggleOnlineAndNaloxoneAvailabilityStatus(req, res) {
 async function updateUserPassword(req, res) {
   let password = req.body.password;
   let attributesToUpdate = {
-    password: bcrypt.hashSync(password, 10)
-  }
+    password: bcrypt.hashSync(password, 10),
+  };
   try {
     await UserService.updateUserById(req.params.id, attributesToUpdate);
-  } catch(err) {
+  } catch (err) {
     return handle.notFound(res, err.message);
   }
 
   res.status(200).json({
-    message: "User password updated"
-  })
+    message: "User password updated",
+  });
 }
 
 async function updateLocation(req, res) {
@@ -276,8 +295,8 @@ async function updateLocation(req, res) {
       {
         location: {
           coords: req.body.coords,
-          note: req.body.note && req.body.note
-        }
+          note: req.body.note && req.body.note,
+        },
       },
       { new: true }
     ).lean();
@@ -287,18 +306,18 @@ async function updateLocation(req, res) {
   res.status(200).json({
     id: result._id,
     location: result.location,
-    note: result.note
+    note: result.note,
   });
 }
 
 async function getLocation(req, res) {
   const result = await UserModel.findOne({
-    _id: new ObjectId(req.params.id)
+    _id: new ObjectId(req.params.id),
   }).lean();
 
   if (result) {
     const data = {
-      location: result.location
+      location: result.location,
     };
     res.status(200).json(data);
   } else {
@@ -310,10 +329,10 @@ async function addPushToken(req, res) {
   try {
     var result = await UserModel.findOneAndUpdate(
       {
-        _id: new ObjectId(req.params.id)
+        _id: new ObjectId(req.params.id),
       },
       {
-        pushToken: req.body.pushToken
+        pushToken: req.body.pushToken,
       },
       { new: true }
     ).lean();
@@ -323,7 +342,7 @@ async function addPushToken(req, res) {
 
   res.status(200).json({
     id: result._id,
-    pushToken: result.pushToken
+    pushToken: result.pushToken,
   });
 }
 
@@ -332,8 +351,8 @@ async function respondingTo(req, res) {
 
   var query = UserModel.find({
     responders: {
-      $elemMatch: { id: userId }
-    }
+      $elemMatch: { id: userId },
+    },
   });
 
   try {
@@ -345,7 +364,7 @@ async function respondingTo(req, res) {
     }
 
     res.status(200).json({
-      respondingTo: userRespondingTo
+      respondingTo: userRespondingTo,
     });
   } catch (err) {
     handle.internalServerError(res, "Failed to query Help Request database");
@@ -364,5 +383,5 @@ module.exports = {
   getLocation,
   getResponderCount,
   addPushToken,
-  respondingTo
+  respondingTo,
 };
