@@ -6,12 +6,11 @@ const findUserById = async (userId, withPassword = false) => {
 
   if (!withPassword) {
     user = await UserModel.findOne({
-      _id: new ObjectId(userId)
-    })
-      .select("-password");
+      _id: new ObjectId(userId),
+    }).select("-password");
   } else {
     user = await UserModel.findOne({
-      _id: new ObjectId(userId)
+      _id: new ObjectId(userId),
     });
   }
 
@@ -26,11 +25,10 @@ const findUserByUsername = async (username, withPassword = false) => {
   let user = null;
 
   if (!withPassword) {
-    user = await UserModel.findOne({ username: username })
-      .select("-password");
+    user = await UserModel.findOne({ username: username }).select("-password");
   } else {
     user = await UserModel.findOne({
-      username: username
+      username: username,
     });
   }
 
@@ -41,7 +39,35 @@ const findUserByUsername = async (username, withPassword = false) => {
   }
 };
 
-const cleanUserAttributes = user => {
+const updateUserById = async (
+  userId,
+  attributesToUpdate,
+  withPassword = false
+) => {
+  let user = null;
+
+  if (!withPassword) {
+    user = await UserModel.findOneAndUpdate(
+      { _id: new ObjectId(userId) },
+      attributesToUpdate,
+      { new: true }
+    ).select("-password");
+  } else {
+    user = await UserModel.findOneAndUpdate(
+      { _id: new ObjectId(userId) },
+      attributesToUpdate,
+      { new: true }
+    );
+  }
+
+  if (!user) {
+    throw new Error(`User with user id ${userId} cannot be updated`);
+  } else {
+    return user;
+  }
+};
+
+const cleanUserAttributes = (user) => {
   if (user.password) {
     delete user.password;
   }
@@ -55,5 +81,6 @@ const cleanUserAttributes = user => {
 module.exports = {
   findUserById,
   findUserByUsername,
-  cleanUserAttributes
+  updateUserById,
+  cleanUserAttributes,
 };

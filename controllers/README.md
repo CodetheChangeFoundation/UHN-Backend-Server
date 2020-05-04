@@ -47,6 +47,25 @@ HTTP Response:
 }
 ```
 
+### Apply for a temporary password (Forgot Password)
+
+POST "/reset-password"
+
+Request Body:
+```
+{
+    "username": string,
+    "phone": string,
+}
+```
+
+HTTP Response:
+```
+{
+    "temporaryPassword": string
+}
+```
+
 ## Users
 
 ### Getting responders of a user
@@ -126,7 +145,7 @@ HTTP Response:
 }
 ```
 
-## Updating location of a user
+### Updating location of a user
 
 PUT "/users/:id/location"
 
@@ -141,6 +160,16 @@ Request Body:
 }
 ```
 
+### Update attributes of a user
+
+PUT "/users/:id/password"
+
+Request Body:
+```
+{
+    password: string
+}
+```
 
 ### Getting Responder Count
 
