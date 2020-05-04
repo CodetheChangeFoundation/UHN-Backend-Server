@@ -42,7 +42,7 @@ async function login(req, res) {
         !bcrypt.compareSync(password, result.password) &&
         !bcrypt.compareSync(
           password,
-          temporaryPassword ? temporaryPassword : ""
+          temporaryPassword
         )
       ) {
         return handle.unauthorized(res, "Username or password incorrect");

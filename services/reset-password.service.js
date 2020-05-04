@@ -31,7 +31,9 @@ async function applyTemporaryPassword(username) {
 
 async function getTemporaryPassword(username) {
   try {
-    return await redis.hgetAsync(temporaryPasswords, username.toString());
+    let temporaryPassword = await redis.hgetAsync(temporaryPasswords, username.toString());
+
+    return temporaryPassword ? temporaryPassword : "";
   } catch (err) {
     console.error("redis getTemporaryPassword error: ", err.message);
   }
