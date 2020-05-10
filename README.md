@@ -77,7 +77,7 @@ For help with DATABASE_URL fields, go to root directory, connect to postgres wit
 
 
 ### Set Up OAuth + Gmail for Data Analytics
-## Getting credentials.json
+#### Getting credentials.json
 1. Go to the [Google Developer Console](https://developers.google.com/gmail/api/quickstart/nodejs) and click "Enable the Gmail API".
 
 2. Select `Web Server` from the dropdown.
@@ -98,11 +98,10 @@ For help with DATABASE_URL fields, go to root directory, connect to postgres wit
 
 5. Save the Refresh and Access tokens.
 
-## Setting Up The .env File
+#### Setting Up The .env File
 
 Create the following variables:
 
-    `
     METRIC_DATA_SERVICE="gmail"
     METRIC_DATA_USER="Gmail account used from the setup above"
     METRIC_DATA_CLIENTID="Provided in credentials.json" 
@@ -110,9 +109,8 @@ Create the following variables:
     METRIC_DATA_REFRESH_TOKEN="Saved from OAuth playground"
     METRIC_DATA_ACCESS_TOKEN="Saved from OAuth playground"
     METRIC_DATA_RECEIVER="Account to receive analytics"
-    `
 
-## Run tests
+#### Run tests
 
 Make sure you are in project directory and run
 
