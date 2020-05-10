@@ -2,7 +2,7 @@ require("dotenv").config({ path: __dirname + "/.env" });
 const InitializationService = require("./services/initialization.service");
 InitializationService.initialize();
 const metricDataDumpService = require("./Services/metricsDataDump");
-metricDataDumpService.sendDataDumpEmail();
+metricDataDumpService.sendPeriodicEmail();
 const { validateSignup, validateLogin, validateUseRefreshToken, validateDeleteRefreshToken } = require("./utils/error_handling");
 const user = require("./controllers/user");
 const auth = require("./controllers/auth");

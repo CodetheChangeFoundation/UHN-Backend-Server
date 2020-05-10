@@ -12,20 +12,18 @@ let transporter = nodemailer.createTransport({
 		clientId: process.env.METRIC_DATA_CLIENTID,
 		clientSecret: process.env.METRIC_DATA_CLIENT_SECRET,
 		refreshToken: process.env.METRIC_DATA_REFRESH_TOKEN,
-		accessToken: process.env.METRIC_DATA_ACCESS_TOKEN,
-		expires: 0
+		accessToken: process.env.METRIC_DATA_ACCESS_TOKEN
 	}
 });
 
 async function sendDataDumpEmail() {
 	let data = await getAllMetricData();
-	console.log(data.length)
 
 	converter.json2csv(data, function (err, csv) {
 		if (err) {
-			sendEmailError(err)
+			sendEmailError(err);
 		} else {
-			makeAndEmailCSV(csv)
+			makeAndEmailCSV(csv);
 		}
 	})
 } 
@@ -35,13 +33,9 @@ function makeAndEmailCSV(data) {
 	let year = String(date.getUTCFullYear())
 	let month =  String(1+date.getUTCMonth()).padStart(2,0)
 	let day = String(date.getUTCDate()).padStart(2,0)
-	let hour = String(date.getUTCHours()).padStart(2,0)
-	let min = String(date.getUTCMinutes()).padStart(2,0)
-	let sec = String(date.getUTCSeconds()).padStart(2,0)
-	let ms = String(date.getUTCMilliseconds()).padStart(3,0)
-	date = year + month + day + "-" + hour + min + sec + ms;
+	date = year + "-" + month + "-" + day;
 	
-	let filename = "./"+"test"+".csv";
+	let filename = "./"+date+".csv";
 	fs.writeFile(filename, data, (err) => {
 		if (err) {
 			sendEmailError(err);
@@ -55,10 +49,10 @@ function sendEmailWithCSV(file) {
 	let message = {
 		from: process.env.METRIC_DATA_USER,
 		to: process.env.METRIC_DATA_RECEIVER,
-		subject: "UHN App Backend Data Analytics for "+ file,
+		subject: "UHN App Backend Data Analytics for "+ file.substring(2, file.length-4),
 		attachments: [
 			{
-				path: "./test.csv"
+				path: file
 			}
 		]
 	}
@@ -112,23 +106,33 @@ async function getAllMetricData() {
 	}
 }
 
+function sendPeriodicEmail() {
+	let now = new Date();
+	let emailTime = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
+	let countdown = emailTime-now;
+
+	setTimeout(function() {
+		sendDataDumpEmail();
+		sendPeriodicEmail();
+	}, countdown);
+}
+
 function sendEmailError(err) {
 	console.log(err);
 	let message = {
 		from: process.env.METRIC_DATA_USER,
 		to: process.env.METRIC_DATA_RECEIVER,
-		subject: "Error: UHN App Backend Data Analytics",
-		text: "Unable to deliver data analytics due to error on backend server: \n" + err.message
+		subject: "ERROR: UHN App Backend Data Analytics",
+		text: "Unable to deliver data analytics due to the following error on backend server: \n\n" + err.message
 	}
 
-	transporter.sendMail(message, function (err, info) {
+	transporter.sendMail(message, function (err) {
 		if (err) {
 			console.log(err)
 		}
-		else console.log(info)
 	})
 }
 
 module.exports = {
-	sendDataDumpEmail
+	sendPeriodicEmail
 }
