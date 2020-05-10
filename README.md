@@ -88,7 +88,7 @@ For help with DATABASE_URL fields, go to root directory, connect to postgres wit
 
 ## Getting OAuth Tokens
 
-1. Go to `https://developers.google.com/oauthplayground` and open the settings menu on the right.
+1. Go to https://developers.google.com/oauthplayground and open the settings menu on the right.
 
 2. Check the box labelled `Use your own OAuth credentials` and enter the OAuth Client ID and OAuth Client Secret provided in the saved `credentials.json` file.
 
@@ -102,7 +102,7 @@ For help with DATABASE_URL fields, go to root directory, connect to postgres wit
 
 Create the following variables:
 
-    ```
+    `
     METRIC_DATA_SERVICE="gmail"
     METRIC_DATA_USER="Gmail account used from the setup above"
     METRIC_DATA_CLIENTID="Provided in credentials.json" 
@@ -110,7 +110,7 @@ Create the following variables:
     METRIC_DATA_REFRESH_TOKEN="Saved from OAuth playground"
     METRIC_DATA_ACCESS_TOKEN="Saved from OAuth playground"
     METRIC_DATA_RECEIVER="Account to receive analytics"
-    ```
+    `
 
 ## Run tests
 
