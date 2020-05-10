@@ -76,6 +76,42 @@ To fill database with example data, uncomment bottom statements in data.sql and 
 For help with DATABASE_URL fields, go to root directory, connect to postgres with `psql --username=metric UHN-metrics` and enter `\conninfo`
 
 
+### Set Up OAuth + Gmail for Data Analytics
+## Getting credentials.json
+1. Go to the [Google Developer Console](https://developers.google.com/gmail/api/quickstart/nodejs) and click "Enable the Gmail API".
+
+2. Select `Web Server` from the dropdown.
+
+3. Enter this link `https://developers.google.com/oauthplayground` in the "Authorized Redirect URIs" field.
+
+4. Download the client configuration to get `credentials.json`
+
+## Getting OAuth Tokens
+
+1. Go to `https://developers.google.com/oauthplayground` and open the settings menu on the right.
+
+2. Check the box labelled `Use your own OAuth credentials` and enter the OAuth Client ID and OAuth Client Secret provided in the saved `credentials.json` file.
+
+3. Go to the `Step 1: Select and authorize APIs` section on the left. Enter the URL `https://mail.google.com` in the field below and click `Authorize APIs`.
+
+4. Go to `Step 2: Exchange authorization code for tokens` and click the button labelled `Exchange authorization code for tokens`.
+
+5. Save the Refresh and Access tokens.
+
+## Setting Up The .env File
+
+Create the following variables:
+
+    ```
+    METRIC_DATA_SERVICE="gmail"
+    METRIC_DATA_USER="Gmail account used from the setup above"
+    METRIC_DATA_CLIENTID="Provided in credentials.json" 
+    METRIC_DATA_CLIENT_SECRET="Provided in credentials.json"
+    METRIC_DATA_REFRESH_TOKEN="Saved from OAuth playground"
+    METRIC_DATA_ACCESS_TOKEN="Saved from OAuth playground"
+    METRIC_DATA_RECEIVER="Account to receive analytics"
+    ```
+
 ## Run tests
 
 Make sure you are in project directory and run
