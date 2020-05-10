@@ -86,7 +86,7 @@ For help with DATABASE_URL fields, go to root directory, connect to postgres wit
 
 4. Download the client configuration to get `credentials.json`
 
-## Getting OAuth Tokens
+#### Getting OAuth Tokens
 
 1. Go to https://developers.google.com/oauthplayground and open the settings menu on the right.
 
@@ -110,7 +110,7 @@ Create the following variables:
     METRIC_DATA_ACCESS_TOKEN="Saved from OAuth playground"
     METRIC_DATA_RECEIVER="Account to receive analytics"
 
-#### Run tests
+## Run tests
 
 Make sure you are in project directory and run
 
