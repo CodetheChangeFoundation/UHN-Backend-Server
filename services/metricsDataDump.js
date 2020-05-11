@@ -110,6 +110,8 @@ function sendPeriodicEmail() {
 	let emailTime = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
 	let countdown = emailTime-now;
 
+	console.log("Next data analytics email scheduled for: "+ emailTime.toUTCString());
+
 	setTimeout(function() {
 		sendDataDumpEmail();
 		sendPeriodicEmail();
