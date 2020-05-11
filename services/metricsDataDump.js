@@ -57,11 +57,10 @@ function sendEmailWithCSV(file) {
 		]
 	}
 
-	transporter.sendMail(message, function (err, info) {
+	transporter.sendMail(message, function (err) {
 		if (err) {
-			console.log(err)
+			sendEmailError(err);
 		}
-		else console.log(info)
 	})
  
 }
