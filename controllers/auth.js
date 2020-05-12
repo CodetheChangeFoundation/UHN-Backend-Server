@@ -28,7 +28,7 @@ async function login(req, res) {
     try {
       result = await UserService.findUserByUsername(username, password);
     } catch (err) {
-      handle.notFound(res, err.message);
+      return handle.notFound(res, err.message);
     }
 
     try {
