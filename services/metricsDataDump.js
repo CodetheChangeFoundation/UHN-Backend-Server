@@ -2,6 +2,7 @@ import metrics from "../database/postgres";
 let fs = require("fs");
 let nodemailer = require("nodemailer");
 let converter = require("json-2-csv")
+let zlib = require("zlib");
 
 let metricDB = metrics.getMetrics();
 let transporter = nodemailer.createTransport({
@@ -17,6 +18,7 @@ let transporter = nodemailer.createTransport({
 });
 
 async function sendDataDumpEmail() {
+	console.log('test')
 	let data = await getAllMetricData();
 
 	converter.json2csv(data, function (err, csv) {
@@ -40,16 +42,28 @@ function makeAndEmailCSV(data) {
 		if (err) {
 			sendEmailError(err);
 		} else {
-			sendEmailWithCSV(filename)
+			zipAndSendFile(filename, date);
 		}
 	})
 }
 
-function sendEmailWithCSV(file) {
+function zipAndSendFile(filename, date) {
+	let gzip = zlib.createGzip();
+	let extension = ".gz";
+
+	let read = fs.createReadStream(filename);
+	let write = fs.createWriteStream(filename+extension);
+
+	read.pipe(gzip).pipe(write);
+
+	sendEmailWithZip(filename+extension, date);
+}
+
+function sendEmailWithZip(file, date) {
 	let message = {
 		from: process.env.METRIC_DATA_USER,
 		to: process.env.METRIC_DATA_RECEIVER,
-		subject: "UHN App Backend Data Analytics for "+ file.substring(2, file.length-4),
+		subject: "UHN App Backend Data Analytics for "+ date,
 		attachments: [
 			{
 				path: file
@@ -64,7 +78,6 @@ function sendEmailWithCSV(file) {
 	})
  
 }
-
 
 async function getAllMetricData() {
 	let results = null;
@@ -92,11 +105,19 @@ async function getAllMetricData() {
       "tl.alertsuccessful as tl_alertSuccessful",
       "tl.treatmenttime as tl_treatmentTime"
     )
-    .from("users AS u")
+		.from("users AS u")
     .fullOuterJoin("alarmlog as al", "u.mongoid", "al.userid")
     .fullOuterJoin("responselog as rl", "rl.alarmid", "al.id")
     .fullOuterJoin("arrivallog as arl", "rl.id", "arl.responseid")
-		.fullOuterJoin("treatmentlog as tl", "rl.id", "tl.responseid");
+		.fullOuterJoin("treatmentlog as tl", "rl.id", "tl.responseid")
+		.whereRaw(
+			"alarmstart >= current_date - interval '1' day \
+			--or lastlogin >= current_date - interval '1' day \
+			or alarmend >= current_date - interval '1' day \
+			or responsetime >= current_date - interval '1' day \
+			or arrivaltime >= current_date - interval '1' day \
+			or treatmenttime >= current_date - interval '1' day"
+		);
 		
 		return results;
 	}
@@ -135,5 +156,6 @@ function sendEmailError(err) {
 }
 
 module.exports = {
-	sendPeriodicEmail
+	sendPeriodicEmail,
+	sendDataDumpEmail
 }
