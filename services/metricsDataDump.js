@@ -18,8 +18,10 @@ let transporter = nodemailer.createTransport({
 });
 
 async function sendDataDumpEmail() {
-	console.log('test')
 	let data = await getAllMetricData();
+	let monthlyLogins = await getMonthlyLogins();
+
+	data[0].monthly_unique_logins = monthlyLogins;
 
 	converter.json2csv(data, function (err, csv) {
 		if (err) {
@@ -112,7 +114,6 @@ async function getAllMetricData() {
 		.fullOuterJoin("treatmentlog as tl", "rl.id", "tl.responseid")
 		.whereRaw(
 			"alarmstart >= current_date - interval '1' day \
-			--or lastlogin >= current_date - interval '1' day \
 			or alarmend >= current_date - interval '1' day \
 			or responsetime >= current_date - interval '1' day \
 			or arrivaltime >= current_date - interval '1' day \
@@ -120,6 +121,22 @@ async function getAllMetricData() {
 		);
 		
 		return results;
+	}
+	catch (err) {
+		sendEmailError(err);
+	}
+}
+
+async function getMonthlyLogins() {
+	let result = null;
+	try {
+		result = await metricDB("users").count("*").whereRaw(
+      "lastLogin >= current_date - interval '30' day"
+		);
+		
+		result = result[0].count;
+
+		return result;
 	}
 	catch (err) {
 		sendEmailError(err);
