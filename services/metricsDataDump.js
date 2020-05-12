@@ -39,7 +39,7 @@ function makeAndEmailCSV(data) {
 	let day = String(date.getUTCDate()).padStart(2,0)
 	date = year + "-" + month + "-" + day;
 	
-	let filename = "./"+date+".csv";
+	let filename = "./metricData/"+date+".csv";
 	fs.writeFile(filename, data, (err) => {
 		if (err) {
 			sendEmailError(err);
@@ -113,11 +113,16 @@ async function getAllMetricData() {
     .fullOuterJoin("arrivallog as arl", "rl.id", "arl.responseid")
 		.fullOuterJoin("treatmentlog as tl", "rl.id", "tl.responseid")
 		.whereRaw(
-			"alarmstart >= current_date - interval '1' day \
-			or alarmend >= current_date - interval '1' day \
-			or responsetime >= current_date - interval '1' day \
-			or arrivaltime >= current_date - interval '1' day \
-			or treatmenttime >= current_date - interval '1' day"
+			"alarmstart >= current_timestamp at time zone 'utc' - interval '1' day - interval '4' hour \
+				and alarmstart < current_timestamp at time zone 'utc' - interval '4' hour \
+			or alarmend >= current_timestamp at time zone 'utc' - interval '1' day - interval '4' hour \
+				and alarmend < current_timestamp at time zone 'utc' - interval '4' hour \
+			or responsetime >= current_timestamp at time zone 'utc' - interval '1' day - interval '4' hour \
+				and responsetime < current_timestamp at time zone 'utc' - interval '4' hour \
+			or arrivaltime >= current_timestamp at time zone 'utc' - interval '1' day - interval '4' hour \
+				and arrivaltime < current_timestamp at time zone 'utc' - interval '4' hour \
+			or treatmenttime >= current_timestamp at time zone 'utc' - interval '1' day - interval '4' hour \
+				and treatmenttime < current_timestamp at time zone 'utc' - interval '4' hour "
 		);
 		
 		return results;
@@ -131,7 +136,8 @@ async function getMonthlyLogins() {
 	let result = null;
 	try {
 		result = await metricDB("users").count("*").whereRaw(
-      "lastLogin >= current_date - interval '30' day"
+			"lastLogin >= current_timestamp at time zone 'utc' - interval '30' day - interval '4' hour \
+			and lastlogin < current_timestamp at time zone 'utc' - interval '4' hour"
 		);
 		
 		result = result[0].count;
