@@ -28,7 +28,7 @@ async function login(req, res) {
     try {
       result = await UserService.findUserByUsername(username, password);
     } catch (err) {
-      handle.notFound(res, err.message);
+      return handle.notFound(res, err.message);
     }
 
     try {
@@ -91,7 +91,7 @@ async function signup(req, res) {
         return handle.badRequest(res, "username already exists");
       }
     } catch {
-      handle.internalServerError(res, "cannot query database");
+      return handle.internalServerError(res, "cannot query database");
     }
 
     let newUser = new UserModel({
@@ -116,7 +116,7 @@ async function signup(req, res) {
       await metricService.addNewUserToMetrics(result.id, username);
     } catch (err) {
       console.log(err)
-      handle.internalServerError(res, "Cannot add new user to metrics database")
+      return handle.internalServerError(res, "Cannot add new user to metrics database")
     }
 
     res.status(200).json(result);
@@ -138,7 +138,7 @@ async function useRefreshToken(req, res) {
       // Consider generating new refresh token and returning it so that refresh token will also expire
       res.status(200).json({ token: token });
     } else {
-      handle.unauthorized(res, "Refresh token and user id do not match")
+      return handle.unauthorized(res, "Refresh token and user id do not match")
     }
   }
 }
