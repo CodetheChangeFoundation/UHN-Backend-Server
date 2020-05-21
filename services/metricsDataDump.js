@@ -1,4 +1,5 @@
 import metrics from "../database/postgres";
+let cron = require("node-cron");
 let fs = require("fs");
 let nodemailer = require("nodemailer");
 let converter = require("json-2-csv")
@@ -36,7 +37,7 @@ function makeAndEmailCSV(data) {
 	let date = new Date()
 	let year = String(date.getUTCFullYear())
 	let month =  String(1+date.getUTCMonth()).padStart(2,0)
-	let day = String(date.getUTCDate()).padStart(2,0)
+	let day = String(date.getUTCDate()-1).padStart(2,0)
 	date = year + "-" + month + "-" + day;
 	
 	let filename = "./metricData/"+date+".csv";
@@ -124,6 +125,32 @@ async function getAllMetricData() {
 			or treatmenttime >= current_timestamp at time zone 'utc' - interval '1' day - interval '4' hour \
 				and treatmenttime < current_timestamp at time zone 'utc' - interval '4' hour "
 		);
+
+		if (results.length === 0) {
+			results = [{
+				User_ID: null,
+				u_mongoid: null,
+				u_username: null,
+				u_lastlogin: null,
+				AlarmLog_ID: null,
+				al_userid: null,
+				al_alarmStart: null,
+				al_alarmEnd: null,
+				al_alarmSent: null,
+				ResponseLog_ID: null,
+				rl_responderid: null,
+				rl_alarmid: null,
+				rl_alertResponse: null,
+				rl_responseTime: null,
+				ArrivalLog_ID: null,
+				arl_responseid: null,
+				arl_arrivalTime: null,
+				TreatmentLog_ID: null,
+				tl_responseid: null,
+				tl_alertSuccessful: null,
+				tl_treatmentTime: null
+			}]
+		}
 		
 		return results;
 	}
@@ -150,16 +177,13 @@ async function getMonthlyLogins() {
 }
 
 function sendPeriodicEmail() {
-	let now = new Date();
-	let emailTime = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
-	let countdown = emailTime-now;
 
-	console.log("Next data analytics email scheduled for: "+ emailTime.toUTCString());
-
-	setTimeout(function() {
-		sendDataDumpEmail();
-		sendPeriodicEmail();
-	}, countdown);
+	cron.schedule('0 0 0 * * *', () => {
+		console.log("Sending scheduled data analytics email...");
+		sendDataDumpEmail()
+	}, {
+		timezone: "Atlantic/South_Georgia"
+	})
 }
 
 function sendEmailError(err) {

@@ -22,6 +22,7 @@
     "mongodb": "^3.3.3",
     "mongoose": "^5.7.6",
     "morgan": "^1.9.1",
+    "node-cron": "^2.0.3",
     "nodemailer": "^6.4.6",
     "pg": "^7.18.1",
     "rand-token": "^0.4.0",
